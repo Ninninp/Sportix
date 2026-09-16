@@ -70,7 +70,8 @@ src/
 
 ## Jalons
 
-### J0 — Préparation (½ journée)
+### J0 — Préparation (½ journée) ✅ fait le 16/09/2026
+> Vitest et oxlint ajoutés dès le J0 ; React Router est en v8 ; `CLAUDE.md` existait déjà (mis à jour au lieu de `/init`).
 - Installer Node LTS, Git, VS Code ; créer un dépôt GitHub.
 - Avec Claude Code : `npm create vite@latest` (react-ts), Tailwind, React Router, puis `/init` pour créer `CLAUDE.md`.
 - **Objectif** : « Hello » s'affiche en local et le code est poussé sur GitHub.

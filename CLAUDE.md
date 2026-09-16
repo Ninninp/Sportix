@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel du dépôt
 
-**Sportix** n'est pas encore échafaudé : le dépôt ne contient que `README.md`, `.gitignore` (modèle Node) et `docs/PLAN.md`. Il n'y a ni `package.json`, ni `src/`, ni dépendances installées.
+**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». Prochaine étape : **Phase D** (design), puis J1 (coquille PWA).
 
 Avant toute action, **lire [`docs/PLAN.md`](docs/PLAN.md)** : c'est la source de vérité du projet (contexte, stack, modèle de données, jalons J0 → J9). Toute décision d'architecture doit s'y conformer ou mettre le plan à jour explicitement.
 
@@ -21,21 +21,26 @@ Contraintes structurantes :
 
 L'auteur est **débutant en développement web** et travaille **en français**. Répondre en français, expliquer les choix et le rôle des fichiers créés plutôt que livrer du code sans commentaire.
 
-## Stack prévue (à mettre en place au jalon J0/J1)
+## Stack
 
-Vite + React + TypeScript · `vite-plugin-pwa` · Dexie + `dexie-react-hooks` · React Router · Tailwind CSS · Recharts · date-fns · Vitest.
+Installé (J0) : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (linter du template Vite, config `.oxlintrc.json`). Node ≥ 24 (`.nvmrc`).
 
-Une fois le projet échafaudé, les commandes seront :
+À ajouter avec les jalons concernés : `vite-plugin-pwa` (J1) · Dexie + `dexie-react-hooks` (J2) · date-fns (J6) · Recharts (J7).
+
+Notes :
+- **Tailwind v4 n'a pas de `tailwind.config.js`** : les tokens de `design/tokens.md` se déclarent dans un bloc `@theme { … }` de `src/index.css`.
+- Routes déclarées dans `src/routes.tsx` (`createBrowserRouter`) ; `src/App.tsx` est le layout racine (`<Outlet />`), où viendra la BottomNav au J1.
+
+## Commandes
 
 ```bash
-npm run dev          # développement
-npm run build        # build de production
-npm run preview      # tester le service worker / mode PWA (ne fonctionne pas en dev)
-npm test             # Vitest
-npm test -- src/lib/oneRepMax.test.ts   # un seul fichier de test
+npm run dev          # serveur de développement
+npm run build        # vérification TypeScript (tsc -b) + build de production dans dist/
+npm run lint         # oxlint
+npm run preview      # servir dist/ — tester le service worker / mode PWA (ne fonctionne pas en dev)
+npm test             # Vitest en mode surveillance ; `npm test -- --run` pour une exécution unique
+npm test -- src/lib/sanity.test.ts   # un seul fichier de test
 ```
-
-Tenir cette section à jour lors du J0 (scripts réels de `package.json`).
 
 ## Architecture visée
 

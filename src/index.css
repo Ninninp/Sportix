@@ -1,0 +1,3 @@
+/* Active Tailwind CSS. Les tokens du design system (design/tokens.md)
+   seront déclarés ici dans un bloc @theme au jalon J1. */
+@import "tailwindcss";
