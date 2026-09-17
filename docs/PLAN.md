@@ -36,14 +36,18 @@ Le design est traité comme une **phase dédiée (Phase D) avant le code**, puis
 | Tests | Vitest (logique métier) |
 
 ## Modèle de données (Dexie)
-- `exercises` : id, nom, groupe musculaire, type (charge/poids du corps/temps)
+> Mis à jour le 17/09/2026 après D1 (voir `docs/design/parcours.md` § 6) : variantes d'équipement, double progression, objectifs de bloc créés par l'utilisateur, semaines de deload, poids corporel.
+
+- `exercises` : id, nom, groupe musculaire, type (charge/poids du corps/temps), variantes disponibles (barre/smith/haltères/machine/poulie)
 - `programs` : id, nom, description
 - `programDays` : id, programId, nom (ex. « Push »), ordre
-- `programExercises` : id, programDayId, exerciseId, séries cibles, reps cibles, repos (s)
-- `blocks` : id, nom, objectif (force/hypertrophie/…), dateDébut, durée (semaines), programId, notes
+- `programExercises` : id, programDayId, exerciseId, variante, séries cibles, repsMin, repsMax (fourchette de double progression), repos (s)
+- `blockGoals` : id, nom (créés par l'utilisateur ; « Force » fourni en exemple)
+- `blocks` : id, nom, goalId, dateDébut, durée (semaines, deload compris), deloadWeeks (n° des semaines de deload), programId, notes
 - `sessions` : id, date, programDayId?, blockId?, durée, notes
-- `sets` : id, sessionId, exerciseId, ordre, reps, charge, RPE?, terminé
-- `settings` : unité (kg/lb), repos par défaut, version du schéma
+- `sets` : id, sessionId, exerciseId, variante, ordre, reps, charge, repsMin?, repsMax? (objectif en vigueur), RPE?, terminé
+- `bodyWeights` : id, date, poids
+- `settings` : unité (kg/lb), pas de charge par variante, repos par défaut, RPE affiché, objectifs perso (poids cible, séances/semaine, séries/muscle/semaine), version du schéma
 
 ## Structure du projet
 ```
@@ -79,7 +83,7 @@ src/
 ### Phase D — Design de l'app (3–5 jours) 🎨
 > Plan détaillé validé : [`PHASE-D.md`](PHASE-D.md) (cible iPhone 14, Claude Design seul).
 - **D1. Parcours & écrans** (Claude chat / Claude Code) : liste des écrans et parcours clés : démarrer une séance → saisir une série → repos → terminer → voir le PR. Diagrammes Mermaid.
-- **D2. Wireframes basse fidélité** (Claude Design) : 8 écrans clés au format téléphone (390×844) : Accueil, Séance en cours, Choix d'exercice, Historique, Programmes, Calendrier des blocs, Stats d'un exercice, Réglages.
+- **D2. Wireframes basse fidélité** (Claude Design) : 9 écrans clés au format téléphone (390×844) : Accueil, Séance en cours, Choix d'exercice, Historique, Programmes, Calendrier des blocs, Stats (vue d'ensemble), Stats d'un exercice, Réglages. Détail dans `docs/design/parcours.md`.
 - **D3. Direction visuelle** : 2–3 variantes (ex. sombre à fort contraste, lisible en salle), en choisir une.
 - **D4. Design system** : couleurs, typographie, espacements, arrondis ; composants Button, NumberStepper, SetRow, Card, BottomNav, RestTimer ; icône de l'app. Export dans `design/tokens.md`, repris dans la config Tailwind au J1.
 - **D5. Maquettes haute fidélité du MVP** (écrans de J2 à J4). Règles d'ergonomie : cibles tactiles ≥ 48 px, actions principales dans la zone du pouce, gros chiffres lisibles à 1 m, contraste AA, utilisable en sueur et d'une main.
@@ -100,7 +104,7 @@ src/
 
 ### J3 — Enregistrer une séance (MVP, 4–6 jours) ⭐
 - Séance vide → ajout d'exercices → séries (reps, charge) avec NumberStepper +/−.
-- Valeurs de la dernière séance reprises automatiquement ; cocher une série ; terminer ; historique.
+- Valeurs de la dernière séance reprises automatiquement ; double progression (objectif de reps, proposition d'augmenter la charge) ; remplacer un exercice ; cocher une série ; terminer ; historique.
 - Sauvegarde automatique à chaque saisie.
 - **Objectif** : **utiliser l'app pour de vrai à la salle** pendant 1 semaine.
 
@@ -122,7 +126,8 @@ src/
 
 ### J7 — Stats & progression (4–5 jours)
 - **Design** : maquettes des graphiques (Claude Code suit sa skill `dataviz` pour des graphiques lisibles et cohérents).
-- 1RM estimé (Epley), volume, PR 🏆, volume hebdo par muscle, comparaison entre blocs ; tests Vitest.
+- 1RM estimé (Epley), volume, PR 🏆, séries hebdo par muscle, comparaison entre blocs ; tests Vitest.
+- Poids corporel (pesées, moyenne 7 jours) et séances/semaine, avec lignes d'objectif modifiables.
 - **Objectif** : répondre à « ai-je progressé au squat pendant mon bloc force ? ».
 
 ### J8 — Sauvegarde & fiabilité (1–2 jours)

@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **à démarrer (D1)**. Cocher chaque étape ici au fur et à mesure.
+> Plan validé le 16/09/2026. Statut : **D1 fait, prochaine étape D2**. Cocher chaque étape ici au fur et à mesure.
 
 ## Contexte
 Le J0 est terminé (squelette Vite/React/Tailwind/Router poussé, commit `f759f71`). D'après `docs/PLAN.md`, la **Phase D** précède tout code d'interface : les maquettes et `design/tokens.md` feront foi pour le J1 (tokens dans le bloc `@theme` de `src/index.css`, composants Button/Card/BottomNav) et pour les écrans des jalons J2 à J4.
@@ -48,7 +48,7 @@ Durée indicative : 3–5 jours, en **5 sessions courtes**, chacune terminée pa
 
 ## Étapes
 
-### D1 — Parcours & écrans (session 1, dans Claude Code)
+### D1 — Parcours & écrans (session 1, dans Claude Code) ✅ fait le 17/09/2026
 Livrable : **`docs/design/parcours.md`**, en français :
 - **Inventaire des écrans** : pour chacun, son rôle, les informations affichées, l'action principale et le jalon concerné.
 - **Parcours clés en diagrammes Mermaid** :
@@ -56,28 +56,32 @@ Livrable : **`docs/design/parcours.md`**, en français :
   2. créer un exercice ;
   3. consulter l'historique ;
   4. (aperçu J5/J6) lancer la séance du jour d'un programme et voir le bloc actif.
-- **Arborescence de navigation** : les 5 onglets de la BottomNav (Séance · Programmes · Calendrier · Stats · Réglages) et les écrans secondaires.
+- **Arborescence de navigation** : les onglets de la BottomNav et les écrans secondaires (5 onglets : Séance · Programmes · Calendrier · Stats · Réglages).
 - **Questions métier à trancher** avec l'utilisateur, notées dans le fichier :
   - le pas de charge (2,5 kg ? 1,25 kg ?) ;
   - le RPE : affiché ou masqué par défaut ;
   - le contenu de l'accueil ;
   - la liste des objectifs de bloc (force, hypertrophie, endurance, …) ;
   - l'affichage de la « dernière fois » pendant la saisie.
-- ✅ Point de validation : l'utilisateur relit et tranche les questions.
+- ✅ Point de validation : l'utilisateur relit et tranche les questions. **Validé** (v4 de `parcours.md`), avec en plus : double progression, 5 variantes d'équipement, remplacement d'exercice, deload, poids corporel et objectifs perso.
 
 ### D2 — Wireframes basse fidélité (session 2, skill `design`)
-Un canvas de **8 planches** en niveaux de gris, sans couleur :
+Un canvas de **9 planches** en niveaux de gris, sans couleur (liste revue après D1, détail dans `docs/design/parcours.md` § 7) :
 - Accueil
 - Séance en cours
-- Choix d'exercice
+- Choix d'exercice (avec la création rapide d'exercice)
 - Historique
 - Programmes
-- Calendrier des blocs
+- Calendrier des blocs (avec une semaine de deload)
+- Stats — vue d'ensemble
 - Stats d'un exercice
 - Réglages (avec l'encart d'installation iOS)
 
 Contenu des planches :
-- La Séance en cours montre deux états : saisie d'une série, et minuteur de repos actif.
+- La Séance en cours montre trois états :
+  - saisie pré-remplie (double progression : objectif de reps, badge ↑ charge ; boutons +/− et `+ Série`) ;
+  - minuteur de repos actif ;
+  - menu `⋯` (remplacer / changer de variante / objectif).
 - Les zones de sécurité iOS sont matérialisées sur chaque planche.
 - Les données d'exemple sont réalistes : squat 100 kg × 5, bloc « Force — semaine 2/4 ».
 
