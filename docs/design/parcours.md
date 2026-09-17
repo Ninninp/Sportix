@@ -284,7 +284,7 @@ Reporté dans [`docs/PLAN.md`](../PLAN.md) :
 
 ## 7. Prochaine étape
 
-Une fois ce document validé, on passe à **D2 — Wireframes basse fidélité** (skill `design`) : **9 planches** en niveaux de gris.
+Une fois ce document validé, on passe à **D2 — Wireframes basse fidélité** (canvas Design) : **9 planches** en niveaux de gris.
 
 1. Accueil
 2. Séance en cours, en 3 états :

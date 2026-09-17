@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #1e1e1c; background: #e9e9e6; }
+    a { color: #1e1e1c; } a:hover { color: #000000; }
+    .num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .safe { flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: .04em; color: #5e5e5a; background: repeating-linear-gradient(135deg, #d6d6d2 0 6px, #e6e6e3 6px 12px); }
+    .nav { flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #ffffff; border-top: 1px solid #c9c9c4; }
+    .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #5e5e5a; text-decoration: none; }
+    .tab.on { color: #1e1e1c; font-weight: 700; }
+    .card { background: #ffffff; border: 1px solid #c9c9c4; border-radius: 12px; box-sizing: border-box; }
+    .icon-btn { box-sizing: border-box; width: 48px; height: 48px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; border: 0; background: transparent; color: #1e1e1c; text-decoration: none; cursor: pointer; }
+    .lbl { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5e5e5a; }
+    .muted { color: #5e5e5a; }
+    .sess { display: flex; align-items: center; gap: 14px; padding: 10px 14px; min-height: 68px; text-decoration: none; }
+    .day { width: 44px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+    .pr { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1.5px solid #1e1e1c; }
+    .blk { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: #e2e2de; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #f4f4f2; overflow: hidden;">
+  <div class="safe" style="height: 47px;">Zone encoche · 47 pt</div>
+  <main style="flex-grow: 1; overflow: hidden; padding: 4px 16px 12px; display: flex; flex-direction: column; gap: 10px;">
+    <header style="display: flex; align-items: center; gap: 4px; margin-left: -12px;">
+      <a class="icon-btn" href="Main.dc.html" aria-label="Retour à l'accueil"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></a>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 700;">Historique</h1>
+    </header>
+
+    <span class="lbl">Septembre 2026</span>
+    <div class="card">
+      <a class="sess" href="Historique.dc.html" style="border-bottom: 1px solid #e2e2de;">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">15</span><span class="muted" style="font-size: 11px;">MAR.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Force B — Haut <span class="blk">F2</span></div><div class="muted num" style="font-size: 13px;">48 min · 5 ex. · 6 240 kg</div></div>
+        <span class="pr">PR</span>
+      </a>
+      <a class="sess" href="Historique.dc.html" style="border-bottom: 1px solid #e2e2de;">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">12</span><span class="muted" style="font-size: 11px;">SAM.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Force A — Jambes <span class="blk">F1</span></div><div class="muted num" style="font-size: 13px;">55 min · 5 ex. · 9 180 kg</div></div>
+        <span class="pr">PR</span>
+      </a>
+      <a class="sess" href="Historique.dc.html" style="border-bottom: 1px solid #e2e2de;">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">10</span><span class="muted" style="font-size: 11px;">JEU.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Force B — Haut <span class="blk">F1</span></div><div class="muted num" style="font-size: 13px;">51 min · 5 ex. · 6 050 kg</div></div>
+      </a>
+      <a class="sess" href="Historique.dc.html" style="border-bottom: 1px solid #e2e2de;">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">08</span><span class="muted" style="font-size: 11px;">MAR.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Force A — Jambes <span class="blk">F1</span></div><div class="muted num" style="font-size: 13px;">57 min · 5 ex. · 8 960 kg</div></div>
+      </a>
+      <a class="sess" href="Historique.dc.html">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">05</span><span class="muted" style="font-size: 11px;">SAM.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Full body <span class="blk">H6</span></div><div class="muted num" style="font-size: 13px;">62 min · 7 ex. · 11 400 kg</div></div>
+      </a>
+    </div>
+
+    <span class="lbl" style="padding-top: 6px;">Août 2026</span>
+    <div class="card">
+      <a class="sess" href="Historique.dc.html" style="border-bottom: 1px solid #e2e2de;">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">29</span><span class="muted" style="font-size: 11px;">SAM.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Full body <span class="blk">H5</span></div><div class="muted num" style="font-size: 13px;">58 min · 7 ex. · 10 900 kg</div></div>
+      </a>
+      <a class="sess" href="Historique.dc.html">
+        <div class="day"><span class="num" style="font-size: 22px; font-weight: 600;">27</span><span class="muted" style="font-size: 11px;">JEU.</span></div>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Full body <span class="blk">H5</span></div><div class="muted num" style="font-size: 13px;">60 min · 7 ex. · 11 150 kg</div></div>
+      </a>
+    </div>
+  </main>
+  <nav class="nav" aria-label="Navigation principale">
+    <a class="tab on" href="Main.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"></path></svg><span>Séance</span></a>
+    <a class="tab" href="Programmes.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span>Programmes</span></a>
+    <a class="tab" href="Calendrier.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Calendrier</span></a>
+    <a class="tab" href="Stats.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"></path></svg><span>Stats</span></a>
+    <a class="tab" href="Reglages.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span>Réglages</span></a>
+  </nav>
+  <div class="safe" style="height: 34px;">Barre d'accueil · 34 pt</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

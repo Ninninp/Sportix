@@ -1,0 +1,49 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-09-17T12:00:00Z" },
+  "title": "Sportix — Wireframes D2",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 390, "h": 844, "title": "01 Accueil", "is_interactive": true },
+    "Seance-saisie.dc.html": { "x": 470, "y": 0, "w": 390, "h": 844, "title": "02a Séance — saisie", "is_interactive": true },
+    "Seance-repos.dc.html": { "x": 940, "y": 0, "w": 390, "h": 844, "title": "02b Séance — repos actif", "is_interactive": true },
+    "Seance-repos-termine.dc.html": { "x": 1410, "y": 0, "w": 390, "h": 844, "title": "02c Séance — repos terminé", "is_interactive": true },
+    "Seance-menu.dc.html": { "x": 1880, "y": 0, "w": 390, "h": 844, "title": "02d Séance — menu ⋯", "is_interactive": true },
+    "Choix-exercice.dc.html": { "x": 2350, "y": 0, "w": 390, "h": 844, "title": "03a Choix d'exercice", "is_interactive": true },
+    "Creation-rapide.dc.html": { "x": 2820, "y": 0, "w": 390, "h": 844, "title": "03b Création rapide d'exercice", "is_interactive": true },
+    "Historique.dc.html": { "x": 3290, "y": 0, "w": 390, "h": 844, "title": "04 Historique", "is_interactive": true },
+    "Programmes.dc.html": { "x": 0, "y": 1244, "w": 390, "h": 844, "title": "05 Programme — détail d'un jour", "is_interactive": true },
+    "Calendrier.dc.html": { "x": 470, "y": 1244, "w": 390, "h": 844, "title": "06a Calendrier des blocs", "is_interactive": true },
+    "Detail-bloc.dc.html": { "x": 940, "y": 1244, "w": 390, "h": 844, "title": "06b Détail d'un bloc", "is_interactive": true },
+    "Stats.dc.html": { "x": 0, "y": 2488, "w": 390, "h": 1640, "title": "07 Stats — vue d'ensemble (page qui défile)", "is_interactive": true },
+    "Stats-exercice.dc.html": { "x": 470, "y": 2488, "w": 390, "h": 844, "title": "08 Stats d'un exercice", "is_interactive": true },
+    "Reglages.dc.html": { "x": 940, "y": 2488, "w": 390, "h": 1480, "title": "09 Réglages (page qui défile)", "is_interactive": true }
+  },
+  "order": [
+    "Main.dc.html",
+    "Seance-saisie.dc.html",
+    "Seance-repos.dc.html",
+    "Seance-repos-termine.dc.html",
+    "Seance-menu.dc.html",
+    "Choix-exercice.dc.html",
+    "Creation-rapide.dc.html",
+    "Historique.dc.html",
+    "Programmes.dc.html",
+    "Calendrier.dc.html",
+    "Detail-bloc.dc.html",
+    "Stats.dc.html",
+    "Stats-exercice.dc.html",
+    "Reglages.dc.html"
+  ],
+  "notes": {
+    "row1": { "x": 0, "y": -300, "text": "Séance — J2 à J4", "kind": "title1", "maxW": 3680 },
+    "row2": { "x": 0, "y": 944, "text": "Planifier — J5 et J6", "kind": "title1", "maxW": 1330 },
+    "row3": { "x": 0, "y": 2188, "text": "Suivre et régler — J1, J7, J8", "kind": "title1", "maxW": 1330 },
+    "legende": {
+      "x": -520, "y": 0, "w": 440, "maxH": 700, "size": "m", "color": "gray",
+      "text": "Wireframes D2 — légende\n\n• Niveaux de gris seulement : la couleur et la police définitives arrivent en D3.\n• Bandes hachurées en haut et en bas = zones de sécurité de l'iPhone 14 (encoche 47 pt, barre d'accueil 34 pt). Rien d'interactif dedans.\n• Chiffres gris = valeurs pré-remplies, pas encore validées (double progression).\n• Étiquettes pointillées J2/J5/J6/J7/J8 = élément qui arrive avec ce jalon.\n• Mode Play : les onglets du bas et les boutons principaux sont cliquables (Démarrer → saisie → Valider → repos → …). Toucher le gros minuteur montre l'écran « repos terminé ».\n• Choix d'exercice en mode remplacement = même écran, titre « Remplacer Squat ».\n• Repos terminé : écran inversé + son (pas de vibration web sur iOS).\n• Graphiques : statiques ici ; le survol / toucher pour lire une valeur viendra en D5."
+    }
+  },
+  "designSystems": []
+}

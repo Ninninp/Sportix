@@ -1,13 +1,15 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1 fait, prochaine étape D2**. Cocher chaque étape ici au fur et à mesure.
+> Plan validé le 16/09/2026. Statut : **D1 fait ; D2 publié, en relecture**.
+>
+> **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
 ## Contexte
 Le J0 est terminé (squelette Vite/React/Tailwind/Router poussé, commit `f759f71`). D'après `docs/PLAN.md`, la **Phase D** précède tout code d'interface : les maquettes et `design/tokens.md` feront foi pour le J1 (tokens dans le bloc `@theme` de `src/index.css`, composants Button/Card/BottomNav) et pour les écrans des jalons J2 à J4.
 
 Décisions prises avec l'utilisateur :
 - **Téléphone : iPhone 14** (écran 390×844 points, **encoche** en haut, barre d'accueil en bas) → concevoir pour Safari en mode PWA « standalone ».
-- **Outil : Claude Design seul** (canvas lancé depuis Claude Code via la skill `design`, publié en Artifact) → une seule source de vérité, pas de Figma.
+- **Outil : Claude Design seul** (canvas créé depuis Claude Code comme Artifact de type « Design ») → une seule source de vérité, pas de Figma.
 - **Direction visuelle : aucune idée préalable** → proposer 3 directions contrastées en D3.
 
 Durée indicative : 3–5 jours, en **5 sessions courtes**, chacune terminée par une validation de l'utilisateur, puis un commit et un push.
@@ -24,7 +26,7 @@ Durée indicative : 3–5 jours, en **5 sessions courtes**, chacune terminée pa
 **Ce que c'est** : une toile de dessin (« canvas ») qui contient plusieurs **planches** (artboards), une par écran, posées côte à côte ; on s'y déplace et on zoome comme dans Figma. Pas d'application à installer : tout se lance depuis Claude Code.
 
 **Le cycle, à chaque fois :**
-1. **Tu décris ce que tu veux** dans Claude Code, par exemple « crée les wireframes des 8 écrans de `docs/design/parcours.md` ». Je charge alors la skill `design` : tu peux aussi taper `/design`.
+1. **Tu décris ce que tu veux** dans Claude Code, par exemple « crée les wireframes des écrans de `docs/design/parcours.md` ». Je crée alors (ou reprends) un Artifact de type « Design ». Il n'y a ni skill ni commande `/design` à lancer : il suffit de le demander.
 2. **Je dessine le premier jet** : j'écris les planches (fichiers `.dc.html`) et je les publie comme **Artifact**, c'est-à-dire une page privée sur claude.ai dont je te donne le lien.
 3. **Tu ouvres le lien**, sur l'ordinateur pour retoucher, et sur l'iPhone pour juger la taille réelle.
 4. **Tu retouches à la souris**, si l'édition est activée sur ton compte (on le verra au premier lien) :
@@ -65,7 +67,7 @@ Livrable : **`docs/design/parcours.md`**, en français :
   - l'affichage de la « dernière fois » pendant la saisie.
 - ✅ Point de validation : l'utilisateur relit et tranche les questions. **Validé** (v4 de `parcours.md`), avec en plus : double progression, 5 variantes d'équipement, remplacement d'exercice, deload, poids corporel et objectifs perso.
 
-### D2 — Wireframes basse fidélité (session 2, skill `design`)
+### D2 — Wireframes basse fidélité (session 2, canvas Design) — premier jet publié le 17/09/2026, en attente de validation
 Un canvas de **9 planches** en niveaux de gris, sans couleur (liste revue après D1, détail dans `docs/design/parcours.md` § 7) :
 - Accueil
 - Séance en cours
@@ -90,7 +92,7 @@ Suite de la session :
 - L'utilisateur ouvre l'URL **sur son iPhone** pour juger la taille réelle et l'accessibilité au pouce.
 - ✅ Validation, puis retouches éventuelles.
 
-### D3 — Direction visuelle (session 3, skill `design`)
+### D3 — Direction visuelle (session 3, canvas Design)
 3 directions contrastées, appliquées chacune aux **deux mêmes écrans** (Séance en cours et Accueil) pour pouvoir comparer :
 1. **Sombre, fort contraste** : fond quasi noir et un accent vif ; lisible en salle.
 2. **Sportif / énergique** : couleurs saturées et typographie condensée.
@@ -116,7 +118,7 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 - **Icône de l'app** : `design/icon.svg`, qui doit rester lisible en petit et sur fond iOS (elle servira à `@vite-pwa/assets-generator` au J1).
 - ✅ Validation.
 
-### D5 — Maquettes haute fidélité du MVP (session 5, skill `design`)
+### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design)
 Écrans des jalons J2 à J4, construits avec le design system de D4. Chaque écran a ses états **vide / rempli** :
 - **J2** : bibliothèque d'exercices (liste + recherche), formulaire d'ajout/modification, confirmation de suppression.
 - **J3** : accueil (démarrer une séance), séance en cours (plusieurs exercices, séries cochées, valeurs reprises de la dernière fois), choix d'exercice, fin de séance / récapitulatif avec PR 🏆, historique et détail d'une séance.

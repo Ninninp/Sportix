@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #1e1e1c; background: #e9e9e6; }
+    a { color: #1e1e1c; } a:hover { color: #000000; }
+    .num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .safe { flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: .04em; color: #5e5e5a; background: repeating-linear-gradient(135deg, #d6d6d2 0 6px, #e6e6e3 6px 12px); }
+    .nav { flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #ffffff; border-top: 1px solid #c9c9c4; }
+    .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #5e5e5a; text-decoration: none; }
+    .tab.on { color: #1e1e1c; font-weight: 700; }
+    .card { background: #ffffff; border: 1px solid #c9c9c4; border-radius: 12px; box-sizing: border-box; }
+    .btn { box-sizing: border-box; min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 1.5px solid #1e1e1c; background: #ffffff; color: #1e1e1c; font: 600 16px 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+    .seg { box-sizing: border-box; min-height: 44px; border: 0; background: transparent; font: 500 15px 'IBM Plex Sans', system-ui, sans-serif; color: #1e1e1c; border-radius: 10px; cursor: pointer; }
+    .seg.on { background: #2b2b29; color: #ffffff; font-weight: 600; }
+    .lbl { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5e5e5a; padding: 0 4px; }
+    .muted { color: #5e5e5a; }
+    .tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px dashed #8a8a85; color: #5e5e5a; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 12px 0 16px; text-decoration: none; }
+    .row + .row { border-top: 1px solid #e2e2de; }
+    .val { display: flex; align-items: center; gap: 4px; color: #5e5e5a; }
+    .sw { appearance: none; -webkit-appearance: none; flex-shrink: 0; width: 52px; height: 32px; margin: 0; border-radius: 16px; background: #c9c9c4; position: relative; cursor: pointer; }
+    .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 13px; background: #ffffff; }
+    .sw:checked { background: #2b2b29; }
+    .sw:checked::after { left: 23px; }
+    .sec { display: flex; flex-direction: column; gap: 6px; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 1480px; display: flex; flex-direction: column; background: #f4f4f2; overflow: hidden;">
+  <div class="safe" style="height: 47px;">Zone encoche · 47 pt</div>
+  <main style="flex-grow: 1; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 18px;">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 700;">Réglages</h1>
+
+    <section class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border: 2px solid #1e1e1c;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v8h14v-8"></path></svg>
+        <h2 style="margin: 0; font-size: 17px; font-weight: 700;">Installer Sportix sur l'iPhone</h2>
+      </div>
+      <ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px;">
+        <li>Dans Safari, touche <strong>Partager</strong> (carré avec flèche).</li>
+        <li>Choisis <strong>Sur l'écran d'accueil</strong>.</li>
+        <li>Ouvre Sportix depuis son icône : l'app marche hors connexion.</li>
+      </ol>
+      <span class="muted" style="font-size: 13px;">Encart masqué une fois l'app installée.</span>
+    </section>
+
+    <div class="sec">
+      <span class="lbl">Unité</span>
+      <div role="group" aria-label="Unité de poids" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: #e2e2de;">
+        <button class="seg on" aria-pressed="true">kg</button>
+        <button class="seg" aria-pressed="false">lb</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Pas de charge (boutons + / −)</span>
+      <div class="card">
+        <a class="row" href="Reglages.dc.html"><span>Barre</span><span class="val"><span class="num">2,5 kg</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <a class="row" href="Reglages.dc.html"><span>Smith</span><span class="val"><span class="num">2,5 kg</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <a class="row" href="Reglages.dc.html"><span>Haltères <span class="muted" style="font-size: 13px;">(par haltère)</span></span><span class="val"><span class="num">2 kg</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <a class="row" href="Reglages.dc.html"><span>Machine</span><span class="val"><span class="num">5 kg</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <a class="row" href="Reglages.dc.html"><span>Poulie</span><span class="val"><span class="num">2,5 kg</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Séance</span>
+      <div class="card">
+        <a class="row" href="Reglages.dc.html"><span>Repos par défaut</span><span class="val"><span class="num">2:00</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <label class="row"><span>Afficher le RPE</span><input class="sw" type="checkbox" role="switch"></label>
+        <label class="row"><span>Son de fin de repos</span><input class="sw" type="checkbox" role="switch" checked></label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Objectifs</span>
+      <div class="card">
+        <a class="row" href="Reglages.dc.html"><span>Objectifs de bloc</span><span class="val"><span>Force</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+        <a class="row" href="Stats.dc.html"><span>Objectifs perso</span><span class="val"><span class="num" style="font-size: 14px;">76 kg · 4/sem.</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Exercices <span class="tag">J2</span></span>
+      <div class="card">
+        <a class="row" href="Choix-exercice.dc.html"><span>Bibliothèque d'exercices</span><span class="val"><span class="num">32</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></span></a>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="lbl">Sauvegarde <span class="tag">J8</span></span>
+      <div class="card" style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+        <span class="muted" style="font-size: 14px;">Tes données restent sur ce téléphone. Exporte-les pour changer d'appareil.</span>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+          <button class="btn">Exporter</button>
+          <button class="btn">Importer</button>
+        </div>
+        <span class="muted num" style="font-size: 13px;">Dernier export : jamais</span>
+      </div>
+    </div>
+  </main>
+  <nav class="nav" aria-label="Navigation principale">
+    <a class="tab" href="Main.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"></path></svg><span>Séance</span></a>
+    <a class="tab" href="Programmes.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span>Programmes</span></a>
+    <a class="tab" href="Calendrier.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Calendrier</span></a>
+    <a class="tab" href="Stats.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"></path></svg><span>Stats</span></a>
+    <a class="tab on" href="Reglages.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span>Réglages</span></a>
+  </nav>
+  <div class="safe" style="height: 34px;">Barre d'accueil · 34 pt</div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":1480}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

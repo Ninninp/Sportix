@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #1e1e1c; background: #e9e9e6; }
+    a { color: #1e1e1c; } a:hover { color: #000000; }
+    .num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    .safe { flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: .04em; color: #5e5e5a; background: repeating-linear-gradient(135deg, #d6d6d2 0 6px, #e6e6e3 6px 12px); }
+    .nav { flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #ffffff; border-top: 1px solid #c9c9c4; }
+    .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #5e5e5a; text-decoration: none; }
+    .tab.on { color: #1e1e1c; font-weight: 700; }
+    .card { background: #ffffff; border: 1px solid #c9c9c4; border-radius: 12px; box-sizing: border-box; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .btn { box-sizing: border-box; min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 1.5px solid #1e1e1c; background: #ffffff; color: #1e1e1c; font: 600 16px 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+    .chip { box-sizing: border-box; min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 24px; border: 1px solid #8a8a85; background: #ffffff; font: 500 15px 'IBM Plex Sans', system-ui, sans-serif; color: #1e1e1c; cursor: pointer; }
+    .chip.on { background: #2b2b29; border-color: #2b2b29; color: #ffffff; font-weight: 600; }
+    .lbl { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5e5e5a; }
+    .muted { color: #5e5e5a; }
+    .tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px dashed #8a8a85; color: #5e5e5a; }
+    .ctitle { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ctitle h2 { margin: 0; font-size: 17px; font-weight: 700; }
+    .leg { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: #5e5e5a; }
+    .leg span { display: flex; align-items: center; gap: 6px; }
+    .axis { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; fill: #5e5e5a; }
+    .prrow { display: flex; align-items: center; gap: 10px; min-height: 52px; text-decoration: none; border-top: 1px solid #e2e2de; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 1640px; position: relative; display: flex; flex-direction: column; background: #f4f4f2; overflow: hidden;">
+  <div class="safe" style="height: 47px;">Zone encoche · 47 pt</div>
+  <main style="flex-grow: 1; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 14px;">
+    <header style="display: flex; justify-content: space-between; align-items: center;">
+      <h1 style="margin: 0; font-size: 26px; font-weight: 700;">Stats</h1>
+      <span class="tag">J7</span>
+    </header>
+    <div role="group" aria-label="Période" style="display: flex; gap: 8px;">
+      <button class="chip" aria-pressed="false">4 sem.</button>
+      <button class="chip on" aria-pressed="true">3 mois</button>
+      <button class="chip" aria-pressed="false">1 an</button>
+    </div>
+
+    <section class="card" aria-label="Poids corporel">
+      <div class="ctitle"><h2>Poids corporel</h2><button class="btn" style="min-height: 44px;">+ Pesée</button></div>
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <span class="num" style="font-size: 32px; font-weight: 600;">78,4 kg</span>
+        <span class="muted" style="font-size: 13px;">moy. 7 j <span class="num">78,7</span> · objectif <span class="num">76</span></span>
+      </div>
+      <svg width="326" height="152" viewBox="0 0 326 152" role="img" aria-label="Poids corporel sur 3 mois : de 80,4 à 78,4 kg, objectif 76 kg">
+        <path d="M24 30H326M24 70H326" stroke="#e2e2de" stroke-width="1"></path>
+        <text class="axis" x="0" y="33">80</text>
+        <text class="axis" x="0" y="73">78</text>
+        <text class="axis" x="0" y="113">76</text>
+        <path d="M24 110H326" stroke="#1e1e1c" stroke-width="1.5" stroke-dasharray="6 4"></path>
+        <text class="axis" x="326" y="104" text-anchor="end" style="font-weight: 600; fill: #1e1e1c;">objectif 76 kg</text>
+        <g fill="#8a8a85" stroke="#ffffff" stroke-width="1.5">
+          <circle cx="34" cy="22" r="4"></circle><circle cx="46" cy="28" r="4"></circle><circle cx="58" cy="18" r="4"></circle><circle cx="70" cy="30" r="4"></circle><circle cx="82" cy="34" r="4"></circle>
+          <circle cx="94" cy="26" r="4"></circle><circle cx="106" cy="36" r="4"></circle><circle cx="118" cy="32" r="4"></circle><circle cx="130" cy="42" r="4"></circle><circle cx="142" cy="34" r="4"></circle>
+          <circle cx="154" cy="40" r="4"></circle><circle cx="166" cy="48" r="4"></circle><circle cx="178" cy="38" r="4"></circle><circle cx="190" cy="46" r="4"></circle><circle cx="202" cy="52" r="4"></circle>
+          <circle cx="214" cy="44" r="4"></circle><circle cx="226" cy="54" r="4"></circle><circle cx="238" cy="50" r="4"></circle><circle cx="250" cy="58" r="4"></circle><circle cx="262" cy="52" r="4"></circle>
+          <circle cx="274" cy="60" r="4"></circle><circle cx="286" cy="54" r="4"></circle><circle cx="298" cy="62" r="4"></circle><circle cx="310" cy="56" r="4"></circle>
+        </g>
+        <polyline points="34,24 70,26 106,31 142,36 178,42 214,47 250,53 286,56 318,58" fill="none" stroke="#1e1e1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+        <circle cx="318" cy="62" r="5" fill="#1e1e1c" stroke="#ffffff" stroke-width="2"></circle>
+        <text class="axis" x="34" y="148">juil.</text>
+        <text class="axis" x="150" y="148">août</text>
+        <text class="axis" x="270" y="148">sept.</text>
+      </svg>
+      <div class="leg">
+        <span><svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="#8a8a85"></circle></svg>pesée</span>
+        <span><svg width="18" height="10" aria-hidden="true"><path d="M1 5H17" stroke="#1e1e1c" stroke-width="2"></path></svg>moyenne 7 jours</span>
+        <span><svg width="18" height="10" aria-hidden="true"><path d="M1 5H17" stroke="#1e1e1c" stroke-width="1.5" stroke-dasharray="4 3"></path></svg>objectif (toucher pour modifier)</span>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Séances par semaine">
+      <div class="ctitle"><h2>Séances / semaine</h2><span class="muted" style="font-size: 13px;">objectif <span class="num">4</span></span></div>
+      <svg width="326" height="124" viewBox="0 0 326 124" role="img" aria-label="Séances par semaine sur 12 semaines, entre 1 et 5, objectif 4">
+        <path d="M24 71H326" stroke="#e2e2de" stroke-width="1"></path>
+        <path d="M24 104H326" stroke="#8a8a85" stroke-width="1"></path>
+        <text class="axis" x="0" y="107">0</text>
+        <text class="axis" x="0" y="74">2</text>
+        <text class="axis" x="0" y="40" style="font-weight: 600; fill: #1e1e1c;">4</text>
+        <g fill="#5e5e5a">
+          <path d="M28,104V58Q28,54 32,54H42Q46,54 46,58V104Z"></path>
+          <path d="M53,104V41Q53,37 57,37H67Q71,37 71,41V104Z"></path>
+          <path d="M78,104V41Q78,37 82,37H92Q96,37 96,41V104Z"></path>
+          <path d="M103,104V75Q103,71 107,71H117Q121,71 121,75V104Z"></path>
+          <path d="M128,104V58Q128,54 132,54H142Q146,54 146,58V104Z"></path>
+          <path d="M153,104V41Q153,37 157,37H167Q171,37 171,41V104Z"></path>
+          <path d="M178,104V25Q178,21 182,21H192Q196,21 196,25V104Z"></path>
+          <path d="M203,104V41Q203,37 207,37H217Q221,37 221,41V104Z"></path>
+          <path d="M228,104V58Q228,54 232,54H242Q246,54 246,58V104Z"></path>
+          <path d="M253,104V41Q253,37 257,37H267Q271,37 271,41V104Z"></path>
+          <path d="M278,104V58Q278,54 282,54H292Q296,54 296,58V104Z"></path>
+        </g>
+        <path d="M303,104V91Q303,87 307,87H317Q321,87 321,91V104Z" fill="#c9c9c4"></path>
+        <path d="M24 37H326" stroke="#1e1e1c" stroke-width="1.5" stroke-dasharray="6 4"></path>
+        <text class="axis" x="28" y="120">juil.</text>
+        <text class="axis" x="128" y="120">août</text>
+        <text class="axis" x="236" y="120">sept.</text>
+        <text class="axis" x="321" y="120" text-anchor="end">en cours</text>
+      </svg>
+    </section>
+
+    <section class="card" aria-label="Régularité">
+      <div class="ctitle"><h2>Régularité</h2><span class="muted num" style="font-size: 13px;">34 séances</span></div>
+      <div style="display: flex; gap: 10px; align-items: flex-start;">
+        <div class="muted num" style="display: grid; grid-template-rows: repeat(7, 16px); row-gap: 3px; font-size: 10px; line-height: 16px;">
+          <span>L</span><span></span><span>M</span><span></span><span>V</span><span></span><span>D</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(12, 16px); grid-template-rows: repeat(7, 16px); grid-auto-flow: column; gap: 3px;">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="84">
+            <div style="border-radius: 3px; background: {{d.bg}}; box-shadow: {{d.ring}};"></div>
+          </sc-for>
+        </div>
+      </div>
+      <div class="leg">
+        <span><span style="width: 12px; height: 12px; border-radius: 3px; background: #2b2b29;"></span>séance</span>
+        <span><span style="width: 12px; height: 12px; border-radius: 3px; background: #e2e2de;"></span>repos</span>
+        <span>12 dernières semaines</span>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Séries par groupe musculaire">
+      <div class="ctitle"><h2>Séries / muscle / semaine</h2><span class="muted" style="font-size: 13px;">sem. en cours</span></div>
+      <svg width="326" height="196" viewBox="0 0 326 196" role="img" aria-label="Séries par muscle : Jambes 16, Pectoraux 12, Dos 14, Épaules 8, Bras 22, Abdos 6 ; zone cible 10 à 20">
+        <rect x="164" y="16" width="80" height="180" fill="#ededea"></rect>
+        <path d="M164 16V196M244 16V196" stroke="#8a8a85" stroke-width="1" stroke-dasharray="3 3"></path>
+        <text class="axis" x="204" y="10" text-anchor="middle" style="font-weight: 600; fill: #1e1e1c;">zone 10–20</text>
+        <g style="font-size: 13px; fill: #1e1e1c; font-family: 'IBM Plex Sans', system-ui, sans-serif;">
+          <text x="0" y="34">Jambes</text><text x="0" y="64">Pectoraux</text><text x="0" y="94">Dos</text><text x="0" y="124">Épaules</text><text x="0" y="154">Bras</text><text x="0" y="184">Abdos</text>
+        </g>
+        <g fill="#5e5e5a">
+          <path d="M84,24H208Q212,24 212,28V32Q212,36 208,36H84Z"></path>
+          <path d="M84,54H176Q180,54 180,58V62Q180,66 176,66H84Z"></path>
+          <path d="M84,84H192Q196,84 196,88V92Q196,96 192,96H84Z"></path>
+          <path d="M84,114H144Q148,114 148,118V122Q148,126 144,126H84Z"></path>
+          <path d="M84,144H256Q260,144 260,148V152Q260,156 256,156H84Z"></path>
+          <path d="M84,174H128Q132,174 132,178V182Q132,186 128,186H84Z"></path>
+        </g>
+        <path d="M84 16V196" stroke="#8a8a85" stroke-width="1"></path>
+        <g class="axis" style="font-size: 12px; fill: #1e1e1c; font-weight: 600;">
+          <text x="218" y="34">16</text><text x="186" y="64">12</text><text x="202" y="94">14</text><text x="154" y="124">8 · sous la zone</text><text x="266" y="154">22 · au-dessus</text><text x="138" y="184">6</text>
+        </g>
+      </svg>
+      <span class="muted" style="font-size: 12px;">Zone cible modifiable en touchant la bande.</span>
+    </section>
+
+    <section class="card" aria-label="Records récents" style="gap: 0;">
+      <div class="ctitle" style="padding-bottom: 8px;"><h2>Records récents</h2></div>
+      <a class="prrow" href="Stats-exercice.dc.html">
+        <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1.5px solid #1e1e1c;">PR</span>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Développé couché · Barre</div><div class="muted" style="font-size: 13px;">15 sept.</div></div>
+        <span class="num" style="font-weight: 600;">82,5 × 8</span>
+      </a>
+      <a class="prrow" href="Stats-exercice.dc.html">
+        <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1.5px solid #1e1e1c;">PR</span>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Squat · Barre</div><div class="muted" style="font-size: 13px;">12 sept.</div></div>
+        <span class="num" style="font-weight: 600;">100 × 5</span>
+      </a>
+      <a class="prrow" href="Stats-exercice.dc.html">
+        <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1.5px solid #1e1e1c;">PR</span>
+        <div style="flex-grow: 1;"><div style="font-weight: 600;">Rowing · Poulie</div><div class="muted" style="font-size: 13px;">10 sept.</div></div>
+        <span class="num" style="font-weight: 600;">65 × 10</span>
+      </a>
+      <a class="btn" href="Stats-exercice.dc.html" style="margin-top: 8px;">Tous les exercices</a>
+    </section>
+
+    <section class="card" aria-label="Comparer deux blocs">
+      <div class="ctitle"><h2>Comparer 2 blocs</h2></div>
+      <div class="muted" style="font-size: 14px;">Hypertrophie (juil.–sept.) vs Force (en cours) : 1RM estimé et volume des exercices communs.</div>
+      <button class="btn">Comparer</button>
+    </section>
+  </main>
+  <nav class="nav" aria-label="Navigation principale">
+    <a class="tab" href="Main.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"></path></svg><span>Séance</span></a>
+    <a class="tab" href="Programmes.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span>Programmes</span></a>
+    <a class="tab" href="Calendrier.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Calendrier</span></a>
+    <a class="tab on" href="Stats.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"></path></svg><span>Stats</span></a>
+    <a class="tab" href="Reglages.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span>Réglages</span></a>
+  </nav>
+  <div class="safe" style="height: 34px;">Barre d'accueil · 34 pt</div>
+  <div style="position: absolute; left: 0; top: 746px; width: 390px; border-top: 2px dashed #5e5e5a; pointer-events: none;">
+    <span style="position: absolute; right: 8px; top: -20px; font-size: 11px; font-weight: 600; color: #1e1e1c; background: #f4f4f2; padding: 1px 6px; border-radius: 4px;">bas de l'écran visible (au-dessus de la barre d'onglets) · la suite défile</span>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":390,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const days = [];
+    for (let w = 0; w < 12; w++) {
+      let trained = [1, 3, 5];
+      if (w === 3) trained = [1, 5];
+      if (w === 6) trained = [1, 3, 4, 5];
+      if (w === 11) trained = [1];
+      for (let d = 0; d < 7; d++) {
+        const future = w === 11 && d > 3;
+        const today = w === 11 && d === 3;
+        let bg = trained.includes(d) ? '#2b2b29' : '#e2e2de';
+        if (future) bg = 'transparent';
+        days.push({ bg, ring: today ? 'inset 0 0 0 2px #1e1e1c' : (future ? 'inset 0 0 0 1px #d6d6d2' : 'none') });
+      }
+    }
+    return { days };
+  }
+}
+</script>
+</body>
+</html>
