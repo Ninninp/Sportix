@@ -1,0 +1,114 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-18T10:30:00Z"
+  },
+  "title": "Sportix — Directions D3",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A1 Accueil",
+      "is_interactive": true
+    },
+    "Nuit-Seance.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A2 Séance en cours",
+      "is_interactive": true
+    },
+    "Nuit-Repos-termine.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "A3 Repos terminé",
+      "is_interactive": true
+    },
+    "Energie-Accueil.dc.html": {
+      "x": 0,
+      "y": 1244,
+      "w": 390,
+      "h": 844,
+      "title": "B1 Accueil",
+      "is_interactive": true
+    },
+    "Energie-Seance.dc.html": {
+      "x": 470,
+      "y": 1244,
+      "w": 390,
+      "h": 844,
+      "title": "B2 Séance en cours",
+      "is_interactive": true
+    },
+    "Energie-Repos-termine.dc.html": {
+      "x": 940,
+      "y": 1244,
+      "w": 390,
+      "h": 844,
+      "title": "B3 Repos terminé",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Nuit-Seance.dc.html",
+    "Nuit-Repos-termine.dc.html",
+    "Energie-Accueil.dc.html",
+    "Energie-Seance.dc.html",
+    "Energie-Repos-termine.dc.html"
+  ],
+  "notes": {
+    "row1": {
+      "x": 0,
+      "y": -300,
+      "text": "A · Nuit + Énergie — sombre, chiffres étroits",
+      "kind": "title1",
+      "maxW": 1330
+    },
+    "palette1": {
+      "x": 1450,
+      "y": 0,
+      "w": 440,
+      "maxH": 600,
+      "size": "m",
+      "color": "gray",
+      "text": "A · Nuit + Énergie\nFond #0E0F0C · surfaces #181A16 · texte #F2F3EE\nCitron #C6F432 : réservé au bouton principal et à la fin du repos\nOrange #FF8A4C (emprunt Énergie) : progression ↑ et PR\nNeutre inversé (os #F2F3EE) : série en cours, pastille active, carte du jour\nPolice : Archivo seule — titres en 800, chiffres en Archivo étroit (largeur 72 %)"
+    },
+    "row2": {
+      "x": 0,
+      "y": 944,
+      "text": "B · Énergie corrigée — affiche sportive, claire",
+      "kind": "title1",
+      "maxW": 1330
+    },
+    "palette2": {
+      "x": 1450,
+      "y": 1244,
+      "w": 440,
+      "maxH": 600,
+      "size": "m",
+      "color": "gray",
+      "text": "B · Énergie corrigée\nFond crème #FFF4E8 · encre #1A1030\nOrange #FF4B1F : réservé au bouton principal et à la fin du repos (texte encre, 5,4:1)\nJaune #FFD23F : progression ↑ et PR (texte encre)\nEncre inversée : série en cours, pastille active, carte du jour\nPolices : Barlow Condensed (titres en capitales, chiffres) + Barlow (texte)"
+    },
+    "play": {
+      "x": 1450,
+      "y": 700,
+      "w": 440,
+      "maxH": 300,
+      "size": "m",
+      "color": "gray",
+      "text": "Mode Play : Démarrer → Séance → Valider → Repos terminé → C'est parti."
+    }
+  },
+  "designSystems": []
+}

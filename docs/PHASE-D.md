@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1 et D2 faits ; prochaine étape D3** (directions visuelles).
+> Plan validé le 16/09/2026. Statut : **D1, D2 et D3 faits ; prochaine étape D4** (design system).
 >
 > **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
@@ -92,7 +92,7 @@ Suite de la session :
 - L'utilisateur ouvre l'URL **sur son iPhone** pour juger la taille réelle et l'accessibilité au pouce.
 - ✅ Validation, puis retouches éventuelles.
 
-### D3 — Direction visuelle (session 3, canvas Design)
+### D3 — Direction visuelle (session 3, canvas Design) ✅ validé le 18/09/2026
 3 directions contrastées, appliquées chacune aux **deux mêmes écrans** (Séance en cours et Accueil) pour pouvoir comparer :
 1. **Sombre, fort contraste** : fond quasi noir et un accent vif ; lisible en salle.
 2. **Sportif / énergique** : couleurs saturées et typographie condensée.
@@ -103,6 +103,8 @@ Pour chaque direction :
 - un aperçu des gros chiffres et de l'écran « fin de repos ».
 
 L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné dans `design/README.md`.
+
+✅ **Fait le 18/09/2026** : Clair écarté après une critique impeccable ; les deux autres corrigées puis validées correction par correction. Décision : **deux thèmes automatiques** (sombre = « Nuit + Énergie », clair = « Énergie corrigée »). D4 doit donc produire des tokens avec une valeur par thème.
 
 ### D4 — Design system (session 4)
 - **`design/tokens.md`** : couleurs nommées par rôle (fond, surface, texte, accent, succès/PR, danger), typographie (tailles, dont les « gros chiffres »), espacements, arrondis et ombres.

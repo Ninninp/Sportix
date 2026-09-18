@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Repos terminé — Nuit</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: 'Archivo', system-ui, sans-serif; color: #F2F3EE; background: #d9d9d6; }
+    a { color: inherit; } a:hover { color: inherit; }
+    .num { font-family: 'Archivo', system-ui, sans-serif; font-stretch: 72%; font-weight: 800; font-variant-numeric: tabular-nums lining-nums; }
+    .disp { font-family: 'Archivo', system-ui, sans-serif; font-weight: 800; text-transform: none; letter-spacing: -0.02em; }
+    .lbl { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #A3A79C; }
+    .muted { color: #A3A79C; }
+    .card { background: #181A16; border: 1px solid #2E322B; border-radius: 14px; box-sizing: border-box; }
+    .btn { box-sizing: border-box; min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; border: 1.5px solid #6B6F66; background: transparent; color: #F2F3EE; font: 600 16px 'Archivo', system-ui, sans-serif; text-decoration: none; cursor: pointer; }
+    .btn.pri { background: #C6F432; border-color: #C6F432; color: #0E0F0C; font-weight: 700; }
+    .icon-btn { box-sizing: border-box; width: 48px; height: 48px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 14px; border: 0; background: transparent; color: #F2F3EE; text-decoration: none; cursor: pointer; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #C6F432; color: #0E0F0C; overflow: hidden;">
+  <div aria-hidden="true" style="height: 47px; flex-shrink: 0;"></div>
+  <main style="flex-grow: 1; overflow: hidden; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px;">
+    <header style="display: flex; align-items: center; gap: 4px; margin: 0 -8px;">
+      <a class="icon-btn" href="Main.dc.html" aria-label="Réduire la séance (elle continue)" style="color: #0E0F0C;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></a>
+      <div style="flex-grow: 1;">
+        <div style="font-size: 15px; font-weight: 700; color: #0E0F0C;">Force A — Jambes</div>
+        <div class="num" style="font-size: 15px; color: #0E0F0C;">27:59</div>
+      </div>
+      <a href="Main.dc.html" style="min-height: 48px; display: inline-flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 600; color: #0E0F0C; text-decoration: underline; text-underline-offset: 3px;">Terminer</a>
+    </header>
+
+    <div role="status" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px;">
+      <div style="font-size: 18px; font-weight: 800;">Repos terminé <span class="num" style="font-size: 18px; font-weight: 600;">· 3:00</span></div>
+      <h1 class="disp" style="margin: 16px 0 0; font-size: 40px; line-height: 1;">Squat · série 3</h1>
+      <div class="num" style="font-size: 104px; line-height: 0.95; letter-spacing: -0.02em;">102,5<span style="font-size: 40px;"> kg</span></div>
+      <div style="font-size: 22px; font-weight: 700;"><span class="num" style="font-size: 30px;">× 5</span> reps · objectif <span class="num" style="font-size: 30px;">4–6</span></div>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="font-size: 13px; font-weight: 600; color: #0E0F0C;">Séance</span>
+        <span style="font-size: 13px; color: #0E0F0C;"><span class="num" style="font-size: 16px; color: #0E0F0C;">2 / 15</span> séries</span>
+      </div>
+      <div role="progressbar" aria-label="Progression de la séance" aria-valuemin="0" aria-valuemax="15" aria-valuenow="2" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px;">
+        <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #0E0F0C; overflow: hidden;"><div style="width: 67%; height: 100%; background: #0E0F0C;"></div></div>
+        <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #0E0F0C;"></div>
+        <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #0E0F0C;"></div>
+        <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #0E0F0C;"></div>
+        <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #0E0F0C;"></div>
+      </div>
+    </div>
+
+    <div style="flex-shrink: 0; display: grid; grid-template-columns: 2fr 3fr; gap: 12px;">
+      <button class="btn" style="min-height: 60px; font-size: 17px; border-color: #0E0F0C; color: #0E0F0C;">+15 s de repos</button>
+      <a class="btn" href="Nuit-Seance.dc.html" style="min-height: 60px; font-size: 20px; font-weight: 800; background: #0E0F0C; border-color: #0E0F0C; color: #C6F432;">C'est parti</a>
+    </div>
+  </main>
+  <div aria-hidden="true" style="height: 34px; flex-shrink: 0;"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
