@@ -67,4 +67,4 @@ Principes à respecter :
 
 ## Git
 
-Dépôt `Ninninp/sportix`, branche `main`. Le projet est travaillé depuis plusieurs machines : commencer par `git pull`, et pousser en fin de session de travail.
+Dépôt `Ninninp/Sportix`, branche `main`. Le projet est travaillé depuis plusieurs machines : commencer par `git pull`, et pousser en fin de session de travail.
