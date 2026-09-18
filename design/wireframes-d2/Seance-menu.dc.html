@@ -26,10 +26,16 @@
 <div style="width: 390px; height: 844px; position: relative; background: #f4f4f2; overflow: hidden;">
   <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; display: flex; flex-direction: column;">
     <div class="safe" style="height: 47px;">Zone encoche · 47 pt</div>
-    <div style="padding: 12px 16px; display: flex; flex-direction: column; gap: 12px;">
-      <div class="ph" style="height: 44px; width: 220px;"></div>
-      <div class="card" style="height: 320px;"></div>
-      <div class="card" style="height: 64px;"></div>
+    <div style="padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px;">
+      <div class="ph" style="height: 44px;"></div>
+      <div style="display: flex; gap: 8px;"><div class="ph" style="height: 48px; width: 110px; border-radius: 24px; background: #2b2b29;"></div><div class="ph" style="height: 48px; width: 100px; border-radius: 24px;"></div><div class="ph" style="height: 48px; width: 110px; border-radius: 24px;"></div></div>
+      <div class="ph" style="height: 56px; width: 200px;"></div>
+      <div class="card" style="padding: 4px; display: flex; flex-direction: column; gap: 4px;">
+        <div style="height: 52px; border-radius: 10px; background: #d6d6d2;"></div>
+        <div style="height: 52px; border-radius: 10px; background: #2b2b29;"></div>
+        <div style="height: 52px; border-radius: 10px; background: #ffffff; box-shadow: inset 0 0 0 1px #e2e2de;"></div>
+        <div style="height: 48px;"></div>
+      </div>
     </div>
   </div>
   <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: rgba(20, 20, 19, 0.55);"></div>
@@ -45,7 +51,6 @@
       <a class="btn" href="Choix-exercice.dc.html" style="justify-content: flex-start; min-height: 56px;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"></path></svg>
         <span style="flex-grow: 1; text-align: left;">Remplacer l'exercice</span>
-        <span class="muted" style="font-size: 13px; font-weight: 400;">machine prise ?</span>
       </a>
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -55,13 +60,12 @@
           <button class="chip" aria-pressed="false">Smith</button>
           <button class="chip" aria-pressed="false">Machine</button>
         </div>
-        <span class="muted" style="font-size: 13px;">Les charges et la « dernière fois » suivent la variante.</span>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span class="lbl">Objectif pour cette séance</span>
+        <span class="lbl">Objectif du jour</span>
         <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding-left: 16px;">
-          <span class="num" style="font-size: 22px; font-weight: 600;">3 × 5</span>
+          <span style="font-size: 18px; font-weight: 600;"><span class="num">3</span> séries · <span class="num">4</span> à <span class="num">6</span> reps</span>
           <button class="btn ghost" style="text-decoration: underline;">Modifier</button>
         </div>
       </div>

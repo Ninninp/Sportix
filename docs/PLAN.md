@@ -41,7 +41,7 @@ Le design est traité comme une **phase dédiée (Phase D) avant le code**, puis
 - `exercises` : id, nom, groupe musculaire, type (charge/poids du corps/temps), variantes disponibles (barre/smith/haltères/machine/poulie)
 - `programs` : id, nom, description
 - `programDays` : id, programId, nom (ex. « Push »), ordre
-- `programExercises` : id, programDayId, exerciseId, variante, séries cibles, repsMin, repsMax (fourchette de double progression), repos (s)
+- `programExercises` : id, programDayId, exerciseId, variante, séries cibles, repsMin, repsMax (fourchette de double progression), doubleProgression (booléen, vrai par défaut), repos (s)
 - `blockGoals` : id, nom (créés par l'utilisateur ; « Force » fourni en exemple)
 - `blocks` : id, nom, goalId, dateDébut, durée (semaines, deload compris), deloadWeeks (n° des semaines de deload), programId, notes
 - `sessions` : id, date, programDayId?, blockId?, durée, notes

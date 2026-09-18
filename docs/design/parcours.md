@@ -6,7 +6,7 @@
 > - **v2 (17/09/2026)** : pré-remplissage, boutons de saisie, remplacement d'exercice, création d'exercice à la volée, variantes d'équipement, deload, objectifs de bloc libres.
 > - **v3 (17/09/2026)** : double progression, Barre et Haltères séparées, graphiques perso (poids, séances/semaine) avec lignes d'objectif.
 > - **v4 (17/09/2026)** : regroupement d'écrans de la v3 annulé (on revient aux écrans séparés et aux 5 onglets) ; la Smith devient une variante à part entière.
-> - **v5 (18/09/2026)** : pendant la séance, la BottomNav est masquée (voir § 4) ; le repère « dernière fois » disparaît de la saisie, puisque les valeurs sont déjà pré-remplies avec la séance précédente.
+> - **v5 (18/09/2026)** : pendant la séance, la BottomNav est masquée (voir § 4) ; double progression activable par exercice (§ 2.1) ; le repère « dernière fois » disparaît de la saisie, puisque les valeurs sont déjà pré-remplies avec la séance précédente.
 
 **Vocabulaire**
 - Un **onglet** est une entrée de la barre de navigation du bas (BottomNav). Il y en a 5.
@@ -46,6 +46,7 @@ Le programme fixe, pour chaque exercice, un **nombre de séries** et une **fourc
 - Quand toutes les séries l'ont atteint, la fois suivante l'app **propose d'augmenter la charge** d'un pas (badge « ↑ +2,5 kg — objectif atteint la dernière fois »), et l'objectif de reps repart du **bas de la fourchette**. On peut refuser et garder la charge.
 - En **séance libre** (sans programme), l'objectif repris est celui utilisé la dernière fois pour cet exercice. On peut le modifier via `⋯` → « Objectif ». Si l'exercice n'a jamais eu d'objectif, il n'y en a pas.
 - Les séances faites pendant une semaine de deload ne déclenchent pas de proposition d'augmentation.
+- La double progression est une **option par exercice du programme** (interrupteur on/off dans le détail de l'exercice, activé par défaut ; décision D2 du 18/09/2026). Désactivée, l'app ne propose jamais d'augmenter la charge : les séries sont pré-remplies avec la séance précédente, et c'est tout.
 
 ### 2.2 Pré-remplissage
 Quand un exercice arrive dans la séance, ses séries sont créées automatiquement :
@@ -275,7 +276,7 @@ Les objectifs perso (poids cible, séances/semaine, zone de séries) se modifien
 
 Reporté dans [`docs/PLAN.md`](../PLAN.md) :
 - `exercises` : + `variantes` (barre / smith / haltères / machine / poulie).
-- `programExercises` : + `variante` ; les reps cibles deviennent une fourchette `repsMin` / `repsMax`.
+- `programExercises` : + `variante` ; les reps cibles deviennent une fourchette `repsMin` / `repsMax` ; + `doubleProgression` (booléen, vrai par défaut).
 - `sets` : + `variante`, + `repsMin` / `repsMax` (objectif en vigueur pendant la série, pour que l'historique reste juste si le programme change ensuite).
 - nouvelle table `blockGoals` (« Force » fournie en exemple) ; `blocks.objectif` devient `blocks.goalId`.
 - `blocks` : + `deloadWeeks`.
