@@ -6,6 +6,7 @@
 > - **v2 (17/09/2026)** : pré-remplissage, boutons de saisie, remplacement d'exercice, création d'exercice à la volée, variantes d'équipement, deload, objectifs de bloc libres.
 > - **v3 (17/09/2026)** : double progression, Barre et Haltères séparées, graphiques perso (poids, séances/semaine) avec lignes d'objectif.
 > - **v4 (17/09/2026)** : regroupement d'écrans de la v3 annulé (on revient aux écrans séparés et aux 5 onglets) ; la Smith devient une variante à part entière.
+> - **v5 (18/09/2026)** : pendant la séance, la BottomNav est masquée (voir § 4) ; le repère « dernière fois » disparaît de la saisie, puisque les valeurs sont déjà pré-remplies avec la séance précédente.
 
 **Vocabulaire**
 - Un **onglet** est une entrée de la barre de navigation du bas (BottomNav). Il y en a 5.
@@ -17,7 +18,7 @@
 | Écran | Onglet | Jalon | Rôle | Informations affichées | Action principale |
 |---|---|---|---|---|---|
 | **Accueil** | Séance | J3 → J5/J6/J7 | Point d'entrée : lancer une séance | Bloc actif (semaine X/Y, deload signalé) dès J6 ; séance du jour dès J5 ; raccourci pesée dès J7 ; sinon « Démarrer une séance » | Démarrer une séance |
-| **Séance en cours** | Séance | J3 | Cœur de l'app, utilisé en salle | Exercices et leur variante ; séries pré-remplies ; objectif de reps ; badge ↑ charge ; repère « dernière fois » | Cocher une série · `+ Série` · boutons +/− |
+| **Séance en cours** | Séance | J3 | Cœur de l'app, utilisé en salle | Exercices et leur variante ; séries pré-remplies ; fourchette de reps ; badge ↑ charge ; progression de la séance | Valider la série · `+ Série` · boutons +/− |
 | **Repos actif / terminé** | Séance | J4 | Minuteur entre deux séries | Décompte en gros chiffres, +15 s, passer ; à la fin, l'écran change franchement de couleur et un son est joué | Passer / reprendre |
 | **Choix d'exercice** | Séance | J3 | Ajouter **ou remplacer** un exercice | Recherche, filtre par groupe musculaire, choix de la variante, « Créer un exercice » | Sélectionner · créer à la volée |
 | **Création rapide d'exercice** (panneau) | — | J2/J3 | Créer un exercice sans quitter la séance ou le programme | Nom (pré-rempli avec la recherche), groupe musculaire, type, variantes | Créer et ajouter |
@@ -56,11 +57,9 @@ Quand un exercice arrive dans la séance, ses séries sont créées automatiquem
 | **Charge** | Dernière fois (même variante), **+ un pas** si la double progression le propose ; sinon vide |
 | **Reps** | Reps faites la dernière fois sur *cette* série : c'est le score à battre. Sinon bas de la fourchette. |
 
-Les valeurs pré-remplies restent en **gris clair** tant que la série n'est pas cochée. Un tap sur « fait » valide la série. Si on a fait plus de reps, on appuie d'abord sur `+`.
+Les valeurs pré-remplies restent en **gris clair** tant que la série n'est pas validée. Le bouton « Valider la série » la valide. Si on a fait plus de reps, on appuie d'abord sur `+`.
 
-Exemple de ligne de série :
-`Série 2 │ 80 kg [−][+] │ 10 reps [−][+]  obj. 12 │ ☐`
-avec, sous le nom de l'exercice, le repère « dernière fois : 80 kg × 12, 11, 10 ».
+*Mise à jour D2 (18/09/2026)* : il n'y a plus de case à cocher par ligne. L'état d'une série se lit à la couleur de sa ligne (passée / en cours / à venir), et un pavé de saisie en bas d'écran (charge et reps, chacun avec ses −/+, puis « Valider la série ») agit sur la série en cours. La fourchette de reps est affichée sous le nom de l'exercice et dans le pavé.
 
 ### 2.3 Saisie par boutons
 - **Charge** : `−` / `+` avec le pas de charge de la variante (§ 5). Un tap sur le chiffre ouvre le pavé numérique.
@@ -211,6 +210,7 @@ flowchart TD
 ```
 
 - Si une séance est en cours, l'onglet **Séance** ouvre directement la séance, et non l'Accueil.
+- **Pendant une séance, la BottomNav est masquée** (écran plein, décision du 18/09/2026, en D2). Une flèche « réduire » en haut à gauche ramène au reste de l'app sans arrêter la séance ; une petite barre « Séance en cours · chrono » apparaît alors au-dessus des onglets pour y revenir.
 - La **bibliothèque d'exercices** est rangée dans les Réglages, car c'est un écran de gestion. Pendant l'entraînement, on crée les exercices à la volée depuis « Choix d'exercice ».
 
 ## 5. Questions métier tranchées
@@ -269,7 +269,7 @@ Les objectifs perso (poids cible, séances/semaine, zone de séries) se modifien
 *Pour plus tard (J9, si besoin)* : mensurations (tour de bras, de taille…) sur le même modèle que le poids.
 
 ### « Dernière fois » pendant la saisie
-Repère discret sous le nom de l'exercice (« dernière fois : 80 kg × 12, 11, 10 »), en plus des reps à battre pré-remplies sur chaque série (§ 2.2).
+~~Repère discret sous le nom de l'exercice.~~ **Abandonné en D2 (18/09/2026)** : les valeurs pré-remplies sur chaque série (§ 2.2) reprennent déjà la séance précédente, le repère faisait doublon. Seul reste le badge « ↑ charge » quand la double progression augmente la charge.
 
 ## 6. Impact sur le modèle de données
 

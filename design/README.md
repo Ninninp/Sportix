@@ -13,7 +13,8 @@ Les fichiers de `wireframes-d2/` sont une **copie** des sources du canvas, faite
 ## Choix de design
 
 - **D2** : 14 planches au format iPhone 14 (390×844 ; Stats et Réglages sont des pages plus hautes, qui défilent).
-  - **Séance en cours** : seule la série active est dépliée, avec de gros boutons −/+ pour la charge et les reps, et un bouton « Valider la série » dans la zone du pouce. Les autres séries tiennent sur une ligne.
+  - **Accueil** (refait le 18/09) : la carte « Séance du jour » domine (aperçu des exercices + gros bouton Démarrer en bas) ; bloc actif sur une ligne fine ; semaine en 7 pastilles ; poids en petit dans l'en-tête ; bouton « Séance libre » secondaire.
+  - **Séance en cours** (refaite le 18/09, validée) : onglets masqués ; pastilles d'exercices en haut ; séries dont l'état se lit à la couleur de la ligne (faite / en cours / à venir), sans case à cocher ; barre de progression de la séance au milieu ; pavé Charge et Reps (chacun ses −/+, fourchette de reps affichée) ; bouton « Valider » séparé, en bas. Pas de repère « dernière fois » : les valeurs sont pré-remplies.
   - **Mode Play** : les onglets et les boutons principaux sont cliquables.
 - **D3** : direction visuelle, à venir.
 

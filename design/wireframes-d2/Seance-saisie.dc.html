@@ -13,98 +13,118 @@
     a { color: #1e1e1c; } a:hover { color: #000000; }
     .num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
     .safe { flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: .04em; color: #5e5e5a; background: repeating-linear-gradient(135deg, #d6d6d2 0 6px, #e6e6e3 6px 12px); }
-    .nav { flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #ffffff; border-top: 1px solid #c9c9c4; }
-    .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #5e5e5a; text-decoration: none; }
-    .tab.on { color: #1e1e1c; font-weight: 700; }
     .card { background: #ffffff; border: 1px solid #c9c9c4; border-radius: 12px; box-sizing: border-box; }
     .btn { box-sizing: border-box; min-height: 48px; padding: 0 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 1.5px solid #1e1e1c; background: #ffffff; color: #1e1e1c; font: 600 16px 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; cursor: pointer; }
     .btn.pri { background: #2b2b29; border-color: #2b2b29; color: #ffffff; }
     .btn.ghost { border-color: transparent; background: transparent; }
     .icon-btn { box-sizing: border-box; width: 48px; height: 48px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; border: 1.5px solid transparent; background: transparent; color: #1e1e1c; text-decoration: none; cursor: pointer; }
-    .step { box-sizing: border-box; width: 56px; height: 52px; flex-shrink: 0; border-radius: 10px; border: 1px solid #c9c9c4; background: #f4f4f2; color: #1e1e1c; font: 600 24px 'IBM Plex Mono', ui-monospace, monospace; cursor: pointer; }
-    .pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; border: 1px solid #8a8a85; vertical-align: middle; }
+    .chip { box-sizing: border-box; flex-shrink: 0; min-height: 48px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border-radius: 24px; border: 1.5px solid #c9c9c4; background: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+    .chip.on { background: #2b2b29; border-color: #2b2b29; color: #ffffff; }
     .lbl { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5e5e5a; }
     .muted { color: #5e5e5a; }
-    .setrow { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 4px 0 8px; border-bottom: 1px solid #e2e2de; }
+    .setrow { box-sizing: border-box; width: 100%; min-height: 52px; display: grid; grid-template-columns: 24px minmax(0, 1fr) 72px; column-gap: 12px; align-items: center; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: #1e1e1c; font: inherit; text-align: left; cursor: pointer; }
+    .setrow.past { background: #d6d6d2; color: #1e1e1c; }
+    .setrow.now { background: #2b2b29; color: #ffffff; }
+    .setrow.next { background: #ffffff; color: #7a7a75; box-shadow: inset 0 0 0 1px #e2e2de; }
+    .stepper { display: flex; align-items: stretch; height: 56px; border: 1.5px solid #1e1e1c; border-radius: 12px; overflow: hidden; background: #ffffff; }
+    .stepper button { box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #e9e9e6; color: #1e1e1c; font: 600 24px 'IBM Plex Mono', ui-monospace, monospace; cursor: pointer; }
+    .stepper .val { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-left: 1.5px solid #1e1e1c; border-right: 1.5px solid #1e1e1c; }
   </style>
 </helmet>
 <div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #f4f4f2; overflow: hidden;">
   <div class="safe" style="height: 47px;">Zone encoche · 47 pt</div>
-  <main style="flex-grow: 1; overflow: hidden; padding: 8px 16px 12px; display: flex; flex-direction: column; gap: 12px;">
-    <header style="display: flex; align-items: center; gap: 4px;">
+  <main style="flex-grow: 1; overflow: hidden; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 12px;">
+
+    <header style="display: flex; align-items: center; gap: 4px; margin-left: -8px;">
+      <a class="icon-btn" href="Main.dc.html" aria-label="Réduire la séance (elle continue)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></a>
       <div style="flex-grow: 1;">
-        <div style="font-size: 20px; font-weight: 700;">Force A — Jambes</div>
-        <div class="muted num" style="font-size: 13px;">24:10 · exercice 1/5</div>
+        <div style="font-size: 15px; font-weight: 700;">Force A — Jambes</div>
+        <div class="muted num" style="font-size: 13px;">24:10</div>
       </div>
-      <a class="icon-btn" href="Choix-exercice.dc.html" aria-label="Ajouter un exercice" style="border-color: #c9c9c4;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
-      <a class="btn" href="Main.dc.html">Terminer</a>
+      <a class="btn" href="Main.dc.html" style="min-height: 44px; padding: 0 14px; font-size: 15px;">Terminer</a>
     </header>
 
-    <section class="card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-      <div style="display: flex; align-items: flex-start; gap: 8px;">
-        <div style="flex-grow: 1;">
-          <div style="font-size: 20px; font-weight: 700;">Squat <span class="pill">Barre</span></div>
-          <div class="muted" style="font-size: 13px;">Objectif 3 × 5 · dernière fois <span class="num">100 kg × 5, 5, 5</span></div>
-        </div>
-        <a class="icon-btn" href="Seance-menu.dc.html" aria-label="Options de l'exercice"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle></svg></a>
+    <nav aria-label="Exercices de la séance" style="display: flex; align-items: center; gap: 8px; margin-right: -16px;">
+      <div style="flex-grow: 1; display: flex; gap: 8px; overflow: hidden;">
+        <a class="chip on" href="Seance-saisie.dc.html" aria-current="step">Squat <span class="num" style="font-size: 13px; opacity: .8;">1/3</span></a>
+        <a class="chip" href="Seance-saisie.dc.html">Presse <span class="num muted" style="font-size: 13px;">0/3</span></a>
+        <a class="chip" href="Seance-saisie.dc.html">Leg curl <span class="num muted" style="font-size: 13px;">0/3</span></a>
+        <a class="chip" href="Seance-saisie.dc.html">Fentes <span class="num muted" style="font-size: 13px;">0/3</span></a>
       </div>
+      <a class="icon-btn" href="Choix-exercice.dc.html" aria-label="Ajouter un exercice" style="border-color: #c9c9c4; border-radius: 24px; margin-right: 16px; background: #ffffff;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    </nav>
 
-      <div style="display: flex; align-items: center; gap: 8px; padding: 0 0 0 10px; border-radius: 10px; border: 1.5px dashed #1e1e1c; font-size: 14px; font-weight: 600;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>
-        <span style="flex-grow: 1;">+2,5 kg : objectif atteint la dernière fois</span>
-        <button class="btn ghost" style="padding: 0 10px; font-size: 14px; text-decoration: underline;">Garder 100</button>
+    <div style="display: flex; align-items: flex-start; gap: 8px; margin-top: 4px;">
+      <div style="flex-grow: 1;">
+        <h1 style="margin: 0; font-size: 30px; font-weight: 700; line-height: 1.1;">Squat</h1>
+        <div style="font-size: 15px; margin-top: 2px;"><span class="num" style="font-weight: 700;">3 × 4–6 reps</span> <span class="muted">· Barre · repos <span class="num">3:00</span></span></div>
       </div>
+      <a class="icon-btn" href="Seance-menu.dc.html" aria-label="Options de l'exercice" style="margin-right: -8px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"></circle><circle cx="12" cy="12" r="1.5"></circle><circle cx="19" cy="12" r="1.5"></circle></svg></a>
+    </div>
 
-      <div class="setrow">
-        <span class="muted" style="width: 20px; font-weight: 600;">1</span>
-        <span class="num" style="flex-grow: 1; font-size: 20px; font-weight: 600;">102,5 kg × 5</span>
-        <span style="font-size: 12px; font-weight: 600;">obj. atteint</span>
-        <button class="icon-btn" aria-label="Série 1 faite" aria-pressed="true" style="background: #2b2b29; color: #ffffff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></button>
+    <section class="card" aria-label="Séries du squat" style="flex-shrink: 0; padding: 4px; display: flex; flex-direction: column; gap: 4px;">
+      <button class="setrow past" aria-label="Série 1, faite : 102,5 kg, 5 reps">
+        <span class="num" style="font-weight: 600;">1</span>
+        <span class="num" style="font-size: 22px; font-weight: 600;">102,5 kg</span>
+        <span class="num" style="font-size: 22px; font-weight: 600; text-align: right;">× 5</span>
+      </button>
+      <button class="setrow now" aria-current="true" aria-label="Série 2, en cours">
+        <span class="num" style="font-weight: 700;">2</span>
+        <span class="num" style="font-size: 22px; font-weight: 600;">102,5 kg</span>
+        <span class="num" style="font-size: 22px; font-weight: 600; text-align: right;">× 5</span>
+      </button>
+      <button class="setrow next" aria-label="Série 3, à faire">
+        <span class="num" style="font-weight: 600;">3</span>
+        <span class="num" style="font-size: 22px; font-weight: 600;">102,5 kg</span>
+        <span class="num" style="font-size: 22px; font-weight: 600; text-align: right;">× 5</span>
+      </button>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn ghost" style="padding: 0 10px; font-size: 15px;">+ Série</button>
+        <a href="Seance-saisie.dc.html" style="min-height: 48px; display: flex; align-items: center; gap: 4px; padding: 0 6px 0 10px; text-decoration: none; font-size: 14px;"><span class="muted">Ensuite :</span> <span style="font-weight: 600;">Presse</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
       </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 12px; border: 2px solid #1e1e1c; background: #f4f4f2;">
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span style="font-size: 16px; font-weight: 700;">Série 2</span>
-          <span class="muted" style="font-size: 13px;">dernière fois <span class="num">100 × 5</span></span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="lbl" style="width: 52px;">Charge</span>
-          <button class="step" aria-label="Retirer 2,5 kg">−</button>
-          <span class="num" style="flex-grow: 1; text-align: center; font-size: 32px; font-weight: 600; color: #7a7a75;">102,5</span>
-          <button class="step" aria-label="Ajouter 2,5 kg">+</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="lbl" style="width: 52px;">Reps</span>
-          <button class="step" aria-label="Retirer une rep">−</button>
-          <span style="flex-grow: 1; text-align: center;"><span class="num" style="font-size: 32px; font-weight: 600; color: #7a7a75;">5</span> <span class="muted" style="font-size: 14px; font-weight: 600;">/ obj. 5</span></span>
-          <button class="step" aria-label="Ajouter une rep">+</button>
-        </div>
-        <a class="btn pri" href="Seance-repos.dc.html" style="min-height: 56px; font-size: 18px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Valider la série</a>
-      </div>
-
-      <div class="setrow">
-        <span class="muted" style="width: 20px; font-weight: 600;">3</span>
-        <span class="num" style="flex-grow: 1; font-size: 20px; font-weight: 600; color: #7a7a75;">102,5 kg × 5</span>
-        <button class="icon-btn" aria-label="Série 3 faite" aria-pressed="false" style="border-color: #8a8a85;"></button>
-      </div>
-      <button class="btn ghost" style="align-self: flex-start; padding: 0 8px;">+ Série</button>
     </section>
 
-    <a class="card" href="Seance-saisie.dc.html" style="padding: 10px 16px; min-height: 64px; text-decoration: none; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-      <div>
-        <div style="font-size: 17px; font-weight: 700;">Presse à cuisses <span class="pill">Machine</span></div>
-        <div class="muted" style="font-size: 13px;">Objectif 3 × 8–12 · 0/3</div>
+    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span class="lbl">Séance</span>
+        <span class="muted" style="font-size: 13px;"><span class="num" style="font-weight: 600; color: #1e1e1c;">1 / 15</span> séries</span>
       </div>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-    </a>
+      <div role="progressbar" aria-label="Progression de la séance" aria-valuemin="0" aria-valuemax="15" aria-valuenow="1" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px;">
+        <div style="height: 6px; border-radius: 3px; background: #d6d6d2; overflow: hidden;"><div style="width: 33%; height: 6px; background: #2b2b29;"></div></div>
+        <div style="height: 6px; border-radius: 3px; background: #d6d6d2;"></div>
+        <div style="height: 6px; border-radius: 3px; background: #d6d6d2;"></div>
+        <div style="height: 6px; border-radius: 3px; background: #d6d6d2;"></div>
+        <div style="height: 6px; border-radius: 3px; background: #d6d6d2;"></div>
+      </div>
+    </div>
+
+    <section class="card" aria-label="Saisie de la série 2" style="flex-shrink: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 16px; font-weight: 700;">Série 2 sur 3</span>
+        <span style="font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; border: 1.5px solid #1e1e1c;">↑ charge +2,5 kg</span>
+      </div>
+
+      <div class="stepper" role="group" aria-label="Charge">
+        <button aria-label="Retirer 2,5 kg">−</button>
+        <div class="val">
+          <span class="lbl">Charge</span>
+          <span><span class="num" style="font-size: 28px; font-weight: 600; line-height: 1; color: #7a7a75;">102,5</span> <span class="muted" style="font-size: 15px; font-weight: 600;">kg</span></span>
+        </div>
+        <button aria-label="Ajouter 2,5 kg">+</button>
+      </div>
+
+      <div class="stepper" role="group" aria-label="Répétitions, objectif 4 à 6">
+        <button aria-label="Retirer une rep">−</button>
+        <div class="val">
+          <span class="lbl">Reps · <span style="color: #1e1e1c;">objectif 4–6</span></span>
+          <span><span class="num" style="font-size: 28px; font-weight: 600; line-height: 1; color: #7a7a75;">5</span> <span class="muted" style="font-size: 15px; font-weight: 600;">reps</span></span>
+        </div>
+        <button aria-label="Ajouter une rep">+</button>
+      </div>
+    </section>
+
+    <a class="btn pri" href="Seance-repos.dc.html" aria-label="Valider la série 2" style="flex-shrink: 0; min-height: 56px; font-size: 19px;">Valider</a>
   </main>
-  <nav class="nav" aria-label="Navigation principale">
-    <a class="tab on" href="Main.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"></path></svg><span>Séance</span></a>
-    <a class="tab" href="Programmes.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span>Programmes</span></a>
-    <a class="tab" href="Calendrier.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Calendrier</span></a>
-    <a class="tab" href="Stats.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"></path></svg><span>Stats</span></a>
-    <a class="tab" href="Reglages.dc.html"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span>Réglages</span></a>
-  </nav>
   <div class="safe" style="height: 34px;">Barre d'accueil · 34 pt</div>
 </div>
 </x-dc>
