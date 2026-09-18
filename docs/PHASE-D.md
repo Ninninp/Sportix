@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1 fait ; D2 publié, en relecture**.
+> Plan validé le 16/09/2026. Statut : **D1 et D2 faits ; prochaine étape D3** (directions visuelles).
 >
 > **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
@@ -67,7 +67,7 @@ Livrable : **`docs/design/parcours.md`**, en français :
   - l'affichage de la « dernière fois » pendant la saisie.
 - ✅ Point de validation : l'utilisateur relit et tranche les questions. **Validé** (v4 de `parcours.md`), avec en plus : double progression, 5 variantes d'équipement, remplacement d'exercice, deload, poids corporel et objectifs perso.
 
-### D2 — Wireframes basse fidélité (session 2, canvas Design) — premier jet publié le 17/09/2026, en attente de validation
+### D2 — Wireframes basse fidélité (session 2, canvas Design) ✅ validé le 18/09/2026 (accueil et écrans de séance refaits, voir `design/README.md`)
 Un canvas de **9 planches** en niveaux de gris, sans couleur (liste revue après D1, détail dans `docs/design/parcours.md` § 7) :
 - Accueil
 - Séance en cours

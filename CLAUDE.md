@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel du dépôt
 
-**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». Prochaine étape : **Phase D** (design), dont le plan détaillé validé est dans [`docs/PHASE-D.md`](docs/PHASE-D.md) — reprendre à l'étape non cochée (D1 au départ). Puis J1 (coquille PWA).
+**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». Prochaine étape : **Phase D** (design), dont le plan détaillé validé est dans [`docs/PHASE-D.md`](docs/PHASE-D.md) — reprendre à l'étape non cochée (D1 et D2 faits, reprendre à D3). Puis J1 (coquille PWA).
 
 ## Appareil cible et outil de design
 

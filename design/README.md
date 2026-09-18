@@ -6,7 +6,7 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 
 | Étape | Canvas | Statut | Sources |
 |---|---|---|---|
-| D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Premier jet publié le 17/09/2026, en relecture | [`wireframes-d2/`](wireframes-d2/) |
+| D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Validé le 18/09/2026 | [`wireframes-d2/`](wireframes-d2/) |
 
 Les fichiers de `wireframes-d2/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
 
