@@ -1,0 +1,58 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-18T14:30:00Z"
+  },
+  "title": "Sportix — Design system D4",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 1060,
+      "title": "Couleurs et typographie"
+    },
+    "Composants-clair.dc.html": {
+      "x": 1360,
+      "y": 0,
+      "w": 390,
+      "h": 2330,
+      "title": "Composants — clair"
+    },
+    "Composants-sombre.dc.html": {
+      "x": 1830,
+      "y": 0,
+      "w": 390,
+      "h": 2330,
+      "title": "Composants — sombre"
+    },
+    "Icone.dc.html": {
+      "x": 0,
+      "y": 1180,
+      "w": 1000,
+      "h": 720,
+      "title": "Icône"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Composants-clair.dc.html",
+    "Composants-sombre.dc.html",
+    "Icone.dc.html"
+  ],
+  "notes": {
+    "t": {
+      "x": 0,
+      "y": -300,
+      "text": "Design system D4 — deux thèmes, mêmes tokens",
+      "kind": "title1",
+      "maxW": 2220
+    }
+  },
+  "designSystems": []
+}

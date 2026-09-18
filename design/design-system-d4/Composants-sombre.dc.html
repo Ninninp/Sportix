@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Composants — Sombre</title>
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif; background: #d9d9d6; }
+    a { color: inherit; } a:hover { color: inherit; }
+    .num { font-variant-numeric: tabular-nums; font-weight: 700; }
+  </style>
+</helmet>
+<div style="width: 390px; height: 2330px; box-sizing: border-box; padding: 24px 16px 32px; background: #0E0F0C; color: #F2F3EE; display: flex; flex-direction: column; gap: 28px;">
+    <header>
+      <h1 style="margin: 0; font-size: 34px; line-height: 38px; font-weight: 800; letter-spacing: -0.02em;">Composants</h1>
+      <p style="margin: 4px 0 0; font-size: 15px; color: #A3A79C;">Thème sombre · SF Pro (Inter en aperçu)</p>
+    </header>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Button — principal</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #C6F432; color: #0E0F0C; border: 1.5px solid #C6F432;">Valider</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Normal</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #C6F432; color: #0E0F0C; border: 1.5px solid #C6F432; box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.22); transform: scale(0.97);">Valider</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Pressé</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button disabled style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #23261F; color: #8A8E83; border: 1.5px solid #23261F;">Valider</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Désactivé</span></div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Button — secondaire</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; color: #F2F3EE; border: 1.5px solid #F2F3EE;">+15 s</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Normal</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; color: #F2F3EE; border: 1.5px solid #F2F3EE; box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.22); transform: scale(0.97);">+15 s</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Pressé</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button disabled style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #23261F; color: #8A8E83; border: 1.5px solid #23261F;">+15 s</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Désactivé</span></div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Button — danger et lien</h2>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><button style="box-sizing: border-box; width: 100%; min-height: 56px; border-radius: 12px; font-size: 17px; font-weight: 700; font-family: inherit; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #FF6B5E; color: #0E0F0C; border: 1.5px solid #FF6B5E;">Supprimer</button><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Normal</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><a href="#" style="min-height: 56px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: #A3A79C; text-decoration: underline; text-underline-offset: 3px;">Terminer</a><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Lien discret</span></div>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Pastilles et badges</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+        <a href="#" aria-current="step" style="box-sizing: border-box; min-height: 48px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; background: #F2F3EE; color: #0E0F0C; font-size: 15px; font-weight: 600; text-decoration: none;">Squat <span class="num" style="opacity: .8;">1/3</span></a>
+        <a href="#" style="box-sizing: border-box; min-height: 48px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; border: 1.5px solid #6B6F66; color: #F2F3EE; font-size: 15px; font-weight: 600; text-decoration: none;">Presse <span class="num" style="opacity: .8;">0/3</span></a>
+        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #FF8A4C; color: #0E0F0C;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>charge +2,5 kg</span>
+        <span style="font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #FF8A4C; color: #0E0F0C;">PR</span>
+      </div>
+      <div style="display: flex; gap: 16px;"><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Pastille active · inactive</span><span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Badges : progression, PR</span></div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Card</h2>
+      <div style="box-sizing: border-box; padding: 12px 16px; border-radius: 16px; background: #181A16; border: 1px solid #2E322B; display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 17px; font-weight: 600; color: #F2F3EE;">Carte</span>
+        <span style="font-size: 15px; color: #A3A79C;">Fond surface, contour décoratif, arrondi 16 px, sans ombre.</span>
+      </div>
+      <div style="box-sizing: border-box; padding: 16px; border-radius: 16px; background: #F2F3EE; color: #0E0F0C; display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">Force A — Jambes</span>
+        <span style="font-size: 15px; color: #4A4E45;">Carte inversée : « ici, maintenant »</span>
+        <a href="#" style="box-sizing: border-box; min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: #0E0F0C; color: #C6F432; font-size: 20px; font-weight: 800; text-decoration: none;">Démarrer la séance</a>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">NumberStepper</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div role="group" aria-label="Charge" style="display: flex; align-items: stretch; height: 60px; border: 1.5px solid #6B6F66; border-radius: 12px; overflow: hidden; background: #181A16;">
+          <button aria-label="Moins" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer;">−</button>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #A3A79C;">Charge</span>
+            <span><span class="num" style="font-size: 38px; line-height: 40px; color: #F2F3EE;">102,5</span> <span style="font-size: 15px; font-weight: 600; color: #A3A79C;">kg</span></span>
+          </div>
+          <button aria-label="Plus" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer;">+</button>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Normal</span>
+        <div role="group" aria-label="Charge" style="display: flex; align-items: stretch; height: 60px; border: 1.5px solid #6B6F66; border-radius: 12px; overflow: hidden; background: #181A16;">
+          <button aria-label="Moins" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer;">−</button>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #A3A79C;">Charge</span>
+            <span><span class="num" style="font-size: 38px; line-height: 40px; color: #F2F3EE;">105</span> <span style="font-size: 15px; font-weight: 600; color: #A3A79C;">kg</span></span>
+          </div>
+          <button aria-label="Plus" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer; box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.22);">+</button>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">« + » pressé : la valeur change aussitôt</span>
+        <div role="group" aria-label="Reps" style="display: flex; align-items: stretch; height: 60px; border: 1.5px solid #6B6F66; border-radius: 12px; overflow: hidden; background: #181A16;">
+          <button disabled aria-label="Moins" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer; color: #6B6F66;">−</button>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #A3A79C;">Reps</span>
+            <span><span class="num" style="font-size: 38px; line-height: 40px; color: #F2F3EE;">0</span> <span style="font-size: 15px; font-weight: 600; color: #A3A79C;">reps</span></span>
+          </div>
+          <button aria-label="Plus" style="box-sizing: border-box; width: 56px; flex-shrink: 0; border: 0; background: #23261F; color: #F2F3EE; font-size: 26px; font-weight: 700; font-family: inherit; cursor: pointer;">+</button>
+        </div>
+        <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Minimum atteint : « − » désactivé</span>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">SetRow</h2>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <button aria-label="Série 1" style="box-sizing: border-box; width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) 64px; column-gap: 12px; align-items: center; padding: 0 14px; border-radius: 8px; background: #23261F; color: #A3A79C; border: 1.5px solid #23261F; font: inherit; text-align: left; cursor: pointer;">
+          <span class="num" style="font-size: 15px;">1</span>
+          <span class="num" style="font-size: 22px;">102,5 kg</span>
+          <span class="num" style="font-size: 22px; text-align: right;">× 5</span>
+        </button>
+        <button aria-label="Série 2" style="box-sizing: border-box; width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) 64px; column-gap: 12px; align-items: center; padding: 0 14px; border-radius: 8px; background: #F2F3EE; color: #0E0F0C; border: 1.5px solid #F2F3EE; font: inherit; text-align: left; cursor: pointer;">
+          <span class="num" style="font-size: 15px;">2</span>
+          <span class="num" style="font-size: 22px;">102,5 kg</span>
+          <span class="num" style="font-size: 22px; text-align: right;">× 5</span>
+        </button>
+        <button aria-label="Série 3" style="box-sizing: border-box; width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) 64px; column-gap: 12px; align-items: center; padding: 0 14px; border-radius: 8px; background: transparent; color: #8A8E83; border: 1.5px dashed #6B6F66; font: inherit; text-align: left; cursor: pointer;">
+          <span class="num" style="font-size: 15px;">3</span>
+          <span class="num" style="font-size: 22px;">102,5 kg</span>
+          <span class="num" style="font-size: 22px; text-align: right;">× 5</span>
+        </button>
+        <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Faite (fond discret) · En cours (inversée) · À venir (pointillés)</span>
+      </div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">Bloc et progression</h2>
+      <div style="box-sizing: border-box; min-height: 52px; padding: 0 12px 0 16px; border-radius: 16px; background: #181A16; border: 1px solid #2E322B; display: flex; align-items: center; gap: 12px; color: #F2F3EE;">
+        <span style="font-size: 15px;"><span style="color: #A3A79C;">Bloc</span> <strong>Force</strong></span>
+        <div style="flex-grow: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px;">
+          <span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: #6B6F66;"></span>
+          <span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: #F2F3EE; color: #0E0F0C;">S2</span>
+          <span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1.5px solid #6B6F66;"></span>
+          <span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1.5px dashed #6B6F66; color: #A3A79C;">D</span>
+          <span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1.5px solid #6B6F66;"></span>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #A3A79C;"><span style="font-weight: 600;">Séance</span><span><span class="num" style="font-size: 16px; color: #F2F3EE;">4 / 15</span> séries</span></div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px;">
+          <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #6B6F66; background: #F2F3EE;"></div>
+          <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #6B6F66; overflow: hidden;"><div style="width: 33%; height: 100%; background: #F2F3EE;"></div></div>
+          <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #6B6F66;"></div>
+          <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #6B6F66;"></div>
+          <div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid #6B6F66;"></div>
+        </div>
+      </div>
+      <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Barre du bloc (S2 en cours, D = deload) · Progression de la séance</span>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">BottomNav</h2>
+      <nav aria-label="Navigation principale" style="height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: #181A16; border: 1px solid #2E322B; border-radius: 16px;">
+        <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 700; color: #F2F3EE; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: #F2F3EE;"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"></path></svg><span>Séance</span></a>
+        <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 500; color: #A3A79C; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: transparent;"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span>Programmes</span></a>
+        <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 500; color: #A3A79C; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: transparent;"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg><span>Calendrier</span></a>
+        <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 500; color: #A3A79C; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: transparent;"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M2 20h20"></path></svg><span>Stats</span></a>
+        <a href="#" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 500; color: #A3A79C; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: transparent;"></span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span>Réglages</span></a>
+      </nav>
+      <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Icônes Lucide, trait de 2 px, libellé toujours visible · masquée pendant la séance</span>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 10px;">
+      <h2 style="margin: 0; font-size: 17px; font-weight: 700; color: #F2F3EE;">RestTimer</h2>
+      <a href="#" style="box-sizing: border-box; min-height: 52px; padding: 0 8px 0 16px; border-radius: 16px; background: #F2F3EE; color: #0E0F0C; display: flex; align-items: center; gap: 12px; text-decoration: none;">
+        <span style="flex-grow: 1; font-size: 15px; font-weight: 600;">Séance en cours · Repos</span>
+        <span class="num" style="font-size: 22px;">1:24</span>
+        <span style="min-height: 44px; min-width: 64px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 1.5px solid #0E0F0C; font-size: 15px; font-weight: 700;">+15 s</span>
+      </a>
+      <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Compact : au-dessus des onglets quand la séance est réduite</span>
+      <div style="box-sizing: border-box; padding: 20px 16px; border-radius: 16px; background: #181A16; border: 1px solid #2E322B; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #F2F3EE;">
+        <span style="font-size: 15px; font-weight: 700; color: #A3A79C;">Repos</span>
+        <span class="num" style="font-size: 88px; line-height: 88px; letter-spacing: -0.02em;">1:24</span>
+        <div style="width: 100%; height: 10px; border-radius: 5px; border: 1.5px solid #6B6F66; box-sizing: border-box; overflow: hidden;"><div style="width: 53%; height: 100%; background: #F2F3EE;"></div></div>
+      </div>
+      <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Plein écran, repos actif (décompte)</span>
+      <div style="box-sizing: border-box; padding: 20px 16px; border-radius: 16px; background: #C6F432; color: #0E0F0C; display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 17px; font-weight: 800;">Repos terminé · <span class="num">3:00</span></span>
+        <span style="font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">Squat · série 3</span>
+        <span class="num" style="font-size: 64px; line-height: 64px; letter-spacing: -0.02em;">102,5<span style="font-size: 28px;"> kg</span></span>
+      </div>
+      <span style="font-size: 12px; font-weight: 600; color: #A3A79C;">Plein écran, fin de repos (réduit ici : 104 px dans l’app)</span>
+    </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2330}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

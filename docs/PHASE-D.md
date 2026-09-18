@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1, D2 et D3 faits ; prochaine étape D4** (design system).
+> Plan validé le 16/09/2026. Statut : **D1, D2 et D3 faits ; D4 publié le 18/09/2026, en relecture** (reprendre par la validation élément par élément : couleurs → typographie → composants → icône).
 >
 > **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
@@ -106,7 +106,9 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 
 ✅ **Fait le 18/09/2026** : Clair écarté après une critique impeccable ; les deux autres corrigées puis validées correction par correction. Décision : **deux thèmes automatiques** (sombre = « Nuit + Énergie », clair = « Énergie corrigée »). D4 doit donc produire des tokens avec une valeur par thème.
 
-### D4 — Design system (session 4)
+### D4 — Design system (session 4) — premier jet publié le 18/09/2026, en relecture
+
+> Fait : `design/tokens.md` (couleurs par rôle pour les deux thèmes, contrastes, typo SF Pro, espacements, mouvement, bloc CSS pour le J1), canvas « Sportix — Design system D4 » (lien dans `design/README.md`, sources dans `design/design-system-d4/`), `design/icon.svg`. Police décidée : SF Pro (système Apple) pour les deux thèmes. À faire : faire valider chaque élément à l'utilisateur, corriger, puis cocher D4.
 - **`design/tokens.md`** : couleurs nommées par rôle (fond, surface, texte, accent, succès/PR, danger), typographie (tailles, dont les « gros chiffres »), espacements, arrondis et ombres.
   - Chaque couleur est donnée en valeur exacte, avec son **ratio de contraste vérifié (AA)** sur son fond.
   - Le fichier est écrit pour être recopié tel quel dans le bloc `@theme` de Tailwind v4 au J1.

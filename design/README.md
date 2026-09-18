@@ -8,8 +8,9 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 |---|---|---|---|
 | D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Validé le 18/09/2026 | [`wireframes-d2/`](wireframes-d2/) |
 | D3 — Directions visuelles | [Sportix — Directions D3](https://claude.ai/artifact/41NwjzST7hReMtjdy2jfyb) | Validé le 18/09/2026 | [`directions-d3/`](directions-d3/) |
+| D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Publié le 18/09/2026, en relecture | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](icon.svg) |
 
-Les fichiers de `wireframes-d2/` et `directions-d3/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
+Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
 
 ## Choix de design
 
@@ -21,7 +22,11 @@ Les fichiers de `wireframes-d2/` et `directions-d3/` sont une **copie** des sour
   - **Sombre = A · Nuit + Énergie** : fond #0E0F0C, surfaces #181A16, texte #F2F3EE ; citron #C6F432 réservé à l'action principale et à la fin de repos ; orange #FF8A4C pour la progression ↑ et les PR ; neutre inversé (#F2F3EE) pour « en cours » et la carte du jour. Police Archivo, chiffres en Archivo étroit (largeur 72 %).
   - **Clair = B · Énergie corrigée** : fond crème #FFF4E8, encre #1A1030 ; orange #FF4B1F (texte encre) réservé à l'action principale et à la fin de repos ; jaune #FFD23F pour la progression et les PR ; encre inversée pour « en cours » et la carte du jour. Barlow Condensed (titres en capitales, chiffres) + Barlow.
   - Règles communes issues de la critique impeccable (validées une par une) : chiffres de saisie en 38 px étroits et gras, blocs −/+ de 60 px ; fin de repos = la série suivante en héros (« Squat · série 3 », « 102,5 kg » en 104 px, bouton « C'est parti ») ; contrastes AA partout (contours ≥ 3:1, texte ≥ 4,5:1, 12 px minimum) ; séries à venir en pointillés ; bloc en barre fine S1…S5 avec « S2 » (en cours) et « D » (deload) ; « Terminer » en lien discret ; pas d'étiquette au-dessus des titres ; carte du jour avec les 5 exercices.
-  - Point ouvert pour D4 : garder deux familles de polices (une par thème) ou unifier ; régler la barre d'état iOS pour la fin de repos (J1).
+  - Polices : tranché en D4, une seule police pour les deux thèmes, **SF Pro** (police système Apple ; Inter en aperçu sur le canvas). Reste à régler au J1 : la barre d’état iOS sur la fin de repos.
+
+## Notes pour plus tard
+
+- **Animation « +15 s après la fin du repos »** (idée du 18/09/2026, à dessiner en D5 et coder au J4) : si l'utilisateur touche « +15 s de repos » alors que le repos est déjà terminé, l'écran repasse en repos actif avec une transition animée. Le gros texte de la série suivante (« 102,5 kg ») rétrécit et le chrono grandit pour redevenir l'élément principal (0:15 qui décompte).
 
 ## Exports
 
