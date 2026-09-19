@@ -4,9 +4,17 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
+// Numéro de version affiché dans Réglages : identifiant court du commit (fourni par GitHub Actions)
+// + date du build. En local, « dev ».
+const commit = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'
+const buildDate = new Date().toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris' })
+
 export default defineConfig({
   // GitHub Pages sert l'app dans un sous-dossier : https://ninninp.github.io/Sportix/
   base: '/Sportix/',
+  define: {
+    __APP_VERSION__: JSON.stringify(`${commit} · ${buildDate}`),
+  },
   plugins: [
     react(),
     tailwindcss(),

@@ -34,7 +34,11 @@ function SettingsPage() {
         </Card>
       )}
 
-      <p className="mt-auto text-center text-small text-muted">Tes données restent sur ce téléphone.</p>
+      <footer className="mt-auto flex flex-col items-center gap-1 text-center text-small text-muted">
+        <p>Tes données restent sur ce téléphone.</p>
+        {/* Permet de vérifier que l'iPhone a bien la dernière version déployée */}
+        <p className="num">Version {__APP_VERSION__}</p>
+      </footer>
     </main>
   )
 }
