@@ -147,3 +147,9 @@ vite.config.ts.timestamp-*
 
 # Impeccable : moteur binaire (14 Mo), retéléchargé automatiquement par le lanceur
 .claude/skills/impeccable/scripts/bin/
+
+# Icônes PWA générées au build depuis public/icon.svg (pwa-assets.config.ts)
+public/pwa-*.png
+public/maskable-icon-*.png
+public/apple-touch-icon-*.png
+public/favicon.ico

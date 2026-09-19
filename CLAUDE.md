@@ -4,11 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel du dépôt
 
-**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». La **Phase D (design) est terminée** (19/09/2026, détail dans [`docs/PHASE-D.md`](docs/PHASE-D.md)). Prochaine étape : **J1 (coquille PWA)**.
+J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)). **J1 (coquille PWA) codé le 19/09/2026** : PWA installable et hors ligne (`vite-plugin-pwa`), tokens dans `src/index.css`, composants `Button`/`Card`/`BottomNav`, 5 onglets (Séance et Réglages en coquille, Programmes/Calendrier/Stats « à venir »), déploiement GitHub Pages. **Reste pour clore J1** : activer Pages (dépôt public + Settings → Pages → GitHub Actions), puis test d'installation sur l'iPhone en mode avion et choix du style de barre d'état (`apple-mobile-web-app-status-bar-style` dans `index.html`). Ensuite : **J2**.
+
+App en ligne : **https://ninninp.github.io/Sportix/** (redéployée à chaque push sur `main` par `.github/workflows/deploy.yml`, qui lance aussi lint et tests).
 
 Références de design, qui font foi pour tout le code d'interface :
-- [`design/tokens.md`](design/tokens.md) : couleurs (deux thèmes automatiques clair/sombre via `prefers-color-scheme`), typo SF Pro, espacements, mouvement, et le bloc CSS à recopier dans `src/index.css` au J1.
-- [`design/icon.svg`](design/icon.svg) : icône de l'app (disque de fonte orange sur encre), source de `@vite-pwa/assets-generator`.
+- [`design/tokens.md`](design/tokens.md) : couleurs (deux thèmes automatiques clair/sombre via `prefers-color-scheme`), typo SF Pro, espacements, mouvement ; son bloc CSS est recopié dans `src/index.css` (le modifier aux deux endroits).
+- [`public/icon.svg`](public/icon.svg) : icône de l'app (disque de fonte orange sur encre), source de `@vite-pwa/assets-generator`.
 - Canvas « Sportix — Maquettes D5 » (lien dans [`design/README.md`](design/README.md)) : 22 écrans du MVP × 2 thèmes. Sources dans `design/maquettes-d5/` (`S-…` sombre, `C-…` clair, générées par `generer.mjs`). Les choix de design validés sont listés dans `design/README.md`.
 - `design/exports/` : PNG des planches, à exporter depuis le canvas (pas encore fait).
 
@@ -34,18 +36,21 @@ L'auteur est **débutant en développement web** et travaille **en français**. 
 
 ## Stack
 
-Installé (J0) : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (linter du template Vite, config `.oxlintrc.json`). Node ≥ 24 (`.nvmrc`).
+Installé : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (config `.oxlintrc.json`, ignore `.claude/` et `design/`) · `vite-plugin-pwa` + `@vite-pwa/assets-generator` (J1). Node ≥ 24 (`.nvmrc`).
 
-À ajouter avec les jalons concernés : `vite-plugin-pwa` (J1) · Dexie + `dexie-react-hooks` (J2) · date-fns (J6) · Recharts (J7).
+À ajouter avec les jalons concernés : Dexie + `dexie-react-hooks` (J2) · date-fns (J6) · Recharts (J7).
 
 Notes :
-- **Tailwind v4 n'a pas de `tailwind.config.js`** : les tokens de `design/tokens.md` se déclarent dans un bloc `@theme { … }` de `src/index.css`.
-- Routes déclarées dans `src/routes.tsx` (`createBrowserRouter`) ; `src/App.tsx` est le layout racine (`<Outlet />`), où viendra la BottomNav au J1.
+- **Tailwind v4 n'a pas de `tailwind.config.js`** : les tokens sont dans `src/index.css` (variables `--sx-*` par thème + `@theme`). Classes disponibles : `bg-bg`, `bg-surface`, `bg-surface-2`, `border-border`, `border-border-strong`, `text-text`, `text-muted`, `text-faint`, `bg-accent`/`text-on-accent`, `accent-2`, `inverse`/`on-inverse`/`on-inverse-muted`, `hero-action`, `danger`, tailles `text-caption` … `text-display` et `text-num-s` … `text-num-hero`, utilitaire `num` (chiffres tabulaires).
+- **L'app vit sous `/Sportix/`** (`base` de `vite.config.ts`, `basename` du routeur) : en dev, ouvrir `http://localhost:5173/Sportix/`.
+- Routes dans `src/routes.tsx` ; `src/App.tsx` = layout racine (contenu + `BottomNav`, zones de sécurité iPhone via `env(safe-area-inset-*)`).
+- **Icônes PWA** générées au build depuis `public/icon.svg` (`pwa-assets.config.ts`) ; les PNG produits dans `public/` sont ignorés par Git.
+- Service worker : pas de doublon dans `workbox.globPatterns` (le manifest est déjà ajouté par le plugin) — un doublon fait échouer toute la mise en cache hors ligne.
 
 ## Commandes
 
 ```bash
-npm run dev          # serveur de développement
+npm run dev          # serveur de développement → http://localhost:5173/Sportix/
 npm run build        # vérification TypeScript (tsc -b) + build de production dans dist/
 npm run lint         # oxlint
 npm run preview      # servir dist/ — tester le service worker / mode PWA (ne fonctionne pas en dev)

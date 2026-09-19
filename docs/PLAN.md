@@ -81,7 +81,7 @@ src/
 - **Objectif** : « Hello » s'affiche en local et le code est poussé sur GitHub.
 
 ### Phase D — Design de l'app (3–5 jours) 🎨 ✅ terminée le 19/09/2026
-> Plan détaillé validé : [`PHASE-D.md`](PHASE-D.md) (cible iPhone 14, Claude Design seul). Résultat : deux thèmes automatiques clair/sombre, tokens dans [`design/tokens.md`](../design/tokens.md), icône [`design/icon.svg`](../design/icon.svg), maquettes MVP validées dans le canvas « Sportix — Maquettes D5 » (liens et choix dans [`design/README.md`](../design/README.md)).
+> Plan détaillé validé : [`PHASE-D.md`](PHASE-D.md) (cible iPhone 14, Claude Design seul). Résultat : deux thèmes automatiques clair/sombre, tokens dans [`design/tokens.md`](../design/tokens.md), icône [`public/icon.svg`](../public/icon.svg), maquettes MVP validées dans le canvas « Sportix — Maquettes D5 » (liens et choix dans [`design/README.md`](../design/README.md)).
 - **D1. Parcours & écrans** (Claude chat / Claude Code) : liste des écrans et parcours clés : démarrer une séance → saisir une série → repos → terminer → voir le PR. Diagrammes Mermaid.
 - **D2. Wireframes basse fidélité** (Claude Design) : 9 écrans clés au format téléphone (390×844) : Accueil, Séance en cours, Choix d'exercice, Historique, Programmes, Calendrier des blocs, Stats (vue d'ensemble), Stats d'un exercice, Réglages. Détail dans `docs/design/parcours.md`.
 - **D3. Direction visuelle** : 2–3 variantes (ex. sombre à fort contraste, lisible en salle), en choisir une.
@@ -90,7 +90,8 @@ src/
 - (Optionnel) reprise dans Figma si tu veux affiner à la main.
 - **Objectif** : maquettes MVP validées et tokens prêts. Le canvas devient la référence visuelle.
 
-### J1 — Coquille PWA installable (1–2 jours)
+### J1 — Coquille PWA installable (1–2 jours) — code fait le 19/09/2026, reste le test sur l'iPhone
+> Hébergement : GitHub Pages (`https://ninninp.github.io/Sportix/`, `base: '/Sportix/'`). Icône source déplacée dans `public/icon.svg` (le générateur écrit les PNG à côté de la source). Hors-ligne vérifié en local (serveur coupé → l'app s'ouvre). Reste : activer Pages, installer sur l'iPhone, test en mode avion, choisir le style de barre d'état.
 - `vite-plugin-pwa` : manifest (nom, icônes générées depuis le SVG de D4, `display: standalone`, couleur du thème), service worker `autoUpdate`.
 - Tokens du design system dans Tailwind ; composants de base (Button, Card, BottomNav) conformes aux maquettes.
 - Barre de navigation en bas : Séance · Programmes · Calendrier · Stats · Réglages.

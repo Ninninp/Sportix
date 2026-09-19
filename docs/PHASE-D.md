@@ -108,9 +108,9 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 
 ### D4 — Design system (session 4) ✅ validé le 19/09/2026
 
-> **19/09/2026 : validé.** Couleurs, typographie et composants acceptés sans retouche. Icône : plusieurs séries explorées (haltères, lettre S, kettlebell, chevrons, chrono, calendrier, courbe) sur la planche « Icône — variantes du disque » ; retenue : **disque de fonte orange `#FF4B1F` sur fond encre `#1A1030`**, une seule icône pour les deux thèmes (`design/icon.svg`).
+> **19/09/2026 : validé.** Couleurs, typographie et composants acceptés sans retouche. Icône : plusieurs séries explorées (haltères, lettre S, kettlebell, chevrons, chrono, calendrier, courbe) sur la planche « Icône — variantes du disque » ; retenue : **disque de fonte orange `#FF4B1F` sur fond encre `#1A1030`**, une seule icône pour les deux thèmes (`public/icon.svg`).
 >
-> Fait : `design/tokens.md` (couleurs par rôle pour les deux thèmes, contrastes, typo SF Pro, espacements, mouvement, bloc CSS pour le J1), canvas « Sportix — Design system D4 » (lien dans `design/README.md`, sources dans `design/design-system-d4/`), `design/icon.svg`. Police décidée : SF Pro (système Apple) pour les deux thèmes.- **`design/tokens.md`** : couleurs nommées par rôle (fond, surface, texte, accent, succès/PR, danger), typographie (tailles, dont les « gros chiffres »), espacements, arrondis et ombres.
+> Fait : `design/tokens.md` (couleurs par rôle pour les deux thèmes, contrastes, typo SF Pro, espacements, mouvement, bloc CSS pour le J1), canvas « Sportix — Design system D4 » (lien dans `design/README.md`, sources dans `design/design-system-d4/`), `public/icon.svg`. Police décidée : SF Pro (système Apple) pour les deux thèmes.- **`design/tokens.md`** : couleurs nommées par rôle (fond, surface, texte, accent, succès/PR, danger), typographie (tailles, dont les « gros chiffres »), espacements, arrondis et ombres.
   - Chaque couleur est donnée en valeur exacte, avec son **ratio de contraste vérifié (AA)** sur son fond.
   - Le fichier est écrit pour être recopié tel quel dans le bloc `@theme` de Tailwind v4 au J1.
 - **Planche de composants** avec leurs états (normal, pressé, désactivé, validé) :
@@ -120,7 +120,7 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
   - SetRow (n°, charge, reps, case « fait », rappel « dernière fois »)
   - BottomNav (5 onglets, icônes Lucide)
   - RestTimer (compact et plein écran)
-- **Icône de l'app** : `design/icon.svg`, qui doit rester lisible en petit et sur fond iOS (elle servira à `@vite-pwa/assets-generator` au J1).
+- **Icône de l'app** : `public/icon.svg`, qui doit rester lisible en petit et sur fond iOS (elle servira à `@vite-pwa/assets-generator` au J1).
 - ✅ Validation (19/09/2026).
 
 ### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design) ✅ validé le 19/09/2026
@@ -144,7 +144,7 @@ Suite de la session :
 - Commit, puis push.
 
 ## Fichiers produits
-`docs/design/parcours.md` · `design/README.md` (URLs des canvas, choix faits) · `design/tokens.md` · `design/icon.svg` · `design/exports/*.png` · sources des canvas dans `design/` · mises à jour de `CLAUDE.md` et `docs/PLAN.md`. **Aucun code dans `src/`** pendant cette phase.
+`docs/design/parcours.md` · `design/README.md` (URLs des canvas, choix faits) · `design/tokens.md` · `public/icon.svg` · `design/exports/*.png` · sources des canvas dans `design/` · mises à jour de `CLAUDE.md` et `docs/PLAN.md`. **Aucun code dans `src/`** pendant cette phase.
 
 ## Vérification
 - Chaque planche est ouverte **sur l'iPhone** via l'URL de l'Artifact : taille des textes, accès au pouce, lecture « à 1 m » des chiffres de la séance et du minuteur.

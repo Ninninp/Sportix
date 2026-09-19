@@ -2,9 +2,22 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover : la page peut s'étendre sous l'encoche et la barre d'accueil ;
+         l'app ajoute elle-même les marges nécessaires avec env(safe-area-inset-*). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Carnet d'entraînement en salle, hors connexion" />
+    <!-- Couleur de la barre du navigateur, selon le thème clair ou sombre de l'appareil -->
+    <meta name="theme-color" content="#FFF4E8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0F0C" media="(prefers-color-scheme: dark)" />
+    <!-- iPhone : app installée sur l'écran d'accueil (plein écran, sans barre Safari) -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Sportix" />
+    <!-- Barre d'état (heure, batterie) : « default » = gérée par iOS, toujours lisible.
+         Alternative à tester sur l'iPhone : « black-translucent » (plein écran, texte blanc). -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Sportix</title>
+    <!-- Icônes (favicon, apple-touch-icon) et manifest : ajoutés automatiquement au build par vite-plugin-pwa -->
   </head>
   <body>
     <div id="root"></div>
