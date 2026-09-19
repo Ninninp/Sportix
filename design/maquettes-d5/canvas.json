@@ -1,0 +1,530 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-19T13:17:10Z"
+  },
+  "title": "Sportix — Maquettes D5",
+  "launch": {
+    "view": "canvas",
+    "page": "j3"
+  },
+  "pages": [
+    {
+      "id": "j2",
+      "name": "J2 · Exercices"
+    },
+    {
+      "id": "j3",
+      "name": "J3 · Séance"
+    },
+    {
+      "id": "j4",
+      "name": "J4 · Repos"
+    },
+    {
+      "id": "reglages",
+      "name": "Réglages"
+    }
+  ],
+  "boards": {
+    "S-Biblio.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Bibliothèque — sombre",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "S-Biblio-vide.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Bibliothèque · aucun résultat — sombre",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "S-Exercice-nouveau.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Nouvel exercice · vide — sombre",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "S-Exercice-modifier.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Modifier un exercice — sombre",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "S-Exercice-supprimer.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Confirmation de suppression — sombre",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "C-Biblio.dc.html": {
+      "x": 0,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Bibliothèque — clair",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "C-Biblio-vide.dc.html": {
+      "x": 470,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Bibliothèque · aucun résultat — clair",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "C-Exercice-nouveau.dc.html": {
+      "x": 940,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Nouvel exercice · vide — clair",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "C-Exercice-modifier.dc.html": {
+      "x": 1410,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Modifier un exercice — clair",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "C-Exercice-supprimer.dc.html": {
+      "x": 1880,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Confirmation de suppression — clair",
+      "page": "j2",
+      "is_interactive": true
+    },
+    "S-Accueil-vide.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · premier lancement — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "Main.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Seance-vide.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · vide — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Seance.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance en cours — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Seance-menu.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · menu ⋯ — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Choix-exercice.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Choix d'exercice — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Creation-rapide.dc.html": {
+      "x": 2820,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Création rapide (panneau) — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Recap.dc.html": {
+      "x": 3290,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Fin de séance · récapitulatif — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Historique-vide.dc.html": {
+      "x": 3760,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Historique · vide — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Historique.dc.html": {
+      "x": 4230,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Historique — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Detail-seance.dc.html": {
+      "x": 4700,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Détail d'une séance — sombre",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Accueil-vide.dc.html": {
+      "x": 0,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · premier lancement — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Accueil.dc.html": {
+      "x": 470,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Seance-vide.dc.html": {
+      "x": 940,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · vide — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Seance.dc.html": {
+      "x": 1410,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Séance en cours — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Seance-menu.dc.html": {
+      "x": 1880,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · menu ⋯ — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Choix-exercice.dc.html": {
+      "x": 2350,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Choix d'exercice — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Creation-rapide.dc.html": {
+      "x": 2820,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Création rapide (panneau) — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Recap.dc.html": {
+      "x": 3290,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Fin de séance · récapitulatif — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Historique-vide.dc.html": {
+      "x": 3760,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Historique · vide — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Historique.dc.html": {
+      "x": 4230,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Historique — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "C-Detail-seance.dc.html": {
+      "x": 4700,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Détail d'une séance — clair",
+      "page": "j3",
+      "is_interactive": true
+    },
+    "S-Repos.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Repos actif — sombre",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "S-Repos-termine.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Repos terminé — sombre",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "S-Repos-prolonge.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Repos prolongé (+15 s après la fin) — sombre",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "S-Seance-reduite.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance réduite (barre compacte) — sombre",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "C-Repos.dc.html": {
+      "x": 0,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Repos actif — clair",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "C-Repos-termine.dc.html": {
+      "x": 470,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Repos terminé — clair",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "C-Repos-prolonge.dc.html": {
+      "x": 940,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Repos prolongé (+15 s après la fin) — clair",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "C-Seance-reduite.dc.html": {
+      "x": 1410,
+      "y": 1264,
+      "w": 390,
+      "h": 844,
+      "title": "Séance réduite (barre compacte) — clair",
+      "page": "j4",
+      "is_interactive": true
+    },
+    "S-Reglages.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1180,
+      "title": "Réglages (page qui défile) — sombre",
+      "page": "reglages",
+      "is_interactive": true
+    },
+    "C-Reglages.dc.html": {
+      "x": 0,
+      "y": 1600,
+      "w": 390,
+      "h": 1180,
+      "title": "Réglages (page qui défile) — clair",
+      "page": "reglages",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "S-Biblio.dc.html",
+    "S-Biblio-vide.dc.html",
+    "S-Exercice-nouveau.dc.html",
+    "S-Exercice-modifier.dc.html",
+    "S-Exercice-supprimer.dc.html",
+    "C-Biblio.dc.html",
+    "C-Biblio-vide.dc.html",
+    "C-Exercice-nouveau.dc.html",
+    "C-Exercice-modifier.dc.html",
+    "C-Exercice-supprimer.dc.html",
+    "S-Accueil-vide.dc.html",
+    "Main.dc.html",
+    "S-Seance-vide.dc.html",
+    "S-Seance.dc.html",
+    "S-Seance-menu.dc.html",
+    "S-Choix-exercice.dc.html",
+    "S-Creation-rapide.dc.html",
+    "S-Recap.dc.html",
+    "S-Historique-vide.dc.html",
+    "S-Historique.dc.html",
+    "S-Detail-seance.dc.html",
+    "C-Accueil-vide.dc.html",
+    "C-Accueil.dc.html",
+    "C-Seance-vide.dc.html",
+    "C-Seance.dc.html",
+    "C-Seance-menu.dc.html",
+    "C-Choix-exercice.dc.html",
+    "C-Creation-rapide.dc.html",
+    "C-Recap.dc.html",
+    "C-Historique-vide.dc.html",
+    "C-Historique.dc.html",
+    "C-Detail-seance.dc.html",
+    "S-Repos.dc.html",
+    "S-Repos-termine.dc.html",
+    "S-Repos-prolonge.dc.html",
+    "S-Seance-reduite.dc.html",
+    "C-Repos.dc.html",
+    "C-Repos-termine.dc.html",
+    "C-Repos-prolonge.dc.html",
+    "C-Seance-reduite.dc.html",
+    "S-Reglages.dc.html",
+    "C-Reglages.dc.html"
+  ],
+  "notes": {
+    "j2-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J2 · Exercices — thème sombre",
+      "kind": "title1",
+      "page": "j2",
+      "maxW": 2270
+    },
+    "j2-C": {
+      "x": 0,
+      "y": 964,
+      "text": "J2 · Exercices — thème clair",
+      "kind": "title1",
+      "page": "j2",
+      "maxW": 2270
+    },
+    "j3-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J3 · Séance — thème sombre",
+      "kind": "title1",
+      "page": "j3",
+      "maxW": 5090
+    },
+    "j3-C": {
+      "x": 0,
+      "y": 964,
+      "text": "J3 · Séance — thème clair",
+      "kind": "title1",
+      "page": "j3",
+      "maxW": 5090
+    },
+    "j4-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J4 · Repos — thème sombre",
+      "kind": "title1",
+      "page": "j4",
+      "maxW": 1800
+    },
+    "j4-C": {
+      "x": 0,
+      "y": 964,
+      "text": "J4 · Repos — thème clair",
+      "kind": "title1",
+      "page": "j4",
+      "maxW": 1800
+    },
+    "reglages-S": {
+      "x": 0,
+      "y": -300,
+      "text": "Réglages — thème sombre",
+      "kind": "title1",
+      "page": "reglages",
+      "maxW": 1200
+    },
+    "reglages-C": {
+      "x": 0,
+      "y": 1300,
+      "text": "Réglages — thème clair",
+      "kind": "title1",
+      "page": "reglages",
+      "maxW": 1200
+    },
+    "j4-anim": {
+      "x": 1880,
+      "y": 0,
+      "w": 380,
+      "page": "j4",
+      "color": "orange",
+      "size": "s",
+      "text": "Animation « +15 s » (à coder au J4) : si on touche « +15 s de repos » sur l’écran de fin de repos, il repasse en repos actif en 320 ms : le « 102,5 kg » rétrécit jusqu’à la carte « Ensuite », le chrono grandit à sa place et décompte depuis 0:15."
+    }
+  },
+  "designSystems": []
+}

@@ -9,6 +9,9 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 | D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Validé le 18/09/2026 | [`wireframes-d2/`](wireframes-d2/) |
 | D3 — Directions visuelles | [Sportix — Directions D3](https://claude.ai/artifact/41NwjzST7hReMtjdy2jfyb) | Validé le 18/09/2026 | [`directions-d3/`](directions-d3/) |
 | D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Validé le 19/09/2026 | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](icon.svg) |
+| D5 — Maquettes MVP | [Sportix — Maquettes D5](https://claude.ai/artifact/97yLtU5WwzEf6hWSRHqJRq) | Premier jet publié le 19/09/2026, en relecture | [`maquettes-d5/`](maquettes-d5/) |
+
+Les planches D5 sont produites par [`maquettes-d5/generer.mjs`](maquettes-d5/generer.mjs) : chaque écran y est décrit une fois, puis généré dans les deux thèmes à partir des tokens (`node design/maquettes-d5/generer.mjs`). Les planches `S-…` sont en thème sombre, `C-…` en clair ; `Main.dc.html` est l'accueil sombre.
 
 Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
 

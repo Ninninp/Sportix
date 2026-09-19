@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1 à D4 faits** (reprendre par D5, maquettes haute fidélité).
+> Plan validé le 16/09/2026. Statut : **D1 à D4 faits ; D5 publié le 19/09/2026, en relecture** (reprendre par la validation page par page : J3 → J4 → J2 → Réglages).
 >
 > **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
@@ -123,7 +123,9 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 - **Icône de l'app** : `design/icon.svg`, qui doit rester lisible en petit et sur fond iOS (elle servira à `@vite-pwa/assets-generator` au J1).
 - ✅ Validation (19/09/2026).
 
-### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design)
+### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design) — premier jet publié le 19/09/2026, en relecture
+
+> Fait : canvas « Sportix — Maquettes D5 » (lien dans `design/README.md`), 21 écrans × 2 thèmes = 42 planches cliquables, rangées en 4 pages (J2 · Exercices, J3 · Séance, J4 · Repos, Réglages). Sources et générateur dans `design/maquettes-d5/`. Choix à faire valider : séance libre nommée par ses exercices dans l'historique (« Squat, Presse à cuisses +3 ») ; exercice supprimé conservé dans l'historique ; encart d'installation iOS aussi sur l'accueil au premier lancement ; barre compacte « séance en cours » au-dessus des onglets. Reste : validation, puis exports PNG dans `design/exports/`.
 Écrans des jalons J2 à J4, construits avec le design system de D4. Chaque écran a ses états **vide / rempli** :
 - **J2** : bibliothèque d'exercices (liste + recherche), formulaire d'ajout/modification, confirmation de suppression.
 - **J3** : accueil (démarrer une séance), séance en cours (plusieurs exercices, séries cochées, valeurs reprises de la dernière fois), choix d'exercice, fin de séance / récapitulatif avec PR 🏆, historique et détail d'une séance.
