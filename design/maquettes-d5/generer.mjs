@@ -93,7 +93,7 @@ const progress = (t, done, total, fills, line = t.strong, fill = t.text, txt = t
 
 const nav = (t, active) => {
   const tabs = [['seance', 'Séance', 'dumbbell', file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
-  return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
+  return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 56px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
     .map(([k, l, i, h]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ''} style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: ${k === active ? 700 : 500}; color: ${k === active ? t.text : t.muted}; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: ${k === active ? t.text : 'transparent'};"></span>${ic(i)}<span>${l}</span></a>`)
     .join('')}</nav>`;
 };
@@ -103,7 +103,7 @@ const sheet = (t, label, inner) =>
   `<div aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgb(0 0 0 / 0.5);"></div><section role="dialog" aria-label="${label}" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 8px 16px 50px; border-radius: 16px 16px 0 0; background: ${t.surface}; color: ${t.text}; box-shadow: 0 -8px 24px rgb(0 0 0 / 0.25); display: flex; flex-direction: column; gap: 16px;"><div aria-hidden="true" style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: ${t.strong};"></div>${inner}</section>`;
 
 const frame = (t, { main, navActive = null, overlay = '', bg = t.bg, color = t.text, pad = '8px 16px 16px', gap = 12, h = 844, bar = '' }) =>
-  `<div style="width: 390px; height: ${h}px; position: relative; display: flex; flex-direction: column; background: ${bg}; color: ${color}; overflow: hidden;"><div aria-hidden="true" style="height: 47px; flex-shrink: 0;"></div><main style="flex-grow: 1; min-height: 0; overflow: hidden; box-sizing: border-box; padding: ${pad}; display: flex; flex-direction: column; gap: ${gap}px;">${main}</main>${bar}${navActive ? nav(t, navActive) : ''}<div aria-hidden="true" style="height: 34px; flex-shrink: 0; background: ${navActive ? t.surface : 'transparent'};"></div>${overlay}</div>`;
+  `<div style="width: 390px; height: ${h}px; position: relative; display: flex; flex-direction: column; background: ${bg}; color: ${color}; overflow: hidden;"><div aria-hidden="true" style="height: 47px; flex-shrink: 0;"></div><main style="flex-grow: 1; min-height: 0; overflow: hidden; box-sizing: border-box; padding: ${pad}; display: flex; flex-direction: column; gap: ${gap}px;">${main}</main>${bar}${navActive ? nav(t, navActive) : ''}<div aria-hidden="true" style="height: ${navActive ? 26 : 34}px; flex-shrink: 0; background: ${navActive ? t.surface : 'transparent'};"></div>${overlay}</div>`;
 
 const listRow = (t, name, sub, href, right = ic('chevR', 20), first = false) =>
   `<a href="${href}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 12px 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span style="color: ${t.muted}; display: flex;">${right}</span></a>`;
@@ -157,7 +157,8 @@ S['Exercice-supprimer'] = { title: 'Confirmation de suppression', page: 'j2', re
     `<div style="display: flex; flex-direction: column; gap: 8px;">${btn.danger(t, `${ic('trash', 20)}Supprimer l'exercice`, file(t, 'Biblio'))}${btn.sec(t, 'Annuler', file(t, 'Exercice-modifier'))}</div>`) }) };
 
 // ===== J3 · Accueil =====
-const today = (t) => `<div><div style="font-size: 15px; color: ${t.muted};">Jeudi 17 septembre</div><h1 style="margin: 0; font-size: 34px; line-height: 38px; font-weight: 800; letter-spacing: -0.02em;">Sportix</h1></div>`;
+// En-tête de l'accueil : la date seule, en discret (retour du test sur iPhone, 19/09/2026)
+const today = (t) => `<div style="font-size: 15px; color: ${t.muted};">Jeudi 17 septembre</div>`;
 const heroCard = (t, title, sub, cta, href) =>
   `<section aria-label="${title}" style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 14px;"><div><h2 style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">${title}</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.onInverseMuted};">${sub}</p></div><a href="${href}" style="box-sizing: border-box; min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 20px; font-weight: 800; text-decoration: none;">${cta}</a></section>`;
 

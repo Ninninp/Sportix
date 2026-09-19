@@ -1,6 +1,7 @@
 // Barre d'onglets du bas (5 onglets). L'onglet actif est en gras avec un trait au-dessus.
-// Elle s'arrête au-dessus de la barre d'accueil de l'iPhone : la zone du dessous
-// (env(safe-area-inset-bottom)) garde la même couleur mais ne contient rien de cliquable.
+// Onglets de 56 px (cible tactile ≥ 48 px), posés un peu plus bas que la zone de sécurité
+// complète (8 px de moins) pour rapprocher la barre du bas de l'écran, comme les apps iOS
+// (retour du test sur iPhone, 19/09/2026).
 import type { ComponentType } from 'react'
 import { NavLink } from 'react-router'
 import { IconCalendrier, IconProgrammes, IconReglages, IconSeance, IconStats } from './icons.tsx'
@@ -17,9 +18,9 @@ function BottomNav() {
   return (
     <nav
       aria-label="Navigation principale"
-      className="shrink-0 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+      className="shrink-0 border-t border-border bg-surface pb-[max(0px,calc(env(safe-area-inset-bottom)-8px))]"
     >
-      <ul className="grid h-16 grid-cols-5">
+      <ul className="grid h-14 grid-cols-5">
         {tabs.map(({ to, label, Icon }) => (
           <li key={to} className="flex">
             <NavLink

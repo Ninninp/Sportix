@@ -109,7 +109,7 @@ Grille de 4 px.
 | `stepper` | 60 px | Bloc −/+ (boutons de 56 px de large) |
 | `button` | 56 px | Bouton principal (Valider, +15 s…) |
 | `button-hero` | 60 px | Démarrer la séance, C'est parti |
-| `nav` | 64 px | Barre d'onglets |
+| `nav` | 56 px | Barre d'onglets (posée 8 px sous la zone de sécurité : `max(0px, env(safe-area-inset-bottom) - 8px)` en dessous) |
 | `safe-top` / `safe-bottom` | `env(safe-area-inset-top)` / `env(safe-area-inset-bottom)` | ≈ 47 / 34 pt sur l'iPhone 14 |
 
 | Token | Valeur | Usage |

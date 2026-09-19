@@ -15,6 +15,8 @@ export default defineConfig({
     VitePWA({
       // Une nouvelle version déployée est installée toute seule au lancement suivant.
       registerType: 'autoUpdate',
+      // L'enregistrement est fait par src/pwa.ts (seulement avec du réseau, voir ce fichier).
+      injectRegister: false,
       // Icônes générées depuis public/icon.svg (voir pwa-assets.config.ts).
       pwaAssets: { config: true, overrideManifestIcons: true, injectThemeColor: false },
       manifest: {
