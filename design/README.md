@@ -9,7 +9,7 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 | D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Validé le 18/09/2026 | [`wireframes-d2/`](wireframes-d2/) |
 | D3 — Directions visuelles | [Sportix — Directions D3](https://claude.ai/artifact/41NwjzST7hReMtjdy2jfyb) | Validé le 18/09/2026 | [`directions-d3/`](directions-d3/) |
 | D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Validé le 19/09/2026 | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](icon.svg) |
-| D5 — Maquettes MVP | [Sportix — Maquettes D5](https://claude.ai/artifact/97yLtU5WwzEf6hWSRHqJRq) | Premier jet publié le 19/09/2026, en relecture | [`maquettes-d5/`](maquettes-d5/) |
+| D5 — Maquettes MVP | [Sportix — Maquettes D5](https://claude.ai/artifact/97yLtU5WwzEf6hWSRHqJRq) | Validé le 19/09/2026 — **référence visuelle des jalons J1 à J4** | [`maquettes-d5/`](maquettes-d5/) |
 
 Les planches D5 sont produites par [`maquettes-d5/generer.mjs`](maquettes-d5/generer.mjs) : chaque écran y est décrit une fois, puis généré dans les deux thèmes à partir des tokens (`node design/maquettes-d5/generer.mjs`). Les planches `S-…` sont en thème sombre, `C-…` en clair ; `Main.dc.html` est l'accueil sombre.
 
@@ -34,6 +34,7 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
   - *J3, sans programme* : ligne fine « dernière séance » vers l'historique, carte « Séance libre » listant les dernières charges par exercice (↑ si hausse prévue).
   - *Complet (J5–J7)* : celui de D3 (poids, bloc, séance du jour, bouton secondaire « Séance libre »).
 - **D5 — reste de la page J3**, validé le 19/09/2026 sans retouche. Choix entérinés : séance libre désignée par ses exercices dans l'historique (« Squat, Presse à cuisses +3 ») ; fin de séance avec carte inversée des records et « La prochaine fois : +2,5 kg » ; onglets masqués sur tous les écrans de séance.
+- **D5 — pages J2 (exercices) et Réglages**, validées le 19/09/2026 sans retouche. Un exercice supprimé n'est plus proposé mais reste dans l'historique des séances passées. La bibliothèque étant pré-remplie, son état « vide » est la recherche sans résultat.
 - **D5 — page J4 (repos)**, validée le 19/09/2026 sans retouche : repos actif (chrono 88 px, carte « Ensuite », +15 s / Passer), repos terminé plein écran (accent), repos prolongé, barre compacte « séance en cours » au-dessus des onglets quand la séance est réduite.
 
 ## Notes pour plus tard

@@ -1,6 +1,6 @@
 # Phase D — Design de Sportix (plan détaillé)
 
-> Plan validé le 16/09/2026. Statut : **D1 à D4 faits ; D5 publié le 19/09/2026, en relecture** (reprendre par la validation page par page : J3 → J4 → J2 → Réglages).
+> Plan validé le 16/09/2026. Statut : **Phase D terminée le 19/09/2026** (D1 à D5 validés). Seule tâche restante, à faire par l'utilisateur quand il veut : exporter les planches D5 en PNG dans `design/exports/`.
 >
 > **À la reprise d'une session de design :** relire le canvas en ligne (lien dans `design/README.md`) et ses commentaires *avant* toute modification. L'utilisateur a pu le retoucher depuis un autre appareil. Recopier ensuite les fichiers modifiés dans `design/wireframes-d2/`. Cocher chaque étape ici au fur et à mesure.
 
@@ -123,11 +123,11 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 - **Icône de l'app** : `design/icon.svg`, qui doit rester lisible en petit et sur fond iOS (elle servira à `@vite-pwa/assets-generator` au J1).
 - ✅ Validation (19/09/2026).
 
-### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design) — premier jet publié le 19/09/2026, en relecture
+### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design) ✅ validé le 19/09/2026
 
 > Fait : canvas « Sportix — Maquettes D5 » (lien dans `design/README.md`), 21 écrans × 2 thèmes = 42 planches cliquables, rangées en 4 pages (J2 · Exercices, J3 · Séance, J4 · Repos, Réglages). Sources et générateur dans `design/maquettes-d5/`. Choix à faire valider : séance libre nommée par ses exercices dans l'historique (« Squat, Presse à cuisses +3 ») ; exercice supprimé conservé dans l'historique ; encart d'installation iOS aussi sur l'accueil au premier lancement ; barre compacte « séance en cours » au-dessus des onglets. Reste : validation, puis exports PNG dans `design/exports/`.
 >
-> **Validé (19/09/2026)** : les 3 accueils, refaits sur la structure D3 (grande carte inversée qui domine, bouton en bas) : premier lancement (encart d'installation en ligne fine, 3 étapes dans la carte — gardées « pour l'instant »), accueil J3 (dernière séance en ligne fine, carte « Séance libre » avec les dernières charges), accueil complet J5–J7 (celui de D3). Puis **toute la page J3 validée sans retouche** (séance vide et en cours, menu ⋯, choix d'exercice, création rapide, fin de séance, historique vide/rempli, détail d'une séance). Puis **page J4 validée sans retouche** (repos actif, repos terminé, repos prolongé + note d'animation, séance réduite). Suite de la relecture : J2, Réglages.
+> **Validé (19/09/2026)** : les 3 accueils, refaits sur la structure D3 (grande carte inversée qui domine, bouton en bas) : premier lancement (encart d'installation en ligne fine, 3 étapes dans la carte — gardées « pour l'instant »), accueil J3 (dernière séance en ligne fine, carte « Séance libre » avec les dernières charges), accueil complet J5–J7 (celui de D3). Puis **toute la page J3 validée sans retouche** (séance vide et en cours, menu ⋯, choix d'exercice, création rapide, fin de séance, historique vide/rempli, détail d'une séance). Puis **page J4 validée sans retouche** (repos actif, repos terminé, repos prolongé + note d'animation, séance réduite). Puis **pages J2 et Réglages validées sans retouche** : D5 entièrement validé le 19/09/2026 (dont : un exercice supprimé reste dans l'historique).
 Écrans des jalons J2 à J4, construits avec le design system de D4. Chaque écran a ses états **vide / rempli** :
 - **J2** : bibliothèque d'exercices (liste + recherche), formulaire d'ajout/modification, confirmation de suppression.
 - **J3** : accueil (démarrer une séance), séance en cours (plusieurs exercices, séries cochées, valeurs reprises de la dernière fois), choix d'exercice, fin de séance / récapitulatif avec PR 🏆, historique et détail d'une séance.

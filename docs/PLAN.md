@@ -80,8 +80,8 @@ src/
 - Avec Claude Code : `npm create vite@latest` (react-ts), Tailwind, React Router, puis `/init` pour créer `CLAUDE.md`.
 - **Objectif** : « Hello » s'affiche en local et le code est poussé sur GitHub.
 
-### Phase D — Design de l'app (3–5 jours) 🎨
-> Plan détaillé validé : [`PHASE-D.md`](PHASE-D.md) (cible iPhone 14, Claude Design seul).
+### Phase D — Design de l'app (3–5 jours) 🎨 ✅ terminée le 19/09/2026
+> Plan détaillé validé : [`PHASE-D.md`](PHASE-D.md) (cible iPhone 14, Claude Design seul). Résultat : deux thèmes automatiques clair/sombre, tokens dans [`design/tokens.md`](../design/tokens.md), icône [`design/icon.svg`](../design/icon.svg), maquettes MVP validées dans le canvas « Sportix — Maquettes D5 » (liens et choix dans [`design/README.md`](../design/README.md)).
 - **D1. Parcours & écrans** (Claude chat / Claude Code) : liste des écrans et parcours clés : démarrer une séance → saisir une série → repos → terminer → voir le PR. Diagrammes Mermaid.
 - **D2. Wireframes basse fidélité** (Claude Design) : 9 écrans clés au format téléphone (390×844) : Accueil, Séance en cours, Choix d'exercice, Historique, Programmes, Calendrier des blocs, Stats (vue d'ensemble), Stats d'un exercice, Réglages. Détail dans `docs/design/parcours.md`.
 - **D3. Direction visuelle** : 2–3 variantes (ex. sombre à fort contraste, lisible en salle), en choisir une.

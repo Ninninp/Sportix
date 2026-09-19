@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel du dépôt
 
-**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». Prochaine étape : **Phase D** (design), dont le plan détaillé validé est dans [`docs/PHASE-D.md`](docs/PHASE-D.md) — reprendre à l'étape non cochée (D1 à D4 faits ; D5 publié, à faire valider page par page ; deux thèmes clair/sombre et tokens dans `design/tokens.md`, icône dans `design/icon.svg`). Puis J1 (coquille PWA).
+**Sportix** est échafaudé (J0 terminé) : Vite + React + TypeScript, Tailwind CSS, React Router et Vitest sont en place, avec une page d'accueil « Hello Sportix » et une page « introuvable ». La **Phase D (design) est terminée** (19/09/2026, détail dans [`docs/PHASE-D.md`](docs/PHASE-D.md)). Prochaine étape : **J1 (coquille PWA)**.
+
+Références de design, qui font foi pour tout le code d'interface :
+- [`design/tokens.md`](design/tokens.md) : couleurs (deux thèmes automatiques clair/sombre via `prefers-color-scheme`), typo SF Pro, espacements, mouvement, et le bloc CSS à recopier dans `src/index.css` au J1.
+- [`design/icon.svg`](design/icon.svg) : icône de l'app (disque de fonte orange sur encre), source de `@vite-pwa/assets-generator`.
+- Canvas « Sportix — Maquettes D5 » (lien dans [`design/README.md`](design/README.md)) : 22 écrans du MVP × 2 thèmes. Sources dans `design/maquettes-d5/` (`S-…` sombre, `C-…` clair, générées par `generer.mjs`). Les choix de design validés sont listés dans `design/README.md`.
+- `design/exports/` : PNG des planches, à exporter depuis le canvas (pas encore fait).
 
 ## Appareil cible et outil de design
 
