@@ -5,7 +5,7 @@
 // - link      : lien discret souligné (ex. « Terminer »)
 // - hero      : bouton « Démarrer » posé sur une carte inversée (60 px)
 // Avec `to`, le bouton devient un lien de navigation (React Router) au même style.
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from 'react'
 import { Link } from 'react-router'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'link' | 'hero'
@@ -30,7 +30,9 @@ const variants: Record<ButtonVariant, string> = {
     'disabled:border-dashed disabled:border-on-inverse-muted disabled:bg-transparent disabled:text-on-inverse-muted',
 }
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+// onClick accepte un bouton comme un lien (le composant peut rendre l'un ou l'autre)
+type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> & {
+  onClick?: MouseEventHandler<HTMLElement>
   variant?: ButtonVariant
   to?: string
   children: ReactNode
@@ -38,9 +40,19 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 function Button({ variant = 'primary', to, className = '', children, ...rest }: Props) {
   const classes = `${base} ${variants[variant]} ${className}`
-  if (to) {
+  // Un lien ne sait pas être « désactivé » : désactivé, on affiche un vrai bouton inerte.
+  if (to && !rest.disabled) {
+    const { onClick, id, title, 'aria-label': ariaLabel, 'aria-describedby': ariaDescribedBy } = rest
     return (
-      <Link to={to} className={classes}>
+      <Link
+        to={to}
+        className={classes}
+        onClick={onClick}
+        id={id}
+        title={title}
+        aria-label={ariaLabel}
+        aria-describedby={ariaDescribedBy}
+      >
         {children}
       </Link>
     )
