@@ -91,7 +91,7 @@ src/
 - **Objectif** : maquettes MVP validées et tokens prêts. Le canvas devient la référence visuelle.
 
 ### J1 — Coquille PWA installable (1–2 jours) — code fait le 19/09/2026, reste le test sur l'iPhone
-> Hébergement : GitHub Pages (`https://ninninp.github.io/Sportix/`, `base: '/Sportix/'`). Icône source déplacée dans `public/icon.svg` (le générateur écrit les PNG à côté de la source). Hors-ligne vérifié en local (serveur coupé → l'app s'ouvre). Reste : activer Pages, installer sur l'iPhone, test en mode avion, choisir le style de barre d'état.
+> Hébergement : GitHub Pages (`https://ninninp.github.io/Sportix/`, `base: '/Sportix/'`). Icône source déplacée dans `public/icon.svg` (le générateur écrit les PNG à côté de la source). Hors-ligne vérifié en local (serveur coupé → l'app s'ouvre). Déployé et en ligne le 19/09/2026. Reste (non validé) : installation et test en mode avion sur l'iPhone, choix du style de barre d'état, `/code-review`.
 - `vite-plugin-pwa` : manifest (nom, icônes générées depuis le SVG de D4, `display: standalone`, couleur du thème), service worker `autoUpdate`.
 - Tokens du design system dans Tailwind ; composants de base (Button, Card, BottomNav) conformes aux maquettes.
 - Barre de navigation en bas : Séance · Programmes · Calendrier · Stats · Réglages.

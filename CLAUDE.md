@@ -4,9 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel du dépôt
 
-J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)). **J1 (coquille PWA) codé le 19/09/2026** : PWA installable et hors ligne (`vite-plugin-pwa`), tokens dans `src/index.css`, composants `Button`/`Card`/`BottomNav`, 5 onglets (Séance et Réglages en coquille, Programmes/Calendrier/Stats « à venir »), déploiement GitHub Pages. **Reste pour clore J1** : activer Pages (dépôt public + Settings → Pages → GitHub Actions), puis test d'installation sur l'iPhone en mode avion et choix du style de barre d'état (`apple-mobile-web-app-status-bar-style` dans `index.html`). Ensuite : **J2**.
+J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)). **J1 (coquille PWA) codé le 19/09/2026** : PWA installable et hors ligne (`vite-plugin-pwa`), tokens dans `src/index.css`, composants `Button`/`Card`/`BottomNav`, 5 onglets (Séance et Réglages en coquille, Programmes/Calendrier/Stats « à venir »), déploiement GitHub Pages. **Déployé et en ligne le 19/09/2026** (dépôt public, Pages en source « GitHub Actions » ; vérifié : page, service worker, manifest, icônes, liens directs, rendu iPhone émulé). **J1 pas encore validé par l'utilisateur** — reprendre ici :
+1. Test sur l'iPhone (Safari → Partager → Sur l'écran d'accueil) : icône, plein écran, 5 onglets, encart « Installer » masqué une fois installée, **mode avion** (fermer puis rouvrir l'app).
+2. Choisir le style de barre d'état (`apple-mobile-web-app-status-bar-style` dans `index.html`, actuellement `default` ; alternative `black-translucent` = plein écran mais texte blanc, illisible sur le fond crème du thème clair).
+3. `/code-review` du J1 (prévu au plan, pas encore fait), puis cocher J1 dans `docs/PLAN.md`. Ensuite : **J2**.
 
-App en ligne : **https://ninninp.github.io/Sportix/** (redéployée à chaque push sur `main` par `.github/workflows/deploy.yml`, qui lance aussi lint et tests).
+App en ligne : **https://ninninp.github.io/Sportix/** (redéployée à chaque push sur `main` par `.github/workflows/deploy.yml`, qui lance aussi lint et tests). Dans l'onglet Actions de GitHub, le seul workflow qui compte est « Déploiement GitHub Pages » ; un run « pages build and deployment » signifie que Pages est repassé en mode « depuis une branche » (il publierait les sources brutes). Pour relancer un déploiement sans changement : `git commit --allow-empty` + push. Sans `gh` sur cette machine : l'état des runs se lit via `https://api.github.com/repos/Ninninp/Sportix/actions/runs` (réponse mise en cache ~1 min).
 
 Références de design, qui font foi pour tout le code d'interface :
 - [`design/tokens.md`](design/tokens.md) : couleurs (deux thèmes automatiques clair/sombre via `prefers-color-scheme`), typo SF Pro, espacements, mouvement ; son bloc CSS est recopié dans `src/index.css` (le modifier aux deux endroits).
