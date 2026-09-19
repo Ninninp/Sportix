@@ -141,3 +141,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Claude Code : réglages propres à chaque machine
+.claude/settings.local.json
+
+# Impeccable : moteur binaire (14 Mo), retéléchargé automatiquement par le lanceur
+.claude/skills/impeccable/scripts/bin/
