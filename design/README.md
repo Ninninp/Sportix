@@ -33,6 +33,7 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
   - *Premier lancement* : ligne fine « Installer Sportix », carte « Première séance » avec 3 étapes numérotées (à revoir plus tard si besoin).
   - *J3, sans programme* : ligne fine « dernière séance » vers l'historique, carte « Séance libre » listant les dernières charges par exercice (↑ si hausse prévue).
   - *Complet (J5–J7)* : celui de D3 (poids, bloc, séance du jour, bouton secondaire « Séance libre »).
+- **D5 — reste de la page J3**, validé le 19/09/2026 sans retouche. Choix entérinés : séance libre désignée par ses exercices dans l'historique (« Squat, Presse à cuisses +3 ») ; fin de séance avec carte inversée des records et « La prochaine fois : +2,5 kg » ; onglets masqués sur tous les écrans de séance.
 
 ## Notes pour plus tard
 
