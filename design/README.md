@@ -37,7 +37,7 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
 - **D5 — pages J2 (exercices) et Réglages**, validées le 19/09/2026 sans retouche. Un exercice supprimé n'est plus proposé mais reste dans l'historique des séances passées. La bibliothèque étant pré-remplie, son état « vide » est la recherche sans résultat.
 - **D5 — page J4 (repos)**, validée le 19/09/2026 sans retouche : repos actif (chrono 88 px, carte « Ensuite », +15 s / Passer), repos terminé plein écran (accent), repos prolongé, barre compacte « séance en cours » au-dessus des onglets quand la séance est réduite.
 
-- **Retours du premier test sur iPhone (19/09/2026, J1)**, reportés dans le canvas D5 et `tokens.md` : barre d'onglets de 56 px posée 8 px plus bas que la zone de sécurité ; en-tête des accueils réduit à la date, en discret (plus de titre « Sportix »).
+- **Retours du premier test sur iPhone (19/09/2026, J1)**, reportés dans le canvas D5 et `tokens.md` : barre d'onglets de 56 px posée 8 px plus bas que la zone de sécurité ; plus de titre ni de date en haut des accueils (seul l'accueil complet garde le poids, à droite).
 
 ## Notes pour plus tard
 

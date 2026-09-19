@@ -157,8 +157,6 @@ S['Exercice-supprimer'] = { title: 'Confirmation de suppression', page: 'j2', re
     `<div style="display: flex; flex-direction: column; gap: 8px;">${btn.danger(t, `${ic('trash', 20)}Supprimer l'exercice`, file(t, 'Biblio'))}${btn.sec(t, 'Annuler', file(t, 'Exercice-modifier'))}</div>`) }) };
 
 // ===== J3 · Accueil =====
-// En-tête de l'accueil : la date seule, en discret (retour du test sur iPhone, 19/09/2026)
-const today = (t) => `<div style="font-size: 15px; color: ${t.muted};">Jeudi 17 septembre</div>`;
 const heroCard = (t, title, sub, cta, href) =>
   `<section aria-label="${title}" style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 14px;"><div><h2 style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">${title}</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.onInverseMuted};">${sub}</p></div><a href="${href}" style="box-sizing: border-box; min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 20px; font-weight: 800; text-decoration: none;">${cta}</a></section>`;
 
@@ -174,8 +172,10 @@ const week = (t, empty = false) => {
 };
 
 // Structure validée en D3 : en-tête (date, Sportix, poids) · ligne fine (bloc) · semaine · grande carte inversée qui domine
+// Pas de titre ni de date en haut des accueils (retours du test sur iPhone, 19/09/2026) ;
+// seul l'accueil complet garde le poids, aligné à droite.
 const homeHeader = (t, weight = true) =>
-  `<header style="display: flex; justify-content: space-between; align-items: flex-end; flex-shrink: 0;">${today(t)}${weight ? `<a href="#" aria-label="Poids 78,4 kg, ajouter une pesée" style="min-height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 4px; text-decoration: none; color: ${t.muted};"><span class="num" style="font-size: 18px;">78,4 kg</span>${ic('plus', 20)}</a>` : ''}</header>`;
+  weight ? `<header style="display: flex; justify-content: flex-end; align-items: center; flex-shrink: 0;"><a href="#" aria-label="Poids 78,4 kg, ajouter une pesée" style="min-height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 4px; text-decoration: none; color: ${t.muted};"><span class="num" style="font-size: 18px;">78,4 kg</span>${ic('plus', 20)}</a></header>` : '';
 const thinRow = (t, inner, href, label) =>
   `<a href="${href}" aria-label="${label}" style="box-sizing: border-box; flex-shrink: 0; min-height: 52px; padding: 0 12px 0 16px; display: flex; align-items: center; gap: 12px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;">${inner}<span style="display: flex; color: ${t.muted};">${ic('chevR', 18)}</span></a>`;
 const blocRow = (t) => {

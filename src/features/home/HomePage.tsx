@@ -1,6 +1,6 @@
 // Onglet Séance — accueil. Au J1, seule la coquille de l'accueil D5 « premier lancement » :
-// date du jour en discret, grande carte inversée avec le bouton en bas (zone du pouce).
-// Le bouton s'activera au J3, quand on pourra enregistrer une séance.
+// la grande carte inversée, avec le bouton en bas (zone du pouce). Pas de titre ni de date en haut
+// (retours du test sur iPhone, 19/09/2026). Le bouton s'activera au J3.
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
 
@@ -10,21 +10,11 @@ const steps = [
   'La fois suivante, tout est pré-rempli',
 ]
 
-// « jeudi 17 septembre » → « Jeudi 17 septembre »
-function todayLabel(date: Date): string {
-  const label = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
-  return label.charAt(0).toUpperCase() + label.slice(1)
-}
-
 function HomePage() {
   return (
     <main className="flex flex-1 flex-col gap-3 px-4 pt-2 pb-4">
-      {/* En-tête discret : juste la date (retour du test sur iPhone, 19/09/2026).
-          Le titre reste pour les lecteurs d'écran, mais n'est pas affiché. */}
-      <header>
-        <h1 className="sr-only">Sportix</h1>
-        <p className="text-body text-muted">{todayLabel(new Date())}</p>
-      </header>
+      {/* Titre de la page pour les lecteurs d'écran uniquement (rien d'affiché en haut) */}
+      <h1 className="sr-only">Sportix</h1>
 
       <Card inverse as="section" aria-labelledby="premiere-seance" className="flex flex-1 flex-col gap-2 p-4">
         <div>
