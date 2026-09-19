@@ -1,58 +1,68 @@
 {
   "v": 3,
-  "createdOnFiles": {
-    "v": 1,
-    "at": "2026-09-18T14:30:00Z"
+  "attachments": {},
+  "boards": {
+    "Composants-clair.dc.html": {
+      "h": 2330,
+      "title": "Composants — clair",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "Composants-sombre.dc.html": {
+      "h": 2330,
+      "title": "Composants — sombre",
+      "w": 390,
+      "x": 1830,
+      "y": 0
+    },
+    "Icone.dc.html": {
+      "h": 720,
+      "title": "Icône",
+      "w": 1000,
+      "x": 0,
+      "y": 1180
+    },
+    "Main.dc.html": {
+      "h": 1060,
+      "title": "Couleurs et typographie",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "Icone-propositions.dc.html": {
+      "x": 0,
+      "y": 2020,
+      "w": 1280,
+      "h": 2280,
+      "title": "Icône — variantes du disque"
+    }
   },
-  "title": "Sportix — Design system D4",
+  "createdOnFiles": {
+    "at": "2026-09-18T14:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
   "launch": {
     "view": "canvas"
   },
-  "pages": [],
-  "boards": {
-    "Main.dc.html": {
+  "notes": {
+    "t": {
+      "kind": "title1",
+      "maxW": 2220,
+      "text": "Design system D4 — deux thèmes, mêmes tokens",
+      "w": 240,
       "x": 0,
-      "y": 0,
-      "w": 1280,
-      "h": 1060,
-      "title": "Couleurs et typographie"
-    },
-    "Composants-clair.dc.html": {
-      "x": 1360,
-      "y": 0,
-      "w": 390,
-      "h": 2330,
-      "title": "Composants — clair"
-    },
-    "Composants-sombre.dc.html": {
-      "x": 1830,
-      "y": 0,
-      "w": 390,
-      "h": 2330,
-      "title": "Composants — sombre"
-    },
-    "Icone.dc.html": {
-      "x": 0,
-      "y": 1180,
-      "w": 1000,
-      "h": 720,
-      "title": "Icône"
+      "y": -300
     }
   },
   "order": [
     "Main.dc.html",
     "Composants-clair.dc.html",
     "Composants-sombre.dc.html",
-    "Icone.dc.html"
+    "Icone.dc.html",
+    "Icone-propositions.dc.html"
   ],
-  "notes": {
-    "t": {
-      "x": 0,
-      "y": -300,
-      "text": "Design system D4 — deux thèmes, mêmes tokens",
-      "kind": "title1",
-      "maxW": 2220
-    }
-  },
-  "designSystems": []
+  "pages": [],
+  "title": "Sportix — Design system D4"
 }

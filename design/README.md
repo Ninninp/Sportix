@@ -8,7 +8,7 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 |---|---|---|---|
 | D2 — Wireframes | [Sportix — Wireframes D2](https://claude.ai/artifact/3rXpyQCzW36QrhRe4dw1m1) | Validé le 18/09/2026 | [`wireframes-d2/`](wireframes-d2/) |
 | D3 — Directions visuelles | [Sportix — Directions D3](https://claude.ai/artifact/41NwjzST7hReMtjdy2jfyb) | Validé le 18/09/2026 | [`directions-d3/`](directions-d3/) |
-| D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Publié le 18/09/2026, en relecture | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](icon.svg) |
+| D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Validé le 19/09/2026 | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](icon.svg) |
 
 Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
 
@@ -23,6 +23,8 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
   - **Clair = B · Énergie corrigée** : fond crème #FFF4E8, encre #1A1030 ; orange #FF4B1F (texte encre) réservé à l'action principale et à la fin de repos ; jaune #FFD23F pour la progression et les PR ; encre inversée pour « en cours » et la carte du jour. Barlow Condensed (titres en capitales, chiffres) + Barlow.
   - Règles communes issues de la critique impeccable (validées une par une) : chiffres de saisie en 38 px étroits et gras, blocs −/+ de 60 px ; fin de repos = la série suivante en héros (« Squat · série 3 », « 102,5 kg » en 104 px, bouton « C'est parti ») ; contrastes AA partout (contours ≥ 3:1, texte ≥ 4,5:1, 12 px minimum) ; séries à venir en pointillés ; bloc en barre fine S1…S5 avec « S2 » (en cours) et « D » (deload) ; « Terminer » en lien discret ; pas d'étiquette au-dessus des titres ; carte du jour avec les 5 exercices.
   - Polices : tranché en D4, une seule police pour les deux thèmes, **SF Pro** (police système Apple ; Inter en aperçu sur le canvas). Reste à régler au J1 : la barre d’état iOS sur la fin de repos.
+
+- **D4** (validé le 19/09/2026) : tokens de `tokens.md` et composants acceptés tels quels. **Icône** : disque de fonte vu de face (trois poignées, trou central), orange `#FF4B1F` sur fond encre `#1A1030`. Une seule icône pour les deux thèmes (une PWA iOS n'en a qu'une). Les variantes écartées restent visibles sur la planche « Icône — variantes du disque ».
 
 ## Notes pour plus tard
 
