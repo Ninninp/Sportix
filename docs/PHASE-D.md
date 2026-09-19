@@ -126,6 +126,8 @@ L'utilisateur choisit une direction, ou un mélange. ✅ Le choix est consigné 
 ### D5 — Maquettes haute fidélité du MVP (session 5, canvas Design) — premier jet publié le 19/09/2026, en relecture
 
 > Fait : canvas « Sportix — Maquettes D5 » (lien dans `design/README.md`), 21 écrans × 2 thèmes = 42 planches cliquables, rangées en 4 pages (J2 · Exercices, J3 · Séance, J4 · Repos, Réglages). Sources et générateur dans `design/maquettes-d5/`. Choix à faire valider : séance libre nommée par ses exercices dans l'historique (« Squat, Presse à cuisses +3 ») ; exercice supprimé conservé dans l'historique ; encart d'installation iOS aussi sur l'accueil au premier lancement ; barre compacte « séance en cours » au-dessus des onglets. Reste : validation, puis exports PNG dans `design/exports/`.
+>
+> **Validé (19/09/2026)** : les 3 accueils, refaits sur la structure D3 (grande carte inversée qui domine, bouton en bas) : premier lancement (encart d'installation en ligne fine, 3 étapes dans la carte — gardées « pour l'instant »), accueil J3 (dernière séance en ligne fine, carte « Séance libre » avec les dernières charges), accueil complet J5–J7 (celui de D3). Suite de la relecture : le reste de la page J3, puis J4, J2, Réglages.
 Écrans des jalons J2 à J4, construits avec le design system de D4. Chaque écran a ses états **vide / rempli** :
 - **J2** : bibliothèque d'exercices (liste + recherche), formulaire d'ajout/modification, confirmation de suppression.
 - **J3** : accueil (démarrer une séance), séance en cours (plusieurs exercices, séries cochées, valeurs reprises de la dernière fois), choix d'exercice, fin de séance / récapitulatif avec PR 🏆, historique et détail d'une séance.

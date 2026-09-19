@@ -29,6 +29,11 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
 
 - **D4** (validé le 19/09/2026) : tokens de `tokens.md` et composants acceptés tels quels. **Icône** : disque de fonte vu de face (trois poignées, trou central), orange `#FF4B1F` sur fond encre `#1A1030`. Une seule icône pour les deux thèmes (une PWA iOS n'en a qu'une). Les variantes écartées restent visibles sur la planche « Icône — variantes du disque ».
 
+- **D5** (en relecture) — **Accueil**, validé le 19/09/2026 : trois états qui gardent tous la structure D3 (en-tête, ligne fine, semaine en pastilles, grande carte inversée avec le bouton « Démarrer la séance » en bas).
+  - *Premier lancement* : ligne fine « Installer Sportix », carte « Première séance » avec 3 étapes numérotées (à revoir plus tard si besoin).
+  - *J3, sans programme* : ligne fine « dernière séance » vers l'historique, carte « Séance libre » listant les dernières charges par exercice (↑ si hausse prévue).
+  - *Complet (J5–J7)* : celui de D3 (poids, bloc, séance du jour, bouton secondaire « Séance libre »).
+
 ## Notes pour plus tard
 
 - **Animation « +15 s après la fin du repos »** (idée du 18/09/2026, à dessiner en D5 et coder au J4) : si l'utilisateur touche « +15 s de repos » alors que le repos est déjà terminé, l'écran repasse en repos actif avec une transition animée. Le gros texte de la série suivante (« 102,5 kg ») rétrécit et le chrono grandit pour redevenir l'élément principal (0:15 qui décompte).

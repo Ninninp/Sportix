@@ -92,7 +92,7 @@ const progress = (t, done, total, fills, line = t.strong, fill = t.text, txt = t
     .join('')}</div></div>`;
 
 const nav = (t, active) => {
-  const tabs = [['seance', 'Séance', 'dumbbell', file(t, 'Accueil')], ['prog', 'Programmes', 'list', '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
+  const tabs = [['seance', 'Séance', 'dumbbell', file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
   return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 64px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
     .map(([k, l, i, h]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ''} style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: ${k === active ? 700 : 500}; color: ${k === active ? t.text : t.muted}; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: ${k === active ? t.text : 'transparent'};"></span>${ic(i)}<span>${l}</span></a>`)
     .join('')}</nav>`;
@@ -161,29 +161,52 @@ const today = (t) => `<div><div style="font-size: 15px; color: ${t.muted};">Jeud
 const heroCard = (t, title, sub, cta, href) =>
   `<section aria-label="${title}" style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 14px;"><div><h2 style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">${title}</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.onInverseMuted};">${sub}</p></div><a href="${href}" style="box-sizing: border-box; min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 20px; font-weight: 800; text-decoration: none;">${cta}</a></section>`;
 
-const week = (t) => {
+const week = (t, empty = false) => {
   const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-  return card(t, `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 15px; font-weight: 700;">Cette semaine</span><span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: ${t.muted};">1 séance ${badgePR(t)}</span></div><div style="display: flex; justify-content: space-between;">${days
+  return card(t, `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 15px; font-weight: 700;">Cette semaine</span><span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: ${t.muted};">${empty ? 'aucune séance' : `1 séance · mar. ${badgePR(t)}`}</span></div><div style="display: flex; justify-content: space-between;">${days
     .map((d, i) => {
-      const done = i === 1, now = i === 3;
+      const done = !empty && i === 1, now = i === 3;
       const dot = done ? `background: ${t.inverse}; border: 2px solid ${t.inverse};` : now ? `border: 3px solid ${t.text};` : `border: 1.5px solid ${t.strong};`;
       return `<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: ${now ? 800 : 600}; color: ${done || now ? t.text : t.muted};"><span style="box-sizing: border-box; width: 30px; height: 30px; border-radius: 15px; ${dot}"></span>${d}</div>`;
     })
     .join('')}</div>`, 'padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0;');
 };
 
-S['Accueil-vide'] = { title: 'Accueil · premier lancement', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
-  `<header style="flex-shrink: 0;">${today(t)}</header>` +
-  card(t, `<span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; background: ${t.surface2}; display: flex; align-items: center; justify-content: center;">${ic('share', 22)}</span><div style="flex-grow: 1;"><div style="font-size: 17px; font-weight: 600;">Installer Sportix</div><div style="font-size: 13px; line-height: 18px; color: ${t.muted};">Dans Safari : <strong style="color: ${t.text};">Partager</strong>, puis <strong style="color: ${t.text};">Sur l'écran d'accueil</strong>. L'app marchera hors connexion.</div></div>${iconBtn(t, 'x', `Masquer l'encart`, '#', 'margin: -8px -8px 0 0;')}`, 'padding: 14px 12px 14px 14px; display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0;') +
-  `<div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 0 8px;"><span style="color: ${t.muted}; display: flex;">${ic('dumbbell', 32)}</span><p style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 700;">Ta première séance commence ici.</p><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Ajoute tes exercices au fil de la séance. Sportix retient tes charges et te les repropose la fois suivante.</p></div>` +
-  heroCard(t, 'Nouvelle séance', '32 exercices prêts, crée les tiens à la volée.', 'Démarrer la séance', file(t, 'Seance-vide')) }) };
+// Structure validée en D3 : en-tête (date, Sportix, poids) · ligne fine (bloc) · semaine · grande carte inversée qui domine
+const homeHeader = (t, weight = true) =>
+  `<header style="display: flex; justify-content: space-between; align-items: flex-end; flex-shrink: 0;">${today(t)}${weight ? `<a href="#" aria-label="Poids 78,4 kg, ajouter une pesée" style="min-height: 48px; display: flex; align-items: center; gap: 6px; padding: 0 4px; text-decoration: none; color: ${t.muted};"><span class="num" style="font-size: 18px;">78,4 kg</span>${ic('plus', 20)}</a>` : ''}</header>`;
+const thinRow = (t, inner, href, label) =>
+  `<a href="${href}" aria-label="${label}" style="box-sizing: border-box; flex-shrink: 0; min-height: 52px; padding: 0 12px 0 16px; display: flex; align-items: center; gap: 12px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;">${inner}<span style="display: flex; color: ${t.muted};">${ic('chevR', 18)}</span></a>`;
+const blocRow = (t) => {
+  const seg = (st, txt = '') => `<span style="box-sizing: border-box; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; ${st}">${txt}</span>`;
+  return thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span><span style="flex-grow: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px;">${seg(`background: ${t.strong};`)}${seg(`background: ${t.inverse}; color: ${t.onInverse};`, 'S2')}${seg(`border: 1.5px solid ${t.strong};`)}${seg(`border: 1.5px dashed ${t.strong}; color: ${t.muted};`, 'D')}${seg(`border: 1.5px solid ${t.strong};`)}</span>`, '#', 'Bloc Force, semaine 2 sur 5, deload en semaine 4');
+};
+// Grande carte « ici, maintenant » : titre, sous-titre, lignes, bouton en bas (zone du pouce)
+const heroBig = (t, { title, sub, rows, cta, href }) =>
+  `<section aria-label="${title}" style="flex-grow: 1; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 8px;"><div><h2 style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.02em;">${title}</h2><div style="font-size: 14px; line-height: 18px; color: ${t.onInverseMuted}; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${sub}</div></div><div style="display: flex; flex-direction: column;">${rows
+    .map((r, i) => `<div style="display: flex; align-items: center; gap: 8px; min-height: 38px; ${i ? `border-top: 1px solid ${t.invLine};` : ''}">${r}</div>`).join('')}</div><div style="flex-grow: 1;"></div><a href="${href}" style="box-sizing: border-box; flex-shrink: 0; min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 20px; font-weight: 800; text-decoration: none;">${cta}</a></section>`;
+const exLine = (t, name, right, up = false) => `<span style="flex-grow: 1; font-size: 17px; font-weight: 600;">${name}</span>${up ? `<span aria-label="charge en hausse" style="display: inline-flex; padding: 2px 6px; border-radius: 999px; background: ${t.accent2}; color: ${t.onAccent2};">${ic('up', 14, 3)}</span>` : ''}<span class="num" style="font-size: 18px;">${right}</span>`;
+const stepLine = (t, n, s) => `<span class="num" style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 14px; border: 1.5px solid ${t.onInverseMuted}; display: flex; align-items: center; justify-content: center; font-size: 15px;">${n}</span><span style="flex-grow: 1; font-size: 15px; line-height: 20px; padding: 8px 0;">${s}</span>`;
 
-S['Accueil'] = { title: 'Accueil', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
-  `<header style="flex-shrink: 0;">${today(t)}</header>` +
+S['Accueil-vide'] = { title: 'Accueil · premier lancement', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
+  homeHeader(t, false) +
+  thinRow(t, `<span style="display: flex; color: ${t.muted};">${ic('share', 20)}</span><span style="flex-grow: 1; font-size: 15px;"><strong>Installer Sportix</strong> <span style="color: ${t.muted};">· Partager → Sur l'écran d'accueil</span></span>`, file(t, 'Reglages'), `Installer Sportix : voir comment dans les réglages`) +
+  week(t, true) +
+  heroBig(t, { title: 'Première séance', sub: 'Pas besoin de programme pour commencer.', href: file(t, 'Seance-vide'), cta: 'Démarrer la séance',
+    rows: [stepLine(t, 1, 'Ajoute tes exercices au fil de la séance'), stepLine(t, 2, 'Règle charge et reps avec − / +, puis valide la série'), stepLine(t, 3, 'La fois suivante, tout est pré-rempli')] }) }) };
+
+S['Accueil-J3'] = { title: 'Accueil · J3 (sans programme)', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
+  homeHeader(t, false) +
+  thinRow(t, `<span style="display: flex; color: ${t.muted};">${ic('history', 20)}</span><span style="flex-grow: 1; font-size: 15px;"><strong>Mardi</strong> <span style="color: ${t.muted};">· 48 min · 6 240 kg</span></span>${badgePR(t)}`, file(t, 'Historique'), 'Dernière séance mardi, voir l’historique') +
   week(t) +
-  card(t, `<a href="${file(t, 'Detail-seance')}" style="display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 16px; text-decoration: none; color: ${t.text};"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; color: ${t.muted};">Dernière séance · mardi</span><span style="font-size: 17px; font-weight: 600;">Développé couché, Tractions +3</span><span class="num" style="font-size: 15px; color: ${t.muted};">48 min · 6 240 kg</span></span>${badgePR(t)}<span style="color: ${t.muted}; display: flex;">${ic('chevR', 20)}</span></a><a href="${file(t, 'Historique')}" style="display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 12px 0 16px; border-top: 1px solid ${t.border}; text-decoration: none; color: ${t.text};"><span style="display: flex; color: ${t.muted};">${ic('history', 20)}</span><span style="flex-grow: 1; font-size: 15px; font-weight: 600;">Historique</span><span class="num" style="font-size: 15px; color: ${t.muted};">12 séances</span><span style="color: ${t.muted}; display: flex;">${ic('chevR', 20)}</span></a>`, 'flex-shrink: 0; overflow: hidden;') +
-  `<div style="flex-grow: 1;"></div>` +
-  heroCard(t, 'Nouvelle séance', 'Tes charges de la dernière fois sont reprises automatiquement.', 'Démarrer la séance', file(t, 'Seance')) }) };
+  heroBig(t, { title: 'Séance libre', sub: 'Tes dernières charges, reprises automatiquement', href: file(t, 'Seance-vide'), cta: 'Démarrer la séance',
+    rows: [exLine(t, 'Squat', '102,5 kg', true), exLine(t, 'Développé couché', '80 kg'), exLine(t, 'Tractions', '× 9'), exLine(t, 'Presse à cuisses', '140 kg'), exLine(t, 'Développé militaire', '22 kg')] }) }) };
+
+S['Accueil'] = { title: 'Accueil · complet (validé en D3, J5 à J7)', page: 'j3', render: (t) => frame(t, { navActive: 'seance', pad: '8px 16px 12px', main:
+  homeHeader(t) + blocRow(t) + week(t) +
+  heroBig(t, { title: 'Force A — Jambes', sub: `Aujourd'hui · Force A/B · 5 exercices`, href: file(t, 'Seance'), cta: 'Démarrer la séance',
+    rows: [exLine(t, 'Squat', '3 × 4–6 · 102,5 kg', true), exLine(t, 'Presse à cuisses', '3 × 8–12 · 140 kg'), exLine(t, 'Leg curl', '3 × 10–15 · 45 kg'), exLine(t, 'Fentes bulgares', '3 × 8–10 · 16 kg'), exLine(t, 'Mollets debout', '4 × 12–15 · 60 kg')] }) +
+  btn.sec(t, `${ic('plus', 20)}Séance libre`, file(t, 'Seance-vide'), `min-height: 52px; border-color: ${t.strong};`) }) };
 
 // ===== J3 · Séance en cours =====
 const PILLS = [['Squat', '1/3', true], ['Presse', '0/3'], ['Leg curl', '0/3'], ['Fentes', '0/3'], ['Mollets', '0/4']];
@@ -263,10 +286,10 @@ S['Recap'] = { title: 'Fin de séance · récapitulatif', page: 'j3', render: (t
   `<section style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 10px;"><div style="display: flex; align-items: center; gap: 10px;">${ic('trophy', 28)}<h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">2 records</h2></div>${[['Squat', 'Barre', '105 kg × 5'], ['Presse à cuisses', 'Machine', '150 kg × 10']].map(([n, v, s], i) => `<div style="display: flex; align-items: center; gap: 8px; min-height: 44px; ${i ? `border-top: 1px solid ${t.invLine};` : ''}"><span style="flex-grow: 1;"><span style="font-size: 17px; font-weight: 600;">${n}</span> <span style="font-size: 13px; color: ${t.onInverseMuted};">${v}</span></span><span class="num" style="font-size: 18px;">${s}</span>${badgePR(t)}</div>`).join('')}</section>` +
   card(t, `${lbl(t, 'La prochaine fois')}<div style="display: flex; align-items: center; gap: 8px; min-height: 40px;"><span style="flex-grow: 1; font-size: 17px; font-weight: 600;">Squat</span>${badgeUp(t, '+2,5 kg')}</div><p style="margin: 0; font-size: 13px; line-height: 18px; color: ${t.muted};">Les 3 séries ont atteint 6 reps : la charge montera à 107,5 kg.</p>`, 'flex-shrink: 0; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px;') +
   `<div style="flex-grow: 1;"></div>` +
-  `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, 'Fermer', file(t, 'Accueil'), 'font-size: 20px; font-weight: 800;')}${btn.link(t, 'Voir le détail', file(t, 'Detail-seance'), t.text)}</div>` }) };
+  `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, 'Fermer', file(t, 'Accueil-J3'), 'font-size: 20px; font-weight: 800;')}${btn.link(t, 'Voir le détail', file(t, 'Detail-seance'), t.text)}</div>` }) };
 
 S['Historique-vide'] = { title: 'Historique · vide', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
-  header(t, 'Historique', file(t, 'Accueil'), `Retour à l'accueil`) +
+  header(t, 'Historique', file(t, 'Accueil-J3'), `Retour à l'accueil`) +
   `<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 0 24px;"><span style="width: 64px; height: 64px; border-radius: 32px; background: ${t.surface2}; color: ${t.muted}; display: flex; align-items: center; justify-content: center;">${ic('history', 28)}</span><h2 style="margin: 8px 0 0; font-size: 22px; line-height: 26px; font-weight: 700;">Aucune séance pour l'instant</h2><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Chaque séance terminée s'ajoute ici, avec ses records.</p></div>` +
   btn.pri(t, 'Démarrer une séance', file(t, 'Seance-vide')) }) };
 
@@ -275,7 +298,7 @@ const HIST = [
   ['Août 2026', [['29', 'SAM.', 'Squat, Développé couché +5', '58 min · 10 900 kg'], ['27', 'JEU.', 'Squat, Développé couché +5', '60 min · 11 150 kg']]],
 ];
 S['Historique'] = { title: 'Historique', page: 'j3', render: (t) => frame(t, { navActive: 'seance', main:
-  header(t, 'Historique', file(t, 'Accueil'), `Retour à l'accueil`) +
+  header(t, 'Historique', file(t, 'Accueil-J3'), `Retour à l'accueil`) +
   HIST.map(([m, xs]) => `${lbl(t, m)}${card(t, xs.map(([d, w, n, s, pr], i) => `<a href="${file(t, 'Detail-seance')}" style="display: flex; align-items: center; gap: 14px; min-height: 68px; padding: 8px 12px 8px 14px; text-decoration: none; color: ${t.text}; ${i ? `border-top: 1px solid ${t.border};` : ''}"><span style="width: 40px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;"><span class="num" style="font-size: 22px; line-height: 24px;">${d}</span><span style="font-size: 12px; font-weight: 600; color: ${t.muted};">${w}</span></span><span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n}</span><span class="num" style="font-size: 13px; font-weight: 500; color: ${t.muted};">${s}</span></span>${pr ? badgePR(t) : ''}<span style="color: ${t.muted}; display: flex;">${ic('chevR', 20)}</span></a>`).join(''), 'flex-shrink: 0; overflow: hidden;')}`).join('') }) };
 
 const doneSet = (t, n, v, pr = false) => `<div style="display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; column-gap: 12px; align-items: center; min-height: 40px; padding: 0 12px; border-radius: 8px; background: ${t.surface2};"><span class="num" style="font-size: 15px; color: ${t.muted};">${n}</span><span class="num" style="font-size: 18px;">${v}</span>${pr ? badgePR(t) : '<span></span>'}</div>`;
@@ -359,7 +382,7 @@ class Component extends DCLogic {
 
 const PAGES = [
   { id: 'j2', name: 'J2 · Exercices', order: ['Biblio', 'Biblio-vide', 'Exercice-nouveau', 'Exercice-modifier', 'Exercice-supprimer'] },
-  { id: 'j3', name: 'J3 · Séance', order: ['Accueil-vide', 'Accueil', 'Seance-vide', 'Seance', 'Seance-menu', 'Choix-exercice', 'Creation-rapide', 'Recap', 'Historique-vide', 'Historique', 'Detail-seance'] },
+  { id: 'j3', name: 'J3 · Séance', order: ['Accueil-vide', 'Accueil-J3', 'Accueil', 'Seance-vide', 'Seance', 'Seance-menu', 'Choix-exercice', 'Creation-rapide', 'Recap', 'Historique-vide', 'Historique', 'Detail-seance'] },
   { id: 'j4', name: 'J4 · Repos', order: ['Repos', 'Repos-termine', 'Repos-prolonge', 'Seance-reduite'] },
   { id: 'reglages', name: 'Réglages', order: ['Reglages'] },
 ];
@@ -382,7 +405,7 @@ notes['j4-anim'] = { x: 4 * 470, y: 0, w: 380, page: 'j4', color: 'orange', size
   text: 'Animation « +15 s » (à coder au J4) : si on touche « +15 s de repos » sur l’écran de fin de repos, il repasse en repos actif en 320 ms : le « 102,5 kg » rétrécit jusqu’à la carte « Ensuite », le chrono grandit à sa place et décompte depuis 0:15.' };
 
 writeFileSync(new URL('canvas.json', OUT), JSON.stringify({
-  v: 3, createdOnFiles: { v: 1, at: new Date().toISOString().replace(/\.\d+Z$/, 'Z') }, title: 'Sportix — Maquettes D5',
+  v: 3, attachments: {}, createdOnFiles: { v: 1, at: '2026-09-19T13:17:10Z' }, title: 'Sportix — Maquettes D5',
   launch: { view: 'canvas', page: 'j3' }, pages: PAGES.map(({ id, name }) => ({ id, name })), boards, order, notes, designSystems: [],
 }, null, 2) + '\n');
 console.log(order.length, 'planches');
