@@ -2,6 +2,8 @@ import { createBrowserRouter } from 'react-router'
 import App from './App.tsx'
 import ComingSoon from './components/ComingSoon.tsx'
 import { IconCalendrier, IconProgrammes, IconStats } from './components/icons.tsx'
+import ExerciseFormPage from './features/exercises/ExerciseFormPage.tsx'
+import ExerciseLibraryPage from './features/exercises/ExerciseLibraryPage.tsx'
 import HomePage from './features/home/HomePage.tsx'
 import NotFoundPage from './features/home/NotFoundPage.tsx'
 import SettingsPage from './features/settings/SettingsPage.tsx'
@@ -37,6 +39,10 @@ export const router = createBrowserRouter(
           ),
         },
         { path: 'reglages', element: <SettingsPage /> },
+        { path: 'reglages/exercices', element: <ExerciseLibraryPage /> },
+        // Le formulaire sert à la création (« nouveau ») comme à la modification (identifiant)
+        { path: 'reglages/exercices/nouveau', element: <ExerciseFormPage /> },
+        { path: 'reglages/exercices/:id', element: <ExerciseFormPage /> },
         { path: '*', element: <NotFoundPage /> },
       ],
     },

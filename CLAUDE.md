@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)). **J1 (coquille PWA) codé le 19/09/2026** : PWA installable et hors ligne (`vite-plugin-pwa`), tokens dans `src/index.css`, composants `Button`/`Card`/`BottomNav`, 5 onglets (Séance et Réglages en coquille, Programmes/Calendrier/Stats « à venir »), déploiement GitHub Pages. **Déployé et en ligne le 19/09/2026** (dépôt public, Pages en source « GitHub Actions » ; vérifié : page, service worker, manifest, icônes, liens directs, rendu iPhone émulé). **J1 pas encore validé par l'utilisateur.** Premier test sur l'iPhone (19/09/2026) : app installée, marche en mode avion, page Réglages OK, barre d'état OK en sombre (`default` gardé ; thème clair non testable sur son iPhone). Retours corrigés et déployés : barre d'onglets abaissée (56 px, 8 px sous la zone de sécurité), accueil sans titre ni date (reporté aussi dans le canvas D5), et service worker enregistré seulement avec du réseau (`src/pwa.ts`) pour éviter le message iOS « Désactivez le mode Avion… » au lancement hors ligne. Reprendre ici :
 1. Re-tester sur l'iPhone : position de la barre d'onglets, accueil, et **le message du mode avion a-t-il disparu ?** (si non : chercher quelle autre requête réseau le déclenche). L'app installée ne se mettait pas à jour (iOS reprend l'app sans la recharger) : `src/pwa.ts` vérifie maintenant les mises à jour à chaque retour au premier plan et recharge tout seul ; le numéro de version (commit · date) s'affiche en bas de Réglages. La toute première installation n'a pas ce mécanisme : la supprimer de l'écran d'accueil et la réinstaller une fois depuis Safari.
-2. `/code-review` du J1 (prévu au plan, pas encore fait), puis cocher J1 dans `docs/PLAN.md`. Ensuite : **J2**.
+2. `/code-review` du J1 fait le 19/09/2026 (une remarque sur `Button` en mode lien, corrigée). Il ne manque que la validation de l'utilisateur après le re-test pour cocher J1 dans `docs/PLAN.md`.
+
+**J2 (base de données + bibliothèque d'exercices) codé le 20/09/2026**, pas encore validé : base Dexie, 32 exercices pré-remplis, écrans Bibliothèque / Nouvel exercice / Modifier / suppression, branchés depuis Réglages. Vérifié en local (24 tests, parcours complet piloté dans le navigateur émulé iPhone : création, persistance après rechargement, suppression). Reste : `/code-review` du J2, test sur l'iPhone, validation.
 
 App en ligne : **https://ninninp.github.io/Sportix/** (redéployée à chaque push sur `main` par `.github/workflows/deploy.yml`, qui lance aussi lint et tests). Dans l'onglet Actions de GitHub, le seul workflow qui compte est « Déploiement GitHub Pages » ; un run « pages build and deployment » signifie que Pages est repassé en mode « depuis une branche » (il publierait les sources brutes). Pour relancer un déploiement sans changement : `git commit --allow-empty` + push. Sans `gh` sur cette machine : l'état des runs se lit via `https://api.github.com/repos/Ninninp/Sportix/actions/runs` (réponse mise en cache ~1 min).
 
@@ -38,9 +40,9 @@ L'auteur est **débutant en développement web** et travaille **en français**. 
 
 ## Stack
 
-Installé : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (config `.oxlintrc.json`, ignore `.claude/` et `design/`) · `vite-plugin-pwa` + `@vite-pwa/assets-generator` (J1). Node ≥ 24 (`.nvmrc`).
+Installé : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (config `.oxlintrc.json`, ignore `.claude/` et `design/`) · `vite-plugin-pwa` + `@vite-pwa/assets-generator` (J1) · Dexie + `dexie-react-hooks`, `fake-indexeddb` en dev (J2). Node ≥ 24 (`.nvmrc`).
 
-À ajouter avec les jalons concernés : Dexie + `dexie-react-hooks` (J2) · date-fns (J6) · Recharts (J7).
+À ajouter avec les jalons concernés : date-fns (J6) · Recharts (J7).
 
 Notes :
 - **Tailwind v4 n'a pas de `tailwind.config.js`** : les tokens sont dans `src/index.css` (variables `--sx-*` par thème + `@theme`). Classes disponibles : `bg-bg`, `bg-surface`, `bg-surface-2`, `border-border`, `border-border-strong`, `text-text`, `text-muted`, `text-faint`, `bg-accent`/`text-on-accent`, `accent-2`, `inverse`/`on-inverse`/`on-inverse-muted`, `hero-action`, `danger`, tailles `text-caption` … `text-display` et `text-num-s` … `text-num-hero`, utilitaire `num` (chiffres tabulaires).
@@ -48,6 +50,9 @@ Notes :
 - Routes dans `src/routes.tsx` ; `src/App.tsx` = layout racine (contenu + `BottomNav`, zones de sécurité iPhone via `env(safe-area-inset-*)`).
 - **Icônes PWA** générées au build depuis `public/icon.svg` (`pwa-assets.config.ts`) ; les PNG produits dans `public/` sont ignorés par Git.
 - Service worker : pas de doublon dans `workbox.globPatterns` (le manifest est déjà ajouté par le plugin) — un doublon fait échouer toute la mise en cache hors ligne.
+- **Base de données** (J2) : `src/db/schema.ts` (Dexie, version 1 = `exercises`), `seed.ts` (32 exercices insérés au premier lancement), `exercises.ts` (lecture/écriture), `persist.ts` (stockage persistant). Les fonctions d'accès acceptent une base en dernier paramètre, ce qui permet de les tester avec `fake-indexeddb` (`src/db/db.test.ts`). **Toute évolution du schéma = une nouvelle `db.version(n)`**, jamais une modification d'une version publiée.
+- **Suppression d'un exercice = suppression « douce »** (`deletedAt`) : il disparaît des listes mais reste en base pour l'historique des séances.
+- Les écrans lisent la base avec `useLiveQuery` (voir `src/features/exercises/useExercises.ts`) : l'affichage se met à jour tout seul.
 
 ## Commandes
 

@@ -41,4 +41,18 @@ export const IconReglages = (p: IconProps) => (
 )
 export const IconPartager = (p: IconProps) => <Icon {...p}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" /></Icon>
 export const IconChevronDroite = (p: IconProps) => <Icon {...p}><path d="M9 6l6 6-6 6" /></Icon>
+export const IconChevronGauche = (p: IconProps) => <Icon {...p}><path d="M15 18l-6-6 6-6" /></Icon>
 export const IconPlus = (p: IconProps) => <Icon {...p}><path d="M12 5v14M5 12h14" /></Icon>
+export const IconFermer = (p: IconProps) => <Icon {...p}><path d="M18 6L6 18M6 6l12 12" /></Icon>
+export const IconRecherche = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M20 20l-3.5-3.5" />
+  </Icon>
+)
+export const IconCorbeille = (p: IconProps) => (
+  <Icon {...p}><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Icon>
+)
+export const IconLivre = (p: IconProps) => (
+  <Icon {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></Icon>
+)

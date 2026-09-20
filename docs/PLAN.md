@@ -98,7 +98,8 @@ src/
 - Déploiement sur GitHub Pages ou Netlify.
 - **Objectif** : l'app s'installe sur l'écran d'accueil et s'ouvre **en mode avion** avec le bon look.
 
-### J2 — Base de données & exercices (2–3 jours)
+### J2 — Base de données & exercices (2–3 jours) — code fait le 20/09/2026, à valider
+> Dexie v1 (`exercises`), 32 exercices pré-remplis, bibliothèque (recherche sans accents, filtre par groupe, création, modification, suppression douce). Identifiants `crypto.randomUUID()`, stockage persistant demandé au navigateur. Variantes obligatoires seulement pour le type « charge ».
 - Schéma Dexie + pré-remplissage d'une trentaine d'exercices (liste préparée avec Claude).
 - Bibliothèque : lister, rechercher, ajouter, modifier, supprimer un exercice.
 - **Objectif** : un exercice créé est toujours là après fermeture de l'app.

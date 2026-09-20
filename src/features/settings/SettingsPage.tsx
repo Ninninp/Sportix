@@ -2,11 +2,14 @@
 // d'installation automatique, il faut passer par Partager). Il disparaît quand l'app est installée.
 // Les vrais réglages (unité, repos, pas de charge…) arrivent avec les jalons qui les utilisent.
 import Card from '../../components/Card.tsx'
-import { IconPartager } from '../../components/icons.tsx'
+import ListRow from '../../components/ListRow.tsx'
+import { IconLivre, IconPartager } from '../../components/icons.tsx'
+import { useActiveExercises } from '../exercises/useExercises.ts'
 import { isStandalone } from '../../lib/standalone.ts'
 
 function SettingsPage() {
   const installed = isStandalone(window)
+  const exercises = useActiveExercises()
 
   return (
     <main className="flex flex-1 flex-col gap-4 px-4 pt-2 pb-4">
@@ -33,6 +36,22 @@ function SettingsPage() {
           </div>
         </Card>
       )}
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">Exercices</h2>
+        <Card className="overflow-hidden">
+          <ListRow
+            to="/reglages/exercices"
+            title="Bibliothèque d'exercices"
+            left={<IconLivre size={20} />}
+            right={
+              <span className="flex items-center gap-3 text-muted">
+                <span className="num text-body-strong">{exercises?.length ?? ''}</span>
+              </span>
+            }
+          />
+        </Card>
+      </section>
 
       <footer className="mt-auto flex flex-col items-center gap-1 text-center text-small text-muted">
         <p>Tes données restent sur ce téléphone.</p>
