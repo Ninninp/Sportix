@@ -5,6 +5,15 @@ import { lastPerformance, prefillSets } from '../lib/progression.ts'
 import { groupSetsByExercise, type Session, type SessionSet } from '../lib/sessions.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 
+/**
+ * Rang du prochain exercice de la séance. On repart du plus grand rang utilisé, jamais du
+ * nombre d'exercices : après en avoir retiré un (rangs 1 et 3), « nombre + 1 » redonnerait 3,
+ * déjà pris, et les deux exercices seraient confondus.
+ */
+function nextExerciseOrder(sets: SessionSet[]): number {
+  return sets.reduce((max, s) => Math.max(max, s.exerciseOrder), 0) + 1
+}
+
 /** La séance en cours (sans date de fin), s'il y en a une. */
 export async function getActiveSession(db: SportixDB = defaultDb): Promise<Session | undefined> {
   const sessions = await db.sessions.toArray()
@@ -40,8 +49,7 @@ export async function addExerciseToSession(
   db: SportixDB = defaultDb,
 ): Promise<void> {
   const [current, history] = await Promise.all([getSessionSets(sessionId, db), getHistorySets(sessionId, db)])
-  const blocks = groupSetsByExercise(current)
-  const exerciseOrder = blocks.length + 1
+  const exerciseOrder = nextExerciseOrder(current)
   const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant)
 
   await db.sets.bulkAdd(
@@ -150,7 +158,7 @@ export async function replaceExercise(
   const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant)
   const doneCount = block.sets.length - remaining.length
   // Le nouvel exercice prend la place suivante s'il reste des séries faites à l'ancien.
-  const newOrder = doneCount > 0 ? groupSetsByExercise(sets).length + 1 : exerciseOrder
+  const newOrder = doneCount > 0 ? nextExerciseOrder(sets) : exerciseOrder
 
   await Promise.all(
     remaining.map((s, i) =>

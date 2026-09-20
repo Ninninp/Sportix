@@ -105,7 +105,7 @@ src/
 - **Objectif** : un exercice créé est toujours là après fermeture de l'app.
 
 ### J3 — Enregistrer une séance (MVP, 4–6 jours) ⭐ — code fait le 20/09/2026, à valider
-> Séance libre : ajout d'exercices (avec variante), séries pré-remplies avec la dernière fois, saisie au pavé − / +, validation immédiate, menu ⋯ (remplacer, variante, objectif, retirer), fin de séance avec records et proposition de charge, historique et détail. Record = charge max par exercice et variante. Reste : test réel à la salle.
+> Séance libre : ajout d'exercices (avec variante), séries pré-remplies avec la dernière fois, saisie au pavé − / +, validation immédiate, menu ⋯ (remplacer, variante, objectif, retirer), fin de séance avec records et proposition de charge, historique et détail. Record = charge max par exercice et variante. `/code-review` fait et corrigé. Reste : test de non-régression du rang d'exercice, puis **test réel à la salle**.
 - Séance vide → ajout d'exercices → séries (reps, charge) avec NumberStepper +/−.
 - Valeurs de la dernière séance reprises automatiquement ; double progression (objectif de reps, proposition d'augmenter la charge) ; remplacer un exercice ; cocher une série ; terminer ; historique.
 - Sauvegarde automatique à chaque saisie.

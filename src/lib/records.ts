@@ -39,11 +39,6 @@ export function findRecords(sets: SessionSet[], history: SessionSet[]): Record_[
   return records
 }
 
-/** Cette série précise est-elle un record ? (badge dans l'historique) */
-export function isRecord(set: SessionSet, history: SessionSet[]): boolean {
-  return findRecords([set], history).length > 0
-}
-
 /**
  * Séances (identifiants) qui ont battu au moins un record, calculées en une passe :
  * on parcourt les séances de la plus ancienne à la plus récente en gardant les meilleurs.

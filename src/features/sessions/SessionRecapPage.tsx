@@ -27,7 +27,18 @@ function SessionRecapPage() {
   const history = useHistorySets(sessionId)
   const exercises = useExercisesById()
 
-  if (!session || sets === undefined || history === undefined || exercises === undefined) return null
+  if (session === undefined || sets === undefined || history === undefined || exercises === undefined) return null
+  // Adresse ouverte avec un identifiant inconnu (lien périmé) : on le dit au lieu d'un écran vide.
+  if (session === null) {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
+        <h1 className="text-title-l font-extrabold tracking-[-0.02em]">Séance introuvable</h1>
+        <Button to="/" className="max-w-xs">
+          Retour à l’accueil
+        </Button>
+      </main>
+    )
+  }
 
   const summary = sessionSummary(session, sets)
   const records = findRecords(sets, history)

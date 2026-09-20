@@ -26,7 +26,13 @@ function NumberStepper({
   plusLabel,
   canDecrement = true,
 }: Props) {
-  // Répétition tant que le doigt reste appuyé (accélère après quelques répétitions)
+  // Les actions sont relues à chaque répétition : si on gardait celles du premier appui,
+  // elles repartiraient toujours de la même valeur et la charge n'avancerait que d'un pas.
+  const actions = useRef({ onIncrement, onDecrement })
+  useEffect(() => {
+    actions.current = { onIncrement, onDecrement }
+  })
+
   const timer = useRef<number | undefined>(undefined)
   const stop = () => {
     window.clearInterval(timer.current)
@@ -34,23 +40,27 @@ function NumberStepper({
   }
   useEffect(() => stop, [])
 
-  const hold = (action: () => void) => ({
-    onPointerDown: () => {
-      action()
-      let ticks = 0
-      timer.current = window.setInterval(() => {
-        ticks += 1
-        action()
-        if (ticks === 5) {
-          window.clearInterval(timer.current)
-          timer.current = window.setInterval(action, 80)
-        }
-      }, 300)
-    },
-    onPointerUp: stop,
-    onPointerLeave: stop,
-    onPointerCancel: stop,
-  })
+  const hold = (direction: 'onIncrement' | 'onDecrement') => {
+    const run = () => actions.current[direction]()
+    return {
+      onPointerDown: () => {
+        run()
+        let ticks = 0
+        // Première répétition après 300 ms, puis accélération
+        timer.current = window.setInterval(() => {
+          ticks += 1
+          run()
+          if (ticks === 5) {
+            stop()
+            timer.current = window.setInterval(run, 80)
+          }
+        }, 300)
+      },
+      onPointerUp: stop,
+      onPointerLeave: stop,
+      onPointerCancel: stop,
+    }
+  }
 
   const button = 'w-14 shrink-0 bg-surface-2 text-[26px] font-bold text-text disabled:text-border-strong'
 
@@ -60,7 +70,7 @@ function NumberStepper({
       aria-label={ariaLabel}
       className="flex h-15 items-stretch overflow-hidden rounded-md border-[1.5px] border-border-strong bg-surface"
     >
-      <button type="button" aria-label={minusLabel} disabled={!canDecrement} className={button} {...hold(onDecrement)}>
+      <button type="button" aria-label={minusLabel} disabled={!canDecrement} className={button} {...hold('onDecrement')}>
         −
       </button>
       <div className="flex flex-1 flex-col items-center justify-center">
@@ -70,7 +80,7 @@ function NumberStepper({
           <span className="text-body font-semibold text-muted">{unit}</span>
         </span>
       </div>
-      <button type="button" aria-label={plusLabel} className={button} {...hold(onIncrement)}>
+      <button type="button" aria-label={plusLabel} className={button} {...hold('onIncrement')}>
         +
       </button>
     </div>

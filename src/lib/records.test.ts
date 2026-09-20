@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findRecords, isRecord } from './records.ts'
+import { findRecords } from './records.ts'
 import type { SessionSet } from './sessions.ts'
 
 const set = (over: Partial<SessionSet> = {}): SessionSet => ({
@@ -52,12 +52,5 @@ describe('findRecords', () => {
   it('ignore les séries non validées ou à zéro rep', () => {
     expect(findRecords([set({ weight: 200, done: false })], history)).toEqual([])
     expect(findRecords([set({ weight: 200, reps: 0 })], history)).toEqual([])
-  })
-})
-
-describe('isRecord', () => {
-  it('répond pour une série isolée', () => {
-    expect(isRecord(set({ weight: 105 }), history)).toBe(true)
-    expect(isRecord(set({ weight: 95 }), history)).toBe(false)
   })
 })
