@@ -66,7 +66,7 @@ const chips = (t, items, onIdx = [], scroll = false) =>
 
 const seg = (t, items, on, label) =>
   `<div role="group" aria-label="${label}" style="display: grid; grid-template-columns: repeat(${items.length}, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 12px; background: ${t.surface2};">${items
-    .map((s, i) => `<button aria-pressed="${i === on}" style="box-sizing: border-box; min-height: 48px; border-radius: 9px; border: 0; font: inherit; font-size: 15px; cursor: pointer; ${i === on ? `background: ${t.inverse}; color: ${t.onInverse}; font-weight: 700;` : `background: transparent; color: ${t.text}; font-weight: 500;`}">${s}</button>`)
+    .map((s, i) => `<button aria-pressed="${i === on}" style="box-sizing: border-box; min-height: 48px; border-radius: 9px; border: 0; font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; ${i === on ? `background: ${t.inverse}; color: ${t.onInverse}; font-weight: 700;` : `background: transparent; color: ${t.text}; font-weight: 500;`}">${s}</button>`)
     .join('')}</div>`;
 
 const search = (t, value = '', ph = 'Rechercher un exercice') =>

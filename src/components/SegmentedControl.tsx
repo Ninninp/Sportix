@@ -24,8 +24,10 @@ function SegmentedControl<T extends string>({ label, options, value, onChange }:
             type="button"
             aria-pressed={on}
             onClick={() => onChange(o.value)}
+            // Texte sur une seule ligne : en gras, une option longue (« Poids du corps ») déborderait
+            // de sa colonne et ferait grandir le bloc au moment du choix.
             className={
-              'min-h-12 rounded-[9px] px-1 text-body ' +
+              'min-h-12 rounded-[9px] px-1 text-small whitespace-nowrap ' +
               (on ? 'bg-inverse font-bold text-on-inverse' : 'bg-transparent font-medium text-text')
             }
           >
