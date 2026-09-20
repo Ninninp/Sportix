@@ -24,11 +24,13 @@ export class SportixDB extends Dexie {
     })
 
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.
+    // Le `return` est indispensable : Dexie attend cette promesse avant de clore la transaction.
+    // Sans lui, la base pourrait s'ouvrir avant la fin de l'insertion (bibliothèque vide).
     this.on('populate', (tx) => {
       const now = Date.now()
-      tx.table('exercises').bulkAdd(
-        SEED_EXERCISES.map((e) => ({ ...e, id: crypto.randomUUID(), createdAt: now })),
-      )
+      return tx
+        .table('exercises')
+        .bulkAdd(SEED_EXERCISES.map((e) => ({ ...e, id: crypto.randomUUID(), createdAt: now })))
     })
   }
 }

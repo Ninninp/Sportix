@@ -38,8 +38,11 @@ function ExerciseFormPage() {
   const navigate = useNavigate()
   const exercises = useActiveExercises()
 
-  // En modification : l'exercice enregistré (undefined tant que la base n'a pas répondu)
-  const saved = useLiveQuery(() => (id ? getExercise(id) : Promise.resolve(undefined)), [id])
+  // En modification : l'exercice enregistré. La réponse est emballée dans un objet pour distinguer
+  // « la base n'a pas encore répondu » (result undefined) de « cet exercice n'existe pas »
+  // (result.value undefined) : sans ça, l'écran peut afficher « introuvable » pendant le chargement.
+  const result = useLiveQuery(async () => ({ value: id ? await getExercise(id) : undefined }), [id])
+  const saved = result?.value
 
   // `draft` = ce que l'utilisateur a modifié ; tant qu'il n'a rien touché, on affiche soit un
   // formulaire vide (création), soit l'exercice venu de la base (modification, d'où le `null`
@@ -75,7 +78,8 @@ function ExerciseFormPage() {
   }
 
   // L'exercice n'existe pas (ou plus) : on le dit plutôt que d'afficher un formulaire vide.
-  if (id && exercises !== undefined && saved === undefined) {
+  // On attend que la lecture ait répondu (`result`) avant de conclure.
+  if (id && result !== undefined && saved === undefined) {
     return (
       <main className="flex flex-1 flex-col gap-5 px-4 pt-2 pb-4">
         <ScreenHeader title="Exercice introuvable" backTo={LIBRARY} backLabel="Retour à la bibliothèque" size="m" />
