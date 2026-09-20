@@ -44,6 +44,24 @@ export const IconChevronDroite = (p: IconProps) => <Icon {...p}><path d="M9 6l6 
 export const IconChevronGauche = (p: IconProps) => <Icon {...p}><path d="M15 18l-6-6 6-6" /></Icon>
 export const IconPlus = (p: IconProps) => <Icon {...p}><path d="M12 5v14M5 12h14" /></Icon>
 export const IconFermer = (p: IconProps) => <Icon {...p}><path d="M18 6L6 18M6 6l12 12" /></Icon>
+export const IconChevronBas = (p: IconProps) => <Icon {...p}><path d="M6 9l6 6 6-6" /></Icon>
+export const IconFleche = (p: IconProps) => <Icon {...p}><path d="M12 19V5M5 12l7-7 7 7" /></Icon>
+export const IconOptions = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="5" cy="12" r="1.5" />
+    <circle cx="12" cy="12" r="1.5" />
+    <circle cx="19" cy="12" r="1.5" />
+  </Icon>
+)
+export const IconEchange = (p: IconProps) => <Icon {...p}><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" /></Icon>
+export const IconTrophee = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2-1.1.6-2 2-2 3.8M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0V2z" />
+  </Icon>
+)
+export const IconHistorique = (p: IconProps) => (
+  <Icon {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5M12 7v5l4 2" /></Icon>
+)
 export const IconRecherche = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="11" cy="11" r="7" />

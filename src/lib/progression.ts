@@ -1,0 +1,85 @@
+// Double progression et pré-remplissage des séries (règles de docs/design/parcours.md § 2).
+//
+// Principe : le programme (ou la dernière séance) fixe un nombre de séries et une fourchette de reps.
+// On garde la même charge tant que TOUTES les séries n'ont pas atteint le haut de la fourchette.
+// Quand c'est le cas, la fois suivante l'app propose la charge + un pas, et l'objectif de reps
+// repart du bas de la fourchette.
+import type { Variant } from './exercises.ts'
+import type { SessionSet } from './sessions.ts'
+
+/** Pas de charge par variante, en kg (valeurs par défaut de parcours.md § 5). */
+export const WEIGHT_STEPS: Record<Variant | 'aucune', number> = {
+  barre: 2.5,
+  smith: 2.5,
+  halteres: 2,
+  machine: 5,
+  poulie: 2.5,
+  aucune: 2.5,
+}
+
+export function weightStep(variant: Variant | null): number {
+  return WEIGHT_STEPS[variant ?? 'aucune']
+}
+
+/** Ce qu'on sait de la dernière fois, pour un exercice et une variante donnés. */
+export type LastPerformance = {
+  sessionId: string
+  sets: SessionSet[]
+}
+
+/** Retrouve la dernière séance où cet exercice (et cette variante) a été travaillé. */
+export function lastPerformance(
+  history: SessionSet[],
+  exerciseId: string,
+  variant: Variant | null,
+): LastPerformance | null {
+  const done = history.filter((s) => s.exerciseId === exerciseId && s.variant === variant && s.done)
+  if (done.length === 0) return null
+  // La série faite le plus récemment désigne la séance à reprendre.
+  const latest = done.reduce((a, b) => ((b.doneAt ?? 0) > (a.doneAt ?? 0) ? b : a))
+  return {
+    sessionId: latest.sessionId,
+    sets: done.filter((s) => s.sessionId === latest.sessionId).sort((a, b) => a.order - b.order),
+  }
+}
+
+/** Toutes les séries de la dernière fois ont-elles atteint le haut de la fourchette ? */
+export function suggestsWeightIncrease(last: LastPerformance | null): boolean {
+  if (!last || last.sets.length === 0) return false
+  return last.sets.every((s) => s.targetRepsMax !== undefined && s.reps >= s.targetRepsMax)
+}
+
+export type PrefilledSet = {
+  weight: number
+  reps: number
+  targetRepsMin?: number
+  targetRepsMax?: number
+}
+
+/**
+ * Séries proposées quand on ajoute un exercice à la séance (parcours.md § 2.2) :
+ * - nombre de séries et objectif : ceux de la dernière fois, sinon 1 série sans objectif
+ * - charge : celle de la dernière fois, + un pas si la double progression le propose
+ * - reps : les reps faites la dernière fois sur CETTE série (le score à battre),
+ *   ou le bas de la fourchette quand la charge augmente.
+ */
+export function prefillSets(last: LastPerformance | null, variant: Variant | null): PrefilledSet[] {
+  if (!last || last.sets.length === 0) return [{ weight: 0, reps: 0 }]
+
+  const increase = suggestsWeightIncrease(last)
+  const step = increase ? weightStep(variant) : 0
+
+  return last.sets.map((s) => ({
+    weight: s.weight + step,
+    reps: increase ? (s.targetRepsMin ?? s.reps) : s.reps,
+    targetRepsMin: s.targetRepsMin,
+    targetRepsMax: s.targetRepsMax,
+  }))
+}
+
+/** Texte du badge « ↑ charge » affiché pendant la saisie, ou null s'il n'y a rien à proposer. */
+export function increaseBadge(last: LastPerformance | null, variant: Variant | null): string | null {
+  if (!suggestsWeightIncrease(last)) return null
+  const step = weightStep(variant)
+  return `charge +${new Intl.NumberFormat('fr-FR').format(step)} kg`
+}

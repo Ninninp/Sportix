@@ -9,10 +9,13 @@
 // Dexie applique alors les étapes manquantes au prochain lancement, sans rien perdre.
 import Dexie, { type EntityTable } from 'dexie'
 import type { Exercise } from '../lib/exercises.ts'
+import type { Session, SessionSet } from '../lib/sessions.ts'
 import { SEED_EXERCISES } from './seed.ts'
 
 export class SportixDB extends Dexie {
   exercises!: EntityTable<Exercise, 'id'>
+  sessions!: EntityTable<Session, 'id'>
+  sets!: EntityTable<SessionSet, 'id'>
 
   constructor(name = 'sportix') {
     super(name)
@@ -21,6 +24,13 @@ export class SportixDB extends Dexie {
     // Champs listés = index (recherche/tri rapides) ; les autres champs sont enregistrés quand même.
     this.version(1).stores({
       exercises: 'id, name, muscleGroup, deletedAt',
+    })
+
+    // Version 2 (J3) : les séances et leurs séries. Ajouter des tables ne touche pas aux
+    // exercices déjà enregistrés ; Dexie applique simplement cette étape au prochain lancement.
+    this.version(2).stores({
+      sessions: 'id, startedAt, endedAt',
+      sets: 'id, sessionId, exerciseId, doneAt, [sessionId+order]',
     })
 
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.

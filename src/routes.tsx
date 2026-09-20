@@ -6,6 +6,11 @@ import ExerciseFormPage from './features/exercises/ExerciseFormPage.tsx'
 import ExerciseLibraryPage from './features/exercises/ExerciseLibraryPage.tsx'
 import HomePage from './features/home/HomePage.tsx'
 import NotFoundPage from './features/home/NotFoundPage.tsx'
+import ExercisePickerPage from './features/sessions/ExercisePickerPage.tsx'
+import HistoryPage from './features/sessions/HistoryPage.tsx'
+import SessionDetailPage from './features/sessions/SessionDetailPage.tsx'
+import SessionPage from './features/sessions/SessionPage.tsx'
+import SessionRecapPage from './features/sessions/SessionRecapPage.tsx'
 import SettingsPage from './features/settings/SettingsPage.tsx'
 
 // Associe chaque adresse (URL) à l'écran à afficher.
@@ -17,6 +22,13 @@ export const router = createBrowserRouter(
       element: <App />,
       children: [
         { index: true, element: <HomePage /> },
+        // Séance (onglets masqués)
+        { path: 'seance', element: <SessionPage /> },
+        { path: 'seance/exercices', element: <ExercisePickerPage /> },
+        { path: 'seance/recap/:id', element: <SessionRecapPage /> },
+        // Historique
+        { path: 'historique', element: <HistoryPage /> },
+        { path: 'historique/:id', element: <SessionDetailPage /> },
         {
           path: 'programmes',
           element: (
