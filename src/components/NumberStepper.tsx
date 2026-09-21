@@ -76,18 +76,23 @@ function NumberStepper({
 
   const button = 'w-14 shrink-0 bg-surface-2 text-[26px] font-bold text-text disabled:text-border-strong'
 
+  // overflow-clip (et non hidden) : coupe les coins sans créer de zone qui défile. Sinon, au
+  // toucher du nombre, le navigateur fait défiler le bloc de quelques pixels pour montrer le champ.
   return (
     <div
       role="group"
       aria-label={ariaLabel}
-      className="flex h-15 items-stretch overflow-hidden rounded-md border-[1.5px] border-border-strong bg-surface"
+      className="flex h-15 items-stretch overflow-clip rounded-md border-[1.5px] border-border-strong bg-surface"
     >
       <button type="button" aria-label={minusLabel} disabled={!canDecrement} className={button} {...hold('onDecrement')}>
         −
       </button>
+      {/* Le bloc fait 60 px (tokens.md) : étiquette et nombre ont des hauteurs de ligne resserrées
+          (14 + 34 px) pour laisser de l'air en haut et en bas. Les chiffres n'ont pas de jambage,
+          34 px suffisent à un nombre de 38 px. */}
       <div className="flex flex-1 flex-col items-center justify-center">
-        <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
-        <span className="flex items-baseline justify-center gap-1 has-[input:focus]:gap-3.5">
+        <span className="text-caption leading-[14px] font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
+        <span className="flex h-[34px] items-baseline justify-center gap-1 has-[input:focus]:gap-3.5">
           {onType ? (
             // Le champ se cale sur le texte réellement affiché : une copie invisible du texte
             // donne sa taille à la case, et le champ occupe exactement cette case. (Une largeur
@@ -95,7 +100,7 @@ function NumberStepper({
             // Pendant la saisie, le fond gris déborde autour du nombre (ombres pleines à gauche et à droite, qui ne prennent pas
             // de place : au repos rien ne bouge) et l'unité s'écarte pour ne pas le toucher.
             <span className="inline-grid rounded-sm focus-within:bg-surface-2 focus-within:shadow-[-8px_0_0_var(--color-surface-2),8px_0_0_var(--color-surface-2)]">
-              <span aria-hidden="true" className="num invisible col-start-1 row-start-1 text-num-l tracking-[-0.02em] whitespace-pre">
+              <span aria-hidden="true" className="num invisible col-start-1 row-start-1 text-num-l leading-[34px] tracking-[-0.02em] whitespace-pre">
                 {(draft ?? value) || ' '}
               </span>
               <input
@@ -121,11 +126,12 @@ function NumberStepper({
                   if (draft !== null && !cancelled.current && draft !== value) onType(draft)
                   setDraft(null)
                 }}
-                className="num col-start-1 row-start-1 w-0 min-w-full bg-transparent p-0 text-center text-num-l tracking-[-0.02em] text-text outline-none"
+                // Hauteur imposée : Safari agrandit sinon le champ au-delà de la hauteur de ligne
+                className="num col-start-1 row-start-1 h-[34px] w-0 min-w-full bg-transparent p-0 text-center text-num-l leading-[34px] tracking-[-0.02em] text-text outline-none"
               />
             </span>
           ) : (
-            <span className="num text-num-l tracking-[-0.02em]">{value}</span>
+            <span className="num text-num-l leading-[34px] tracking-[-0.02em]">{value}</span>
           )}
           <span className="text-body font-semibold text-muted">{unit}</span>
         </span>
