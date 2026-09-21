@@ -1,237 +1,303 @@
 {
   "v": 3,
   "attachments": {},
-  "createdOnFiles": {
-    "v": 1,
-    "at": "2026-09-21T12:00:00Z"
-  },
-  "title": "Sportix — Maquettes J5",
-  "launch": {
-    "view": "canvas",
-    "page": "j5"
-  },
-  "pages": [
-    {
-      "id": "j5",
-      "name": "J5 · Programmes"
-    }
-  ],
   "boards": {
-    "S-Programmes-vide.dc.html": {
-      "x": 0,
-      "y": 0,
-      "w": 390,
+    "C-Accueil-J5-leger.dc.html": {
       "h": 844,
-      "title": "Programmes · aucun — sombre",
+      "is_interactive": true,
       "page": "j5",
-      "is_interactive": true
-    },
-    "S-Programmes.dc.html": {
-      "x": 470,
-      "y": 0,
+      "title": "Accueil · proposition allégée — clair",
       "w": 390,
-      "h": 844,
-      "title": "Programmes — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Programme-nouveau.dc.html": {
-      "x": 940,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Nouveau programme (panneau) — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Programme-detail.dc.html": {
-      "x": 1410,
-      "y": 0,
-      "w": 390,
-      "h": 1240,
-      "title": "Détail d’un programme (page qui défile) — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Programme-exercice.dc.html": {
-      "x": 1880,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Exercice du programme · double progression — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Programme-exercice-fixe.dc.html": {
-      "x": 2350,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Exercice du programme · reps fixes — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "Main.dc.html": {
-      "x": 2820,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Accueil · séance du jour (J5) — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Accueil-J5-leger.dc.html": {
       "x": 3290,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Accueil · proposition allégée — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Jour-choix.dc.html": {
-      "x": 3760,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Choisir un autre jour (panneau) — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Seance-programme.dc.html": {
-      "x": 4230,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Séance lancée depuis le programme — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Seance-programme-leger.dc.html": {
-      "x": 4700,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Séance · proposition allégée — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "S-Seance-liste.dc.html": {
-      "x": 5170,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Séance · en liste (exemple inspiré de Lyfta) — sombre",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programmes-vide.dc.html": {
-      "x": 0,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Programmes · aucun — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programmes.dc.html": {
-      "x": 470,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Programmes — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programme-nouveau.dc.html": {
-      "x": 940,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Nouveau programme (panneau) — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programme-detail.dc.html": {
-      "x": 1410,
-      "y": 1660,
-      "w": 390,
-      "h": 1240,
-      "title": "Détail d’un programme (page qui défile) — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programme-exercice.dc.html": {
-      "x": 1880,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Exercice du programme · double progression — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Programme-exercice-fixe.dc.html": {
-      "x": 2350,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Exercice du programme · reps fixes — clair",
-      "page": "j5",
-      "is_interactive": true
+      "y": 1660
     },
     "C-Accueil-J5.dc.html": {
-      "x": 2820,
-      "y": 1660,
-      "w": 390,
       "h": 844,
+      "is_interactive": true,
+      "page": "j5",
       "title": "Accueil · séance du jour (J5) — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Accueil-J5-leger.dc.html": {
-      "x": 3290,
-      "y": 1660,
       "w": 390,
-      "h": 844,
-      "title": "Accueil · proposition allégée — clair",
-      "page": "j5",
-      "is_interactive": true
+      "x": 2820,
+      "y": 1660
     },
     "C-Jour-choix.dc.html": {
-      "x": 3760,
-      "y": 1660,
-      "w": 390,
       "h": 844,
+      "is_interactive": true,
+      "page": "j5",
       "title": "Choisir un autre jour (panneau) — clair",
-      "page": "j5",
-      "is_interactive": true
-    },
-    "C-Seance-programme.dc.html": {
-      "x": 4230,
-      "y": 1660,
       "w": 390,
-      "h": 844,
-      "title": "Séance lancée depuis le programme — clair",
-      "page": "j5",
-      "is_interactive": true
+      "x": 3760,
+      "y": 1660
     },
-    "C-Seance-programme-leger.dc.html": {
-      "x": 4700,
-      "y": 1660,
-      "w": 390,
-      "h": 844,
-      "title": "Séance · proposition allégée — clair",
+    "C-Programme-detail.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
       "page": "j5",
-      "is_interactive": true
+      "title": "Détail d’un programme (page qui défile) — clair",
+      "w": 390,
+      "x": 1410,
+      "y": 1660
+    },
+    "C-Programme-exercice-fixe.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Exercice du programme · reps fixes — clair",
+      "w": 390,
+      "x": 2350,
+      "y": 1660
+    },
+    "C-Programme-exercice.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Exercice du programme · double progression — clair",
+      "w": 390,
+      "x": 1880,
+      "y": 1660
+    },
+    "C-Programme-nouveau.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Nouveau programme (panneau) — clair",
+      "w": 390,
+      "x": 940,
+      "y": 1660
+    },
+    "C-Programmes-vide.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Programmes · aucun — clair",
+      "w": 390,
+      "x": 0,
+      "y": 1660
+    },
+    "C-Programmes.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Programmes — clair",
+      "w": 390,
+      "x": 470,
+      "y": 1660
     },
     "C-Seance-liste.dc.html": {
-      "x": 5170,
-      "y": 1660,
-      "w": 390,
       "h": 844,
-      "title": "Séance · en liste (exemple inspiré de Lyfta) — clair",
+      "is_interactive": true,
       "page": "j5",
-      "is_interactive": true
+      "title": "Séance · en liste (exemple inspiré de Lyfta) — clair",
+      "w": 390,
+      "x": 5170,
+      "y": 1660
+    },
+    "C-Seance-programme-leger.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Séance · proposition allégée — clair",
+      "w": 390,
+      "x": 4700,
+      "y": 1660
+    },
+    "C-Seance-programme.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Séance lancée depuis le programme — clair",
+      "w": 390,
+      "x": 4230,
+      "y": 1660
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Accueil · séance du jour (J5) — sombre",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "S-Accueil-J5-leger.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Accueil · proposition allégée — sombre",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "S-Jour-choix.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Choisir un autre jour (panneau) — sombre",
+      "w": 390,
+      "x": 3760,
+      "y": 0
+    },
+    "S-Programme-detail.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Détail d’un programme (page qui défile) — sombre",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "S-Programme-exercice-fixe.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Exercice du programme · reps fixes — sombre",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "S-Programme-exercice.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Exercice du programme · double progression — sombre",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "S-Programme-nouveau.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Nouveau programme (panneau) — sombre",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "S-Programmes-vide.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Programmes · aucun — sombre",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    },
+    "S-Programmes.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Programmes — sombre",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "S-Seance-liste.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Séance · en liste (exemple inspiré de Lyfta) — sombre",
+      "w": 390,
+      "x": 5170,
+      "y": 0
+    },
+    "S-Seance-programme-leger.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Séance · proposition allégée — sombre",
+      "w": 390,
+      "x": 4700,
+      "y": 0
+    },
+    "S-Seance-programme.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "page": "j5",
+      "title": "Séance lancée depuis le programme — sombre",
+      "w": 390,
+      "x": 4230,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-21T12:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "j5-C": {
+      "kind": "title1",
+      "maxW": 5560,
+      "page": "j5",
+      "text": "J5 · Programmes — thème clair",
+      "w": 240,
+      "x": 0,
+      "y": 1360
+    },
+    "j5-S": {
+      "kind": "title1",
+      "maxW": 5560,
+      "page": "j5",
+      "text": "J5 · Programmes — thème sombre",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "j5-actif": {
+      "page": "j5",
+      "text": "Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme.",
+      "w": 400,
+      "x": 5640,
+      "y": 420
+    },
+    "j5-ajout": {
+      "page": "j5",
+      "text": "« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice.",
+      "w": 400,
+      "x": 5640,
+      "y": 1688
+    },
+    "j5-demarrer": {
+      "color": "teal",
+      "page": "j5",
+      "text": "Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages.",
+      "w": 400,
+      "x": 5640,
+      "y": 840
+    },
+    "j5-jour": {
+      "color": "orange",
+      "page": "j5",
+      "text": "Séance du jour : le jour qui suit, dans l’ordre du programme, le dernier jour fait (A → B → A…). « Autre jour » en choisit un autre pour aujourd’hui, sans changer l’ordre.",
+      "w": 400,
+      "x": 5640,
+      "y": 0
+    },
+    "j5-leger": {
+      "color": "red",
+      "page": "j5",
+      "text": "Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil : lien discret « Autre séance » sous la carte, qui ouvre le choix du jour (jours du programme + séance libre).",
+      "w": 400,
+      "x": 5640,
+      "y": 2112
+    },
+    "j5-liste": {
+      "color": "purple",
+      "page": "j5",
+      "text": "Séance « en liste » (dernière planche, exemple inspiré de Lyfta) : toute la séance dans une liste, l’exercice en cours déplié en tableau N° · Dernière fois · Kg · Reps · ✓, les suivants repliés. Le pavé − / + et « Valider » restent en bas pour la saisie à une main. À comparer avec la séance actuelle et la séance allégée.",
+      "w": 400,
+      "x": 5640,
+      "y": 2536
+    },
+    "j5-seance": {
+      "page": "j5",
+      "text": "Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre ».",
+      "w": 400,
+      "x": 5640,
+      "y": 1264
     }
   },
   "order": [
@@ -260,83 +326,11 @@
     "C-Seance-programme-leger.dc.html",
     "C-Seance-liste.dc.html"
   ],
-  "notes": {
-    "j5-S": {
-      "x": 0,
-      "y": -300,
-      "text": "J5 · Programmes — thème sombre",
-      "kind": "title1",
-      "page": "j5",
-      "maxW": 5560
-    },
-    "j5-C": {
-      "x": 0,
-      "y": 1360,
-      "text": "J5 · Programmes — thème clair",
-      "kind": "title1",
-      "page": "j5",
-      "maxW": 5560
-    },
-    "j5-jour": {
-      "x": 5640,
-      "y": 0,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "color": "orange",
-      "text": "Séance du jour : le jour qui suit, dans l’ordre du programme, le dernier jour fait (A → B → A…). « Autre jour » en choisit un autre pour aujourd’hui, sans changer l’ordre."
-    },
-    "j5-actif": {
-      "x": 5640,
-      "y": 420,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "text": "Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme."
-    },
-    "j5-demarrer": {
-      "x": 5640,
-      "y": 840,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "color": "teal",
-      "text": "Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages."
-    },
-    "j5-seance": {
-      "x": 5640,
-      "y": 1264,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "text": "Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre »."
-    },
-    "j5-leger": {
-      "x": 5640,
-      "y": 2112,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "color": "red",
-      "text": "Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). La séance a trois versions à comparer : actuelle, allégée, en liste. « Autre jour » et « Séance libre » n’ont plus de place sur l’accueil : où les mettre ?"
-    },
-    "j5-liste": {
-      "x": 5640,
-      "y": 2536,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "color": "purple",
-      "text": "Séance « en liste » (dernière planche, exemple inspiré de Lyfta) : toute la séance dans une liste, l’exercice en cours déplié en tableau N° · Dernière fois · Kg · Reps · ✓, les suivants repliés. Le pavé − / + et « Valider » restent en bas pour la saisie à une main. À comparer avec la séance actuelle et la séance allégée."
-    },
-    "j5-ajout": {
-      "x": 5640,
-      "y": 1688,
-      "w": 400,
-      "page": "j5",
-      "size": "s",
-      "text": "« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice."
+  "pages": [
+    {
+      "id": "j5",
+      "name": "J5 · Programmes"
     }
-  },
-  "designSystems": []
+  ],
+  "title": "Sportix — Maquettes J5"
 }
