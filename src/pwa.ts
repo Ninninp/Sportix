@@ -3,7 +3,10 @@
 //
 // 1. Mode avion : à chaque vérification, le navigateur va chercher sw.js sur Internet. En mode avion,
 //    iOS intercepte cette requête et affiche « Désactivez le mode Avion ou utilisez le Wi-Fi… ».
-//    On ne vérifie donc que si le téléphone a du réseau ; hors ligne, la version en cache sert l'app.
+//    On n'enregistre donc le service worker que si le téléphone a du réseau. Limite connue (mesurée
+//    le 21/09/2026) : le navigateur lui-même revérifie sw.js à CHAQUE ouverture de l'app, même sans
+//    JavaScript (c'est la norme des service workers) ; le message reste donc possible en mode avion.
+//    Il n'apparaît pas avec les données mobiles activées, même sans réseau, et l'app marche quand même.
 // 2. Mises à jour : sur iPhone, une app installée est rarement relancée, iOS la « reprend » là où
 //    elle était, sans rechargement, donc sans vérification. On vérifie donc aussi à chaque retour
 //    au premier plan. Si une nouvelle version existe, elle s'installe et la page se recharge

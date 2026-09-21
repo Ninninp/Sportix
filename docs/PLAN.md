@@ -91,21 +91,21 @@ src/
 - **Objectif** : maquettes MVP validées et tokens prêts. Le canvas devient la référence visuelle.
 
 ### J1 — Coquille PWA installable (1–2 jours) — code fait le 19/09/2026, reste le test sur l'iPhone
-> Hébergement : GitHub Pages (`https://ninninp.github.io/Sportix/`, `base: '/Sportix/'`). Icône source déplacée dans `public/icon.svg` (le générateur écrit les PNG à côté de la source). Hors-ligne vérifié en local (serveur coupé → l'app s'ouvre). Déployé et en ligne le 19/09/2026. Premier test iPhone : installé, marche en mode avion, barre d'état `default` gardée ; retours corrigés (barre d'onglets abaissée, accueil sans titre, service worker enregistré seulement avec du réseau contre le message iOS du mode avion). Reste (non validé) : re-test iPhone, `/code-review`.
+> Hébergement : GitHub Pages (`https://ninninp.github.io/Sportix/`, `base: '/Sportix/'`). Icône source déplacée dans `public/icon.svg` (le générateur écrit les PNG à côté de la source). Hors-ligne vérifié en local (serveur coupé → l'app s'ouvre). Déployé et en ligne le 19/09/2026. Premier test iPhone : installé, marche en mode avion, barre d'état `default` gardée ; retours corrigés (barre d'onglets abaissée, accueil sans titre, service worker enregistré seulement avec du réseau contre le message iOS du mode avion). `/code-review` fait. Re-test iPhone du 21/09/2026 : le message iOS du mode avion reste ; mesuré : le navigateur revérifie `sw.js` à chaque ouverture, même sans JavaScript (norme des service workers), donc impossible à supprimer depuis l'app. Reste : décision de l'utilisateur sur cette limite, puis validation.
 - `vite-plugin-pwa` : manifest (nom, icônes générées depuis le SVG de D4, `display: standalone`, couleur du thème), service worker `autoUpdate`.
 - Tokens du design system dans Tailwind ; composants de base (Button, Card, BottomNav) conformes aux maquettes.
 - Barre de navigation en bas : Séance · Programmes · Calendrier · Stats · Réglages.
 - Déploiement sur GitHub Pages ou Netlify.
 - **Objectif** : l'app s'installe sur l'écran d'accueil et s'ouvre **en mode avion** avec le bon look.
 
-### J2 — Base de données & exercices (2–3 jours) — code fait le 20/09/2026, à valider
+### J2 — Base de données & exercices (2–3 jours) — ✅ validé le 21/09/2026 (testé sur l'iPhone)
 > Dexie v1 (`exercises`), 32 exercices pré-remplis, bibliothèque (recherche sans accents, filtre par groupe, création, modification, suppression douce). Identifiants `crypto.randomUUID()`, stockage persistant demandé au navigateur. Variantes obligatoires seulement pour le type « charge ».
 - Schéma Dexie + pré-remplissage d'une trentaine d'exercices (liste préparée avec Claude).
 - Bibliothèque : lister, rechercher, ajouter, modifier, supprimer un exercice.
 - **Objectif** : un exercice créé est toujours là après fermeture de l'app.
 
-### J3 — Enregistrer une séance (MVP, 4–6 jours) ⭐ — code fait le 20/09/2026, à valider
-> Séance libre : ajout d'exercices (avec variante), séries pré-remplies avec la dernière fois, saisie au pavé − / +, validation immédiate, menu ⋯ (remplacer, variante, objectif, retirer), fin de séance avec records et proposition de charge, historique et détail. Record = charge max par exercice et variante. `/code-review` fait et corrigé. Reste : test de non-régression du rang d'exercice, puis **test réel à la salle**.
+### J3 — Enregistrer une séance (MVP, 4–6 jours) ⭐ — ✅ validé le 21/09/2026 (test réel à la salle)
+> Séance libre : ajout d'exercices (avec variante), séries pré-remplies avec la dernière fois, saisie au pavé − / +, validation immédiate, menu ⋯ (remplacer, variante, objectif, retirer), fin de séance avec records et proposition de charge, historique et détail. Record = charge max par exercice et variante. `/code-review` fait et corrigé, test de non-régression du rang d'exercice écrit. Retour de la salle : à la barre libre, la charge ne descend plus sous 20 kg (barre à vide, `minWeight` dans `src/lib/progression.ts`).
 - Séance vide → ajout d'exercices → séries (reps, charge) avec NumberStepper +/−.
 - Valeurs de la dernière séance reprises automatiquement ; double progression (objectif de reps, proposition d'augmenter la charge) ; remplacer un exercice ; cocher une série ; terminer ; historique.
 - Sauvegarde automatique à chaque saisie.

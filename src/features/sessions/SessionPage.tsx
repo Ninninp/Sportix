@@ -12,7 +12,7 @@ import SetRow from '../../components/SetRow.tsx'
 import { IconChevronBas, IconChevronDroite, IconOptions, IconPlus } from '../../components/icons.tsx'
 import { addSet, endSession, startSession, updateSet, validateSet } from '../../db/sessions.ts'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
-import { increaseBadge, lastPerformance, weightStep } from '../../lib/progression.ts'
+import { increaseBadge, lastPerformance, minWeight, stepWeight, weightStep } from '../../lib/progression.ts'
 import {
   currentSet,
   formatDuration,
@@ -239,9 +239,9 @@ function SessionPage() {
                 unit={unit || 'kg'}
                 minusLabel={`Retirer ${formatNumber(step)} kg`}
                 plusLabel={`Ajouter ${formatNumber(step)} kg`}
-                canDecrement={editing.weight >= step}
-                onDecrement={() => updateSet(editing.id, { weight: Math.max(0, editing.weight - step) })}
-                onIncrement={() => updateSet(editing.id, { weight: editing.weight + step })}
+                canDecrement={editing.weight > minWeight(editing.variant)}
+                onDecrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, -1) })}
+                onIncrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, 1) })}
               />
             )}
             <NumberStepper

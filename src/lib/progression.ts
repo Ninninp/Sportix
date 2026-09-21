@@ -21,6 +21,20 @@ export function weightStep(variant: Variant | null): number {
   return WEIGHT_STEPS[variant ?? 'aucune']
 }
 
+/**
+ * Charge minimale, en kg : à la barre libre, la barre olympique pèse déjà 20 kg à vide
+ * (la charge saisie est le total, barre comprise). Pas de minimum pour les autres variantes :
+ * la barre du Smith est souvent contrebalancée, et une machine ou une poulie part de 0.
+ */
+export function minWeight(variant: Variant | null): number {
+  return variant === 'barre' ? 20 : 0
+}
+
+/** Charge après un appui sur − (-1) ou + (+1) : un pas de la variante, jamais sous le minimum. */
+export function stepWeight(weight: number, variant: Variant | null, direction: 1 | -1): number {
+  return Math.max(minWeight(variant), weight + direction * weightStep(variant))
+}
+
 /** Ce qu'on sait de la dernière fois, pour un exercice et une variante donnés. */
 export type LastPerformance = {
   sessionId: string
@@ -64,13 +78,14 @@ export type PrefilledSet = {
  *   ou le bas de la fourchette quand la charge augmente.
  */
 export function prefillSets(last: LastPerformance | null, variant: Variant | null): PrefilledSet[] {
-  if (!last || last.sets.length === 0) return [{ weight: 0, reps: 0 }]
+  const min = minWeight(variant)
+  if (!last || last.sets.length === 0) return [{ weight: min, reps: 0 }]
 
   const increase = suggestsWeightIncrease(last)
   const step = increase ? weightStep(variant) : 0
 
   return last.sets.map((s) => ({
-    weight: s.weight + step,
+    weight: Math.max(min, s.weight + step),
     reps: increase ? (s.targetRepsMin ?? s.reps) : s.reps,
     targetRepsMin: s.targetRepsMin,
     targetRepsMax: s.targetRepsMax,
