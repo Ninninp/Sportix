@@ -87,38 +87,46 @@ function NumberStepper({
       </button>
       <div className="flex flex-1 flex-col items-center justify-center">
         <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
-        <span>
+        <span className="flex items-baseline justify-center gap-1 has-[input:focus]:gap-3.5">
           {onType ? (
-            <input
-              type="text"
-              inputMode={inputMode}
-              enterKeyHint="done"
-              aria-label={`${ariaLabel} : saisir au clavier`}
-              value={draft ?? value}
-              // Largeur calée sur le texte, pour que l'unité reste collée au nombre
-              style={{ width: `${Math.max(1, (draft ?? value).length) + 0.4}ch` }}
-              onFocus={(e) => {
-                cancelled.current = false
-                setDraft(value)
-                e.currentTarget.select()
-              }}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') e.currentTarget.blur()
-                if (e.key === 'Escape') {
-                  cancelled.current = true
-                  e.currentTarget.blur()
-                }
-              }}
-              onBlur={() => {
-                if (draft !== null && !cancelled.current && draft !== value) onType(draft)
-                setDraft(null)
-              }}
-              className="num min-w-0 rounded-sm bg-transparent text-center text-num-l tracking-[-0.02em] text-text outline-none focus:bg-surface-2"
-            />
+            // Le champ se cale sur le texte réellement affiché : une copie invisible du texte
+            // donne sa taille à la case, et le champ occupe exactement cette case. (Une largeur
+            // estimée en « ch » tombait à côté avec SF Pro sur l'iPhone : texte décalé, collé au bord.)
+            // Pendant la saisie, le fond gris déborde autour du nombre (ombres pleines à gauche et à droite, qui ne prennent pas
+            // de place : au repos rien ne bouge) et l'unité s'écarte pour ne pas le toucher.
+            <span className="inline-grid rounded-sm focus-within:bg-surface-2 focus-within:shadow-[-8px_0_0_var(--color-surface-2),8px_0_0_var(--color-surface-2)]">
+              <span aria-hidden="true" className="num invisible col-start-1 row-start-1 text-num-l tracking-[-0.02em] whitespace-pre">
+                {(draft ?? value) || ' '}
+              </span>
+              <input
+                type="text"
+                inputMode={inputMode}
+                enterKeyHint="done"
+                aria-label={`${ariaLabel} : saisir au clavier`}
+                value={draft ?? value}
+                onFocus={(e) => {
+                  cancelled.current = false
+                  setDraft(value)
+                  e.currentTarget.select()
+                }}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.currentTarget.blur()
+                  if (e.key === 'Escape') {
+                    cancelled.current = true
+                    e.currentTarget.blur()
+                  }
+                }}
+                onBlur={() => {
+                  if (draft !== null && !cancelled.current && draft !== value) onType(draft)
+                  setDraft(null)
+                }}
+                className="num col-start-1 row-start-1 w-0 min-w-full bg-transparent p-0 text-center text-num-l tracking-[-0.02em] text-text outline-none"
+              />
+            </span>
           ) : (
             <span className="num text-num-l tracking-[-0.02em]">{value}</span>
-          )}{' '}
+          )}
           <span className="text-body font-semibold text-muted">{unit}</span>
         </span>
       </div>
