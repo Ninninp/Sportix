@@ -141,7 +141,9 @@ function SettingsPage() {
           <div className="text-title font-bold">Repos par défaut</div>
           <p className="text-body text-muted">Lancé après chaque série validée. « +15 s » l’allonge en séance.</p>
         </div>
+        {/* Version compacte : « 2:00 » n'a pas besoin des gros chiffres de la séance (retour du 21/09/2026) */}
         <NumberStepper
+          compact
           label="Repos"
           ariaLabel="Repos par défaut"
           value={formatRest(settings.restSeconds)}

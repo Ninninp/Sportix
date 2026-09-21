@@ -658,8 +658,10 @@ const blocForm = (t) =>
   field(t, 'Nom du bloc', 'Force') +
   fieldset(t, 'Objectif', chips(t, ['Force', 'Hypertrophie', 'Sèche', '+ Nouvel objectif'], [0])) +
   `<label style="display: flex; flex-direction: column; gap: 6px;">${lbl(t, 'Premier jour (un lundi)')}<input type="date" value="2026-09-14" style="box-sizing: border-box; width: 100%; height: 52px; padding: 0 14px; border-radius: 12px; border: 1.5px solid ${t.strong}; background: ${t.surface}; color: ${t.text}; font: inherit; font-size: 17px; font-weight: 600;"></label>` +
-  card(t, numRow(t, 'Durée', '5', 'semaines') + `<div style="height: 1px; background: ${t.border};"></div>` + numRow(t, 'Deload en semaine', '4', ''),
+  // Le deload est facultatif : en dessous de la semaine 1, le réglage affiche « Aucun ».
+  card(t, numRow(t, 'Durée', '5', 'semaines') + `<div style="height: 1px; background: ${t.border};"></div>` + numRow(t, 'Deload', 'semaine 4', ''),
     'flex-shrink: 0; padding: 2px 14px; display: flex; flex-direction: column;') +
+  `<span style="margin-top: -10px; font-size: 13px; color: ${t.muted};">Deload sur « − » jusqu’à <strong style="color: ${t.text};">Aucun</strong> si tu n’en veux pas.</span>` +
   fieldset(t, 'Programme suivi', chips(t, ['Force A/B', 'PPL', 'Aucun'], [0]));
 
 S['Bloc-nouveau'] = { title: 'Nouveau bloc', page: 'j6', h: 940, render: (t) => frame(t, { h: 940, gap: 18, main:
