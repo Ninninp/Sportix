@@ -43,10 +43,18 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
   const finished = isRestFinished(rest, now)
   // Repos relancé depuis l'écran de fin : on joue l'animation de retour au repos actif
   const [fromEnd, setFromEnd] = useState(false)
+  // Voile `rest` qui s'efface après « +15 s de repos ». Il doit QUITTER la page une fois effacé :
+  // même invisible, iOS s'en sert pour colorer la zone de la barre d'état (bande verte restée en
+  // haut de l'écran, test iPhone du 21/09/2026).
+  const [veil, setVeil] = useState(false)
   const target = upcoming ? formatTarget(upcoming.targetRepsMin, upcoming.targetRepsMax) : null
 
   const extend = () => {
     setFromEnd(finished)
+    if (finished) {
+      setVeil(true)
+      window.setTimeout(() => setVeil(false), 600) // filet de sécurité si la fin d'animation n'arrive pas
+    }
     setLocal({ from: session.rest.endsAt, rest: extendRest(rest, Date.now()) })
     void extendSessionRest(session.id)
   }
@@ -110,10 +118,11 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
   const remaining = restRemaining(rest, now)
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-1 pb-4">
-      {fromEnd && (
-        // L'aplat de fin de repos s'efface au lieu de disparaître d'un coup
+      {veil && (
+        // L'aplat de fin de repos s'efface au lieu de disparaître d'un coup, puis est retiré
         <div
           aria-hidden="true"
+          onAnimationEnd={() => setVeil(false)}
           className="pointer-events-none fixed inset-0 z-40 animate-[sx-effacer_320ms_var(--ease-out)_forwards] bg-rest"
         />
       )}

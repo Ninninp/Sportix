@@ -142,8 +142,16 @@ src/
 - **Revue design** : captures de chaque écran (Browser pane) comparées aux maquettes ; corriger les écarts.
 - Mode clair/sombre, kg/lb, supersets, échauffement, bannière « nouvelle version ».
 
+### J10 — Animations (à la fin, une fois les écrans stabilisés)
+> Décidé le 21/09/2026 : les animations se règlent quand tous les écrans sont en place, pour ne pas les refaire à chaque changement. D'ici là, seules des animations simples en CSS existent (fin de repos, « +15 s », `src/index.css`).
+- Reprendre les animations du repos : fin du repos, « +15 s de repos » telle que décrite dans `design/README.md` (la charge rétrécit jusqu'à la carte « Ensuite », le chrono grandit à sa place).
+- Transitions entre écrans (entrée / sortie de séance, panneaux), retour visuel à la validation d'une série, mise en valeur des records sur le récapitulatif.
+- Durées et courbes des tokens (`design/tokens.md` § mouvement) ; « Réduire les animations » d'iOS respecté partout.
+- Vérifier sur l'iPhone : fluidité, et rien ne reste affiché après une animation (voir la bande de la barre d'état, J4).
+- **Objectif** : des animations qui aident à comprendre ce qui se passe, sans ralentir la saisie en salle.
+
 ## Ordre & durée indicative
-J0 → **Phase D** → J1 → J2 → J3 (**MVP, ~3 semaines**) → J4 → J5 → J6 → J7 → J8 → J9.
+J0 → **Phase D** → J1 → J2 → J3 (**MVP, ~3 semaines**) → J4 → J5 → J6 → J7 → J8 → J9 → J10.
 Total ≈ 6–8 semaines à temps partiel.
 
 ## Vérification (à chaque jalon)
