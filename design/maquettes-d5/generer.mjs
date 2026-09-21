@@ -368,7 +368,7 @@ const dayCard = (t, name, info, exs, next = false) =>
 
 S['Programmes-vide'] = { title: 'Programmes · aucun', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main:
   `<h1 style="${H1} flex-shrink: 0;">Programmes</h1>` +
-  `<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 0 16px;"><span style="width: 64px; height: 64px; border-radius: 32px; background: ${t.surface2}; color: ${t.muted}; display: flex; align-items: center; justify-content: center;">${ic('list', 28)}</span><h2 style="margin: 8px 0 0; font-size: 22px; line-height: 26px; font-weight: 700;">Aucun programme</h2><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Un programme regroupe tes jours d’entraînement (ex. Push, Pull, Legs). Ta prochaine séance est alors prête sur l’accueil, en un appui.</p></div>` +
+  `<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 0 16px;"><span style="width: 64px; height: 64px; border-radius: 32px; background: ${t.surface2}; color: ${t.muted}; display: flex; align-items: center; justify-content: center;">${ic('list', 28)}</span><h2 style="margin: 8px 0 0; font-size: 22px; line-height: 26px; font-weight: 700;">Aucun programme</h2></div>` +
   btn.pri(t, `${ic('plus', 20)}Créer un programme`, file(t, 'Programme-nouveau')) }) };
 
 const progCard = (t, name, sub, days, active) =>
@@ -388,12 +388,11 @@ S['Programme-nouveau'] = { title: 'Nouveau programme (panneau)', page: 'j5', ren
     `<h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Nouveau programme</h2>` +
     field(t, 'Nom du programme', 'Force A/B', 'Ex. Force A/B, PPL') +
     field(t, 'Premier jour', 'Force A — Jambes', 'Ex. Push, Jambes, Haut du corps') +
-    `<p style="margin: -4px 0 0; font-size: 13px; line-height: 18px; color: ${t.muted};">Tu ajouteras ses exercices, puis les autres jours, sur la page du programme.</p>` +
     `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, 'Créer le programme', file(t, 'Programme-detail'))}${btn.link(t, 'Annuler', file(t, 'Programmes'), t.text)}</div>`) }) };
 
 const detailMain = (t) =>
   header(t, 'Force A/B', file(t, 'Programmes'), 'Retour aux programmes', iconBtn(t, 'more', 'Options du programme (renommer, supprimer)', '#'), 24) +
-  card(t, `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 0 16px;"><span style="display: flex; flex-direction: column;"><span style="font-size: 17px;">Programme actif</span><span style="font-size: 13px; color: ${t.muted};">Sa prochaine séance est proposée sur l’accueil</span></span><input class="sw" type="checkbox" role="switch" checked></label>`, 'flex-shrink: 0;') +
+  card(t, `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 0 16px;"><span style="font-size: 17px;">Programme actif</span><input class="sw" type="checkbox" role="switch" checked></label>`, 'flex-shrink: 0;') +
   dayCard(t, 'Force A — Jambes', '', DAY_A, true) +
   dayCard(t, 'Force B — Haut du corps', 'jeudi', DAY_B) +
   btn.sec(t, `${ic('plus', 20)}Ajouter un jour`, '#');
@@ -411,7 +410,7 @@ const progExSheet = (t, dp) => sheet(t, 'Squat dans Force A — Jambes',
   `<div style="font-size: 22px; line-height: 26px; font-weight: 700;">Squat</div>` +
   `<div style="display: flex; flex-direction: column; gap: 8px;">${lbl(t, 'Variante')}${chips(t, ['Barre', 'Smith', 'Machine'], [0])}</div>` +
   `<div style="display: flex; flex-direction: column;">${mini(t, 'Séries', '3', 'Séries')}` +
-  `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px;"><span style="display: flex; flex-direction: column;"><span style="font-size: 17px;">Double progression</span><span style="font-size: 13px; color: ${t.muted};">${dp ? 'Propose +2,5 kg quand toutes les séries atteignent 6 reps' : 'Même charge et même nombre de reps à chaque fois'}</span></span><input class="sw" type="checkbox" role="switch"${dp ? ' checked' : ''}></label>` +
+  `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px;"><span style="font-size: 17px;">Double progression</span><input class="sw" type="checkbox" role="switch"${dp ? ' checked' : ''}></label>` +
   (dp ? mini(t, 'Reps, au moins', '4', 'Reps minimum') + mini(t, 'Reps, au plus', '6', 'Reps maximum') : mini(t, 'Reps', '5', 'Reps')) +
   `${mini(t, 'Repos', '3:00', 'Repos')}</div>` +
   `<div style="display: flex; justify-content: space-between; align-items: center;"><a href="${file(t, 'Programme-detail')}" style="min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 0 4px; font-size: 15px; font-weight: 600; color: ${t.danger}; text-decoration: none;">${ic('trash', 20)}Retirer du jour</a>${btn.link(t, 'OK', file(t, 'Programme-detail'), t.text)}</div>`);
@@ -420,16 +419,14 @@ S['Programme-exercice'] = { title: 'Exercice du programme · double progression'
 S['Programme-exercice-fixe'] = { title: 'Exercice du programme · reps fixes', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: detailMain(t), overlay: progExSheet(t, false) }) };
 
 const homeJ5 = (t) =>
-  thinRow(t, `<span style="display: flex; color: ${t.muted};">${ic('history', 20)}</span><span style="flex-grow: 1; font-size: 15px;"><strong>Jeudi</strong> <span style="color: ${t.muted};">· Force B · 52 min</span></span>`, '#', 'Dernière séance jeudi, voir l’historique') +
   week(t) +
   heroBig(t, { title: 'Force A — Jambes', sub: 'Prochaine séance · Force A/B · 5 exercices', href: file(t, 'Seance-programme'), cta: 'Démarrer la séance',
-    rows: [exLine(t, 'Squat', '3 × 4–6 · 102,5 kg', true), exLine(t, 'Presse à cuisses', '3 × 8–12 · 140 kg'), exLine(t, 'Leg curl', '3 × 10–15 · 45 kg'), exLine(t, 'Fentes bulgares', '3 × 8–10 · 16 kg'), exLine(t, 'Mollets debout', '4 × 12–15 · 60 kg')] }) +
-  `<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0;">${btn.sec(t, 'Autre jour', file(t, 'Jour-choix'), `min-height: 52px; border-color: ${t.strong};`)}${btn.sec(t, `${ic('plus', 20)}Séance libre`, '#', `min-height: 52px; border-color: ${t.strong};`)}</div>`;
+    rows: [exLine(t, 'Squat', '', true), exLine(t, 'Presse à cuisses', ''), exLine(t, 'Leg curl', ''), exLine(t, 'Fentes bulgares', ''), exLine(t, 'Mollets debout', '')] });
 
 S['Accueil-J5'] = { title: 'Accueil · séance du jour (J5)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t) }) };
 
 const dayOption = (t, name, sub, on, first = false) =>
-  `<a href="${file(t, 'Accueil-J5')}" aria-current="${on}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 12px; ${on ? `border: 7px solid ${t.inverse};` : `border: 1.5px solid ${t.strong};`}"></span></a>`;
+  `<a href="${file(t, 'Accueil-J5')}" aria-current="${on}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; font-size: 17px; font-weight: 600;">${name}</span><span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 12px; ${on ? `border: 7px solid ${t.inverse};` : `border: 1.5px solid ${t.strong};`}"></span></a>`;
 
 S['Jour-choix'] = { title: 'Choisir un autre jour (panneau)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t),
   overlay: sheet(t, 'Quelle séance aujourd’hui ?',
@@ -459,6 +456,40 @@ S['Seance-programme-leger'] = { title: 'Séance · proposition allégée', page:
     'flex-shrink: 0; padding: 4px; display: flex; flex-direction: column; gap: 4px;') +
   `<div style="flex-grow: 1;"></div>` +
   card(t, `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 17px; font-weight: 700;">Série 2</span>${badgeUp(t, 'charge +2,5 kg')}</div>` +
+    stepper(t, 'Charge', '102,5', 'kg', 'Charge', 'Retirer 2,5 kg', 'Ajouter 2,5 kg') +
+    stepper(t, 'Reps', '5', 'reps', 'Répétitions', 'Retirer une rep', 'Ajouter une rep'),
+    'flex-shrink: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px;') +
+  btn.pri(t, 'Valider la série', '#', 'font-size: 20px; font-weight: 800;') }) };
+
+
+// ----- Séance « en liste », inspirée de Lyfta mais à une main (exemple du 21/09/2026) -----
+// Toute la séance dans une liste qui défile : l'exercice en cours est déplié en tableau
+// N° | Dernière fois | Kg | Reps | ✓, les suivants sont repliés sur une ligne. Le pavé − / + et
+// « Valider la série » restent fixés en bas, dans la zone du pouce. Remplace les pastilles, le
+// sous-titre, la barre de progression et « Ensuite ».
+P.check = '<path d="M5 12.5l4.5 4.5L19 7.5"></path>';
+const COLS = 'grid-template-columns: 28px minmax(0, 1fr) 76px 48px 36px; column-gap: 8px;';
+const listSet = (t, n, last, kg, reps, state) => {
+  const st = state === 'done' ? `background: ${t.surface2}; color: ${t.muted};` : state === 'now' ? `background: ${t.inverse}; color: ${t.onInverse};` : `color: ${t.faint};`;
+  const tick = state === 'done'
+    ? `<span aria-label="faite" style="width: 28px; height: 28px; border-radius: 14px; background: ${t.text}; color: ${t.bg}; display: flex; align-items: center; justify-content: center;">${ic('check', 18, 3)}</span>`
+    : `<span aria-hidden="true" style="box-sizing: border-box; width: 28px; height: 28px; border-radius: 14px; border: 1.5px ${state === 'now' ? `solid ${t.onInverse}` : `dashed ${t.strong}`};"></span>`;
+  return `<div role="row" aria-label="Série ${n}"${state === 'now' ? ' aria-current="true"' : ''} style="display: grid; ${COLS} align-items: center; min-height: 52px; padding: 0 10px; border-radius: 10px; ${st}"><span class="num" style="font-size: 15px;">${n}</span><span class="num" style="font-size: 15px; font-weight: 500; ${state === 'now' ? `color: ${t.onInverseMuted};` : ''}">${last}</span><span class="num" style="font-size: 22px; text-align: right;">${kg}</span><span class="num" style="font-size: 22px; text-align: right;">${reps}</span><span style="display: flex; justify-content: flex-end;">${tick}</span></div>`;
+};
+const folded = (t, name, info) =>
+  `<a href="#" style="flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 8px 0 16px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;"><span style="flex-grow: 1; font-size: 17px; font-weight: 600;">${name}</span><span class="num" style="font-size: 15px; font-weight: 500; color: ${t.muted};">${info}</span><span style="display: flex; color: ${t.muted};">${ic('chevD', 20)}</span></a>`;
+
+S['Seance-liste'] = { title: 'Séance · en liste (exemple inspiré de Lyfta)', page: 'j5', render: (t) => frame(t, { pad: '4px 16px 16px', main:
+  seanceHeader(t, '24:10').replace('>Séance libre<', '>Force A — Jambes<') +
+  `<div style="flex-grow: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 8px;">` +
+    card(t, `<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0 2px 6px;"><div style="flex-grow: 1; display: flex; align-items: baseline; gap: 8px;"><span style="font-size: 20px; line-height: 24px; font-weight: 800;">Squat</span><span class="num" style="font-size: 15px; color: ${t.muted};">4–6 reps</span></div>${iconBtn(t, 'more', `Options de l'exercice`, '#')}</div>` +
+      `<div role="row" style="display: grid; ${COLS} padding: 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: ${t.muted};"><span>N°</span><span>Dernière fois</span><span style="text-align: right;">Kg</span><span style="text-align: right;">Reps</span><span></span></div>` +
+      listSet(t, 1, '100 × 5', '102,5', 5, 'done') + listSet(t, 2, '100 × 5', '102,5', 5, 'now') + listSet(t, 3, '100 × 4', '102,5', 5, 'next') +
+      `<button style="align-self: flex-start; min-height: 44px; padding: 0 6px; border: 0; background: transparent; color: ${t.text}; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">+ Série</button>`,
+      'flex-shrink: 0; padding: 6px; display: flex; flex-direction: column; gap: 4px;') +
+    folded(t, 'Presse à cuisses', '0/3') + folded(t, 'Leg curl', '0/3') + folded(t, 'Fentes bulgares', '0/3') + folded(t, 'Mollets debout', '0/4') +
+  `</div>` +
+  card(t, `<div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 17px; font-weight: 700;">Squat · série 2</span>${badgeUp(t, 'charge +2,5 kg')}</div>` +
     stepper(t, 'Charge', '102,5', 'kg', 'Charge', 'Retirer 2,5 kg', 'Ajouter 2,5 kg') +
     stepper(t, 'Reps', '5', 'reps', 'Répétitions', 'Retirer une rep', 'Ajouter une rep'),
     'flex-shrink: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px;') +
@@ -538,7 +569,7 @@ writeCanvas('./', { title: 'Sportix — Maquettes D5', at: '2026-09-19T13:17:10Z
 
 // ===== Canvas J5 (programmes) : son propre dossier, son propre lien =====
 MAIN = 'Accueil-J5';
-const J5_ORDER = ['Programmes-vide', 'Programmes', 'Programme-nouveau', 'Programme-detail', 'Programme-exercice', 'Programme-exercice-fixe', 'Accueil-J5', 'Accueil-J5-leger', 'Jour-choix', 'Seance-programme', 'Seance-programme-leger'];
+const J5_ORDER = ['Programmes-vide', 'Programmes', 'Programme-nouveau', 'Programme-detail', 'Programme-exercice', 'Programme-exercice-fixe', 'Accueil-J5', 'Accueil-J5-leger', 'Jour-choix', 'Seance-programme', 'Seance-programme-leger', 'Seance-liste'];
 const noteJ5 = (y, text, color) => ({ x: J5_ORDER.length * 470, y, w: 400, page: 'j5', size: 's', ...(color ? { color } : {}), text });
 writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-09-21T12:00:00Z',
   pages: [{ id: 'j5', name: 'J5 · Programmes', order: J5_ORDER }], launch: { view: 'canvas', page: 'j5' }, extraNotes: {
@@ -546,6 +577,7 @@ writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-0
     'j5-actif': noteJ5(420, 'Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme.'),
     'j5-demarrer': noteJ5(840, 'Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages.', 'teal'),
     'j5-seance': noteJ5(1264, 'Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre ».'),
-    'j5-leger': noteJ5(2112, 'Écrans jugés trop chargés (21/09/2026) : l’accueil et la séance ont chacun une « proposition allégée » juste à droite de la version actuelle. Choisir laquelle garder (ou quoi garder de chacune). La séance allégée s’appliquerait aussi à la séance libre.', 'red'),
+    'j5-leger': noteJ5(2112, 'Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). La séance a trois versions à comparer : actuelle, allégée, en liste. « Autre jour » et « Séance libre » n’ont plus de place sur l’accueil : où les mettre ?', 'red'),
+    'j5-liste': noteJ5(2536, 'Séance « en liste » (dernière planche, exemple inspiré de Lyfta) : toute la séance dans une liste, l’exercice en cours déplié en tableau N° · Dernière fois · Kg · Reps · ✓, les suivants repliés. Le pavé − / + et « Valider » restent en bas pour la saisie à une main. À comparer avec la séance actuelle et la séance allégée.', 'purple'),
     'j5-ajout': noteJ5(1688, '« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice.'),
   } });
