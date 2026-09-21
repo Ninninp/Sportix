@@ -442,8 +442,8 @@ const weekDots = (t) => `<div style="display: flex; justify-content: center; gap
 const weekStats = (t) =>
   `<section aria-label="Cette semaine" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;"><div style="display: flex; align-items: center; justify-content: space-between; margin-right: -12px;">${lbl(t, 'Cette semaine')}${btn.link(t, 'Autre séance', file(t, 'Jour-choix'), t.muted)}</div>` +
   `<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">${weekStat(t, 'Séances', '2', '', true)}${weekStat(t, 'Durée', '1 h 44', '', true)}${weekStat(t, 'Volume', '12 480', 'kg', false)}</div>${weekDots(t)}</section>`;
-const homeJ5 = (t) =>
-  weekStats(t) +
+const homeJ5 = (t, insert = '') =>
+  weekStats(t) + insert +
   heroBig(t, { title: 'Force A — Jambes', sub: 'Prochaine séance · Force A/B · 5 exercices', href: file(t, 'Seance-liste'), cta: 'Démarrer la séance',
     rows: [exLine(t, 'Squat', '', true), exLine(t, 'Presse à cuisses', ''), exLine(t, 'Leg curl', ''), exLine(t, 'Fentes bulgares', ''), exLine(t, 'Mollets debout', '')] });
 
@@ -530,14 +530,13 @@ S['Seance-liste'] = { title: 'Séance · en liste (exemple inspiré de Lyfta)', 
 
 // ===================================================================================
 // J6 — Calendrier des blocs de spécialisation
-// Deux variantes de l'écran principal (docs/PLAN.md en demande deux) :
-//   A. « Frise » : les blocs les uns sous les autres, chacun avec sa barre de semaines.
-//   B. « Mois »  : un vrai calendrier mensuel, avec une colonne de semaines à gauche
-//      (S1, S2, D…) pour lire la périodisation sans quitter la grille.
+// Écran principal retenu le 21/09/2026 : le mois, avec une colonne de semaines à gauche
+// (S1, S2, D…) pour lire la périodisation sans quitter la grille. La variante « frise des
+// blocs » a été écartée ; les autres blocs se retrouvent en changeant de mois.
 // Exemple commun : bloc « Force », 5 semaines du lundi 14 septembre au dimanche 18 octobre
 // 2026, deload en semaine 4, semaine en cours = S2 ; aujourd'hui = jeudi 24 septembre.
 // ===================================================================================
-const J6NAV = (t) => ({ seance: file(t, 'Accueil-J6'), cal: file(t, 'Calendrier-frise') });
+const J6NAV = (t) => ({ seance: file(t, 'Accueil-J6'), cal: file(t, 'Calendrier-mois') });
 
 // Barre des semaines d'un bloc : pleine = passée, inversée = en cours, pointillés = deload.
 const weekBar = (t, { weeks, current, deload, done = [], onInverse = false }) => {
@@ -560,27 +559,11 @@ const blocEnCours = (t) =>
   `<section aria-label="Bloc Force, semaine 2 sur 5" style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 12px;">` +
   `<div style="display: flex; align-items: baseline; gap: 8px;"><h2 style="margin: 0; font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -0.02em; flex-grow: 1;">Force</h2><span class="num" style="font-size: 15px; color: ${t.onInverseMuted};">14 sept. → 18 oct.</span></div>` +
   weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1], onInverse: true }) +
-  `<div style="display: flex; align-items: flex-end; gap: 12px;"><div style="flex-grow: 1;"><div style="font-size: 15px; font-weight: 600;">Semaine 2 sur 5 · Force A/B</div><div style="font-size: 13px; color: ${t.onInverseMuted}; margin-top: 2px;"><span class="num">6</span> séances faites · deload en semaine 4</div></div>` +
+  `<div style="display: flex; align-items: flex-end; gap: 12px;"><div style="flex-grow: 1;"><div style="font-size: 15px; font-weight: 600;">Semaine 2 sur 5 · Force A/B</div><div style="font-size: 13px; color: ${t.onInverseMuted}; margin-top: 2px;"><span class="num"><span style="font-weight: normal">6</span>/15 séances</span></div></div>` +
   `<a href="${file(t, 'Bloc-detail')}" style="box-sizing: border-box; flex-shrink: 0; min-height: 48px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 15px; font-weight: 700; text-decoration: none;">Ouvrir</a></div></section>`;
 
-const blocRowCard = (t, { name, dates, sub, weeks, deload, past = false }) =>
-  `<a href="${file(t, 'Bloc-detail')}" style="box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;">` +
-  `<div style="display: flex; align-items: baseline; gap: 8px;"><span style="flex-grow: 1; font-size: 17px; font-weight: 700; ${past ? `color: ${t.muted};` : ''}">${name}</span><span class="num" style="font-size: 13px; color: ${t.muted};">${dates}</span></div>` +
-  weekBar(t, { weeks, current: 0, deload, done: past ? Array.from({ length: weeks }, (_, i) => i + 1) : [] }) +
-  `<span style="font-size: 13px; color: ${t.muted};">${sub}</span></a>`;
-
-const calHeader = (t, variante) =>
-  `<header style="display: flex; align-items: center; gap: 4px; margin-right: -8px; flex-shrink: 0;"><h1 style="${H1} flex-grow: 1;">Calendrier</h1>${iconBtn(t, 'plus', 'Nouveau bloc', file(t, 'Bloc-nouveau'), `border: 1.5px solid ${t.strong}; border-radius: 999px; width: 44px; height: 44px;`)}</header>` +
-  `<div style="flex-shrink: 0;">${seg(t, ['Frise', 'Mois'], variante, 'Affichage du calendrier')}</div>`;
-
-S['Calendrier-frise'] = { title: 'Calendrier · frise des blocs (variante A)', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), gap: 10, main:
-  calHeader(t, 0) +
-  lbl(t, 'En cours') + blocEnCours(t) +
-  lbl(t, 'À venir') +
-  blocRowCard(t, { name: 'Hypertrophie', dates: '19 oct. → 29 nov.', sub: 'Objectif Hypertrophie · 6 semaines · PPL', weeks: 6, deload: 6 }) +
-  lbl(t, 'Terminés') +
-  blocRowCard(t, { name: 'Prise de masse', dates: '3 août → 13 sept.', sub: '6 semaines · 22 séances', weeks: 6, deload: 6, past: true }) +
-  `<div style="flex-grow: 1;"></div>` }) };
+const calHeader = (t) =>
+  `<header style="display: flex; align-items: center; gap: 4px; margin-right: -8px; flex-shrink: 0;"><h1 style="${H1} flex-grow: 1;">Calendrier</h1>${iconBtn(t, 'plus', 'Nouveau bloc', file(t, 'Bloc-nouveau'), `border: 1.5px solid ${t.strong}; border-radius: 999px; width: 44px; height: 44px;`)}</header>`;
 
 S['Calendrier-vide'] = { title: 'Calendrier · aucun bloc', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), main:
   `<header style="flex-shrink: 0;"><h1 style="${H1}">Calendrier</h1></header>` +
@@ -623,8 +606,8 @@ const legende = (t) =>
 const monthNav = (t) =>
   `<div style="flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; margin: 0 -8px;">${iconBtn(t, 'chevL', 'Mois précédent', '#')}<span style="font-size: 17px; font-weight: 700;">Septembre 2026</span>${iconBtn(t, 'chevR', 'Mois suivant', '#')}</div>`;
 
-S['Calendrier-mois'] = { title: 'Calendrier · vue mensuelle (variante B)', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), gap: 10, main:
-  calHeader(t, 1) + monthNav(t) + calGrid(t) + legende(t) +
+S['Calendrier-mois'] = { title: 'Calendrier · le mois', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), gap: 10, main:
+  calHeader(t) + monthNav(t) + calGrid(t) + legende(t) +
   `<div style="flex-grow: 1;"></div>` + blocEnCours(t) }) };
 
 // ---------- Fiche d'un bloc ----------
@@ -638,7 +621,7 @@ const weekRow = (t, { n, dates, sessions, state }) => {
 };
 
 const blocDetailMain = (t) =>
-  header(t, 'Force', file(t, 'Calendrier-frise'), 'Retour au calendrier', btn.link(t, 'Modifier', file(t, 'Bloc-nouveau'), t.text)) +
+  header(t, 'Force', file(t, 'Calendrier-mois'), 'Retour au calendrier', btn.link(t, 'Modifier', file(t, 'Bloc-nouveau'), t.text)) +
   `<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 15px; color: ${t.muted};">Objectif <strong style="color: ${t.text};">Force</strong> · programme <strong style="color: ${t.text};">Force A/B</strong></span><span class="num" style="font-size: 15px; color: ${t.muted};">Du 14 septembre au 18 octobre 2026</span></div>` +
   `<div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">${tile(t, 'Semaine', '2/5')}${tile(t, 'Séances', '6')}${tile(t, 'Volume', '38 t')}</div>` +
   lbl(t, 'Semaines') +
@@ -680,12 +663,13 @@ const blocForm = (t) =>
   fieldset(t, 'Programme suivi', chips(t, ['Force A/B', 'PPL', 'Aucun'], [0]));
 
 S['Bloc-nouveau'] = { title: 'Nouveau bloc', page: 'j6', h: 940, render: (t) => frame(t, { h: 940, gap: 18, main:
-  header(t, 'Nouveau bloc', file(t, 'Calendrier-frise'), 'Annuler', '', 24) + blocForm(t) +
+  header(t, 'Nouveau bloc', file(t, 'Calendrier-mois'), 'Annuler', '', 24) + blocForm(t) +
   `<div style="flex-grow: 1;"></div>` +
-  `<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;">${btn.pri(t, 'Créer le bloc', file(t, 'Calendrier-frise'), 'width: 100%;')}<span class="num" style="text-align: center; font-size: 13px; font-weight: 500; color: ${t.muted};">Du 14 septembre au 18 octobre 2026</span></div>` }) };
+  // Retouche de l'utilisateur (21/09/2026) : les dates calculées se lisent AVANT le bouton.
+  `<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;"><span class="num" style="text-align: center; font-size: 13px; font-weight: 500; color: ${t.muted};">Du 14 septembre au 18 octobre 2026</span>${btn.pri(t, 'Créer le bloc', file(t, 'Calendrier-mois'), 'width: 100%;')}</div>` }) };
 
 S['Objectif-nouveau'] = { title: 'Nouvel objectif (panneau)', page: 'j6', h: 940, render: (t) => frame(t, { h: 940, gap: 18,
-  main: header(t, 'Nouveau bloc', file(t, 'Calendrier-frise'), 'Annuler', '', 24) + blocForm(t) + `<div style="flex-grow: 1;"></div>`,
+  main: header(t, 'Nouveau bloc', file(t, 'Calendrier-mois'), 'Annuler', '', 24) + blocForm(t) + `<div style="flex-grow: 1;"></div>`,
   overlay: sheet(t, 'Nouvel objectif',
     `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Nouvel objectif</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Il reste dans la liste : deux blocs du même objectif se comparent dans les Stats.</p></div>` +
     field(t, 'Nom', '', 'Ex. Puissance') +
@@ -693,8 +677,10 @@ S['Objectif-nouveau'] = { title: 'Nouvel objectif (panneau)', page: 'j6', h: 940
 
 // Accueil complet du J6 : la ligne du bloc se pose au-dessus de l'accueil du J5.
 S['Accueil-J6'] = { title: 'Accueil · avec le bloc en cours', page: 'j6', render: (t) => frame(t, { navActive: 'seance', navLinks: J6NAV(t),
-  main: thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span>` +
-    `<span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, file(t, 'Calendrier-frise'), 'Bloc Force, semaine 2 sur 5, deload en semaine 4') + homeJ5(t) }) };
+  // Place retenue le 21/09/2026 (déplacée par l'utilisateur dans le canvas) : la ligne du bloc
+  // vient SOUS les chiffres de la semaine, juste avant la grande carte.
+  main: homeJ5(t, thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span>` +
+    `<span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, file(t, 'Calendrier-mois'), 'Bloc Force, semaine 2 sur 5, deload en semaine 4')) }) };
 
 // ---------- Écriture des fichiers ----------
 const page = (t, title, h, body) => `<!doctype html>
@@ -784,13 +770,13 @@ writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-0
   } });
 
 // ===== Canvas J6 (calendrier des blocs) : son propre dossier, son propre lien =====
-MAIN = 'Calendrier-frise';
-const J6_ORDER = ['Calendrier-vide', 'Calendrier-frise', 'Calendrier-mois', 'Bloc-nouveau', 'Objectif-nouveau', 'Bloc-detail', 'Bloc-chevauchement', 'Accueil-J6'];
+MAIN = 'Calendrier-mois';
+const J6_ORDER = ['Calendrier-vide', 'Calendrier-mois', 'Bloc-nouveau', 'Objectif-nouveau', 'Bloc-detail', 'Bloc-chevauchement', 'Accueil-J6'];
 const noteJ6 = (y, text, color) => ({ x: J6_ORDER.length * 470, y, w: 400, page: 'j6', size: 's', ...(color ? { color } : {}), text });
 writeCanvas('../maquettes-j6/', { title: 'Sportix — Maquettes J6', at: '2026-09-21T18:00:00Z',
   pages: [{ id: 'j6', name: 'J6 · Calendrier des blocs' }].map((p) => ({ ...p, order: J6_ORDER })), launch: { view: 'canvas', page: 'j6' }, extraNotes: {
-    'j6-choix': noteJ6(0, 'À CHOISIR : deux variantes de l’écran principal (planches 2 et 3). A « Frise » : les blocs les uns sous les autres, le bloc en cours en grand, chacun avec sa barre de semaines — on lit la périodisation, pas les dates. B « Mois » : un vrai calendrier, une colonne S1/S2/… à gauche pour les semaines du bloc, un point par séance faite, la case du jour cerclée — on lit les dates et l’assiduité. Le sélecteur Frise / Mois en haut des deux planches suppose qu’on garde les deux ; si une seule suffit, on retire le sélecteur.', 'orange'),
-    'j6-semaine': noteJ6(520, 'Un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7.', 'teal'),
+    'j6-choix': noteJ6(0, 'Écran principal retenu le 21/09/2026 : la vue mensuelle. Un vrai calendrier, la colonne S1/S2/… à gauche pour les semaines du bloc, la case du jour cerclée, un point sous les jours où une séance a été faite, et les jours du bloc sur fond plein. La variante « frise des blocs » (les blocs les uns sous les autres) a été écartée : on retrouve les autres blocs en changeant de mois, et le bloc en cours est rappelé en bas de l’écran.', 'teal'),
+    'j6-semaine': noteJ6(520, 'Retenu le 21/09/2026 : un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7.', 'teal'),
     'j6-deload': noteJ6(1040, 'Deload : une semaine du bloc marquée « D » (pointillés). « + Semaine de deload » l’insère et allonge le bloc d’une semaine ; si le bloc suivant est touché, on propose de le décaler (planche 7). Le deload reste visible dans les Stats du J7, grisé.'),
     'j6-rattachement': noteJ6(1560, 'Chaque séance enregistrée pendant un bloc en garde l’identifiant (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Les séances déjà faites avant la création du bloc ne sont pas rattachées.'),
     'j6-accueil': noteJ6(2080, 'Accueil (dernière planche) : la ligne fine du bloc passe au-dessus des chiffres de la semaine. Elle mène au détail du bloc. Sans bloc en cours, la ligne disparaît et l’accueil est celui du J5.'),

@@ -31,21 +31,12 @@
       "y": 0,
       "w": 390,
       "h": 844,
-      "title": "Calendrier · frise des blocs (variante A) — sombre",
-      "page": "j6",
-      "is_interactive": true
-    },
-    "S-Calendrier-mois.dc.html": {
-      "x": 940,
-      "y": 0,
-      "w": 390,
-      "h": 844,
-      "title": "Calendrier · vue mensuelle (variante B) — sombre",
+      "title": "Calendrier · le mois — sombre",
       "page": "j6",
       "is_interactive": true
     },
     "S-Bloc-nouveau.dc.html": {
-      "x": 1410,
+      "x": 940,
       "y": 0,
       "w": 390,
       "h": 940,
@@ -54,7 +45,7 @@
       "is_interactive": true
     },
     "S-Objectif-nouveau.dc.html": {
-      "x": 1880,
+      "x": 1410,
       "y": 0,
       "w": 390,
       "h": 940,
@@ -63,7 +54,7 @@
       "is_interactive": true
     },
     "S-Bloc-detail.dc.html": {
-      "x": 2350,
+      "x": 1880,
       "y": 0,
       "w": 390,
       "h": 940,
@@ -72,7 +63,7 @@
       "is_interactive": true
     },
     "S-Bloc-chevauchement.dc.html": {
-      "x": 2820,
+      "x": 2350,
       "y": 0,
       "w": 390,
       "h": 940,
@@ -81,7 +72,7 @@
       "is_interactive": true
     },
     "S-Accueil-J6.dc.html": {
-      "x": 3290,
+      "x": 2820,
       "y": 0,
       "w": 390,
       "h": 844,
@@ -98,26 +89,17 @@
       "page": "j6",
       "is_interactive": true
     },
-    "C-Calendrier-frise.dc.html": {
+    "C-Calendrier-mois.dc.html": {
       "x": 470,
       "y": 1360,
       "w": 390,
       "h": 844,
-      "title": "Calendrier · frise des blocs (variante A) — clair",
-      "page": "j6",
-      "is_interactive": true
-    },
-    "C-Calendrier-mois.dc.html": {
-      "x": 940,
-      "y": 1360,
-      "w": 390,
-      "h": 844,
-      "title": "Calendrier · vue mensuelle (variante B) — clair",
+      "title": "Calendrier · le mois — clair",
       "page": "j6",
       "is_interactive": true
     },
     "C-Bloc-nouveau.dc.html": {
-      "x": 1410,
+      "x": 940,
       "y": 1360,
       "w": 390,
       "h": 940,
@@ -126,7 +108,7 @@
       "is_interactive": true
     },
     "C-Objectif-nouveau.dc.html": {
-      "x": 1880,
+      "x": 1410,
       "y": 1360,
       "w": 390,
       "h": 940,
@@ -135,7 +117,7 @@
       "is_interactive": true
     },
     "C-Bloc-detail.dc.html": {
-      "x": 2350,
+      "x": 1880,
       "y": 1360,
       "w": 390,
       "h": 940,
@@ -144,7 +126,7 @@
       "is_interactive": true
     },
     "C-Bloc-chevauchement.dc.html": {
-      "x": 2820,
+      "x": 2350,
       "y": 1360,
       "w": 390,
       "h": 940,
@@ -153,7 +135,7 @@
       "is_interactive": true
     },
     "C-Accueil-J6.dc.html": {
-      "x": 3290,
+      "x": 2820,
       "y": 1360,
       "w": 390,
       "h": 844,
@@ -165,14 +147,12 @@
   "order": [
     "S-Calendrier-vide.dc.html",
     "Main.dc.html",
-    "S-Calendrier-mois.dc.html",
     "S-Bloc-nouveau.dc.html",
     "S-Objectif-nouveau.dc.html",
     "S-Bloc-detail.dc.html",
     "S-Bloc-chevauchement.dc.html",
     "S-Accueil-J6.dc.html",
     "C-Calendrier-vide.dc.html",
-    "C-Calendrier-frise.dc.html",
     "C-Calendrier-mois.dc.html",
     "C-Bloc-nouveau.dc.html",
     "C-Objectif-nouveau.dc.html",
@@ -187,7 +167,7 @@
       "text": "J6 · Calendrier des blocs — thème sombre",
       "kind": "title1",
       "page": "j6",
-      "maxW": 3680
+      "maxW": 3210
     },
     "j6-C": {
       "x": 0,
@@ -195,28 +175,28 @@
       "text": "J6 · Calendrier des blocs — thème clair",
       "kind": "title1",
       "page": "j6",
-      "maxW": 3680
+      "maxW": 3210
     },
     "j6-choix": {
-      "x": 3760,
+      "x": 3290,
       "y": 0,
       "w": 400,
       "page": "j6",
       "size": "s",
-      "color": "orange",
-      "text": "À CHOISIR : deux variantes de l’écran principal (planches 2 et 3). A « Frise » : les blocs les uns sous les autres, le bloc en cours en grand, chacun avec sa barre de semaines — on lit la périodisation, pas les dates. B « Mois » : un vrai calendrier, une colonne S1/S2/… à gauche pour les semaines du bloc, un point par séance faite, la case du jour cerclée — on lit les dates et l’assiduité. Le sélecteur Frise / Mois en haut des deux planches suppose qu’on garde les deux ; si une seule suffit, on retire le sélecteur."
+      "color": "teal",
+      "text": "Écran principal retenu le 21/09/2026 : la vue mensuelle. Un vrai calendrier, la colonne S1/S2/… à gauche pour les semaines du bloc, la case du jour cerclée, un point sous les jours où une séance a été faite, et les jours du bloc sur fond plein. La variante « frise des blocs » (les blocs les uns sous les autres) a été écartée : on retrouve les autres blocs en changeant de mois, et le bloc en cours est rappelé en bas de l’écran."
     },
     "j6-semaine": {
-      "x": 3760,
+      "x": 3290,
       "y": 520,
       "w": 400,
       "page": "j6",
       "size": "s",
       "color": "teal",
-      "text": "Un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7."
+      "text": "Retenu le 21/09/2026 : un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7."
     },
     "j6-deload": {
-      "x": 3760,
+      "x": 3290,
       "y": 1040,
       "w": 400,
       "page": "j6",
@@ -224,7 +204,7 @@
       "text": "Deload : une semaine du bloc marquée « D » (pointillés). « + Semaine de deload » l’insère et allonge le bloc d’une semaine ; si le bloc suivant est touché, on propose de le décaler (planche 7). Le deload reste visible dans les Stats du J7, grisé."
     },
     "j6-rattachement": {
-      "x": 3760,
+      "x": 3290,
       "y": 1560,
       "w": 400,
       "page": "j6",
@@ -232,7 +212,7 @@
       "text": "Chaque séance enregistrée pendant un bloc en garde l’identifiant (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Les séances déjà faites avant la création du bloc ne sont pas rattachées."
     },
     "j6-accueil": {
-      "x": 3760,
+      "x": 3290,
       "y": 2080,
       "w": 400,
       "page": "j6",
