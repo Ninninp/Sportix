@@ -118,7 +118,7 @@ src/
 - **Objectif** : le timer reste exact après verrouillage/déverrouillage.
 - Note : pas de vibration web sur iOS.
 
-### J5 — Programmes / routines (3–4 jours) — code fait le 21/09/2026, à valider
+### J5 — Programmes / routines (3–4 jours) — ✅ validé le 21/09/2026
 > Maquettes validées le 21/09/2026 (canvas « Sportix — Maquettes J5 »). Dexie v4 (`programs`, `programDays`, `programExercises`). Un seul programme actif (Réglages `activeProgramId`) ; séance du jour = jour suivant, dans l'ordre, le dernier fait (`nextDay`) ; « Autre séance » (jours + séance libre) ; démarrage = toutes les séries du jour créées et pré-remplies (`planDaySets`), repos par exercice, fourchette de reps seulement avec double progression (sinon reps fixes). Accueil façon Lyfta : séances / durée / volume de la semaine avec flèche d'évolution à date égale, pastilles des jours. Séance « en liste » (tableau N° · Dernière fois · Kg · Reps · ✓, exercices suivants repliés, pavé compact) pour toutes les séances. Reste : test sur l'iPhone à la salle.
 - **Design** : maquettes création de programme + lancement de séance.
 - Programme → jours → exercices avec cibles ; « Démarrer la séance du jour ».
