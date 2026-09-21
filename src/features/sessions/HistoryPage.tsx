@@ -58,7 +58,8 @@ function HistoryPage() {
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                         <span className="truncate text-body-strong font-semibold">
-                          {describeSessionExercises(sessionSets, (id) => exercises.get(id)?.name)}
+                          {/* Séance de programme : le nom du jour ; séance libre : ses exercices */}
+                          {s.title ?? describeSessionExercises(sessionSets, (id) => exercises.get(id)?.name)}
                         </span>
                         <span className="num text-small font-medium text-muted">
                           {formatDuration(summary.durationMs)} · {formatWeight(summary.volume)}

@@ -1,5 +1,6 @@
-// Séance en cours (maquette D5 « Séance en cours ») : pastilles d'exercices, séries,
-// progression, pavé de saisie Charge / Reps et bouton « Valider la série ».
+// Séance en cours, « en liste » (maquette J5 retenue le 21/09/2026, inspirée de Lyfta) : toute la
+// séance dans une liste (SessionList), l'exercice ouvert en tableau, les autres repliés ; en bas,
+// le pavé de saisie Charge / Reps (compact) et « Valider la série », dans la zone du pouce.
 // Les onglets du bas sont masqués sur cet écran (décision de D2).
 // Terminer demande toujours une confirmation : un appui de trop en salle ne doit pas clore la séance.
 // Valider une série lance le repos (J4) : l'écran de repos remplace alors la saisie.
@@ -9,11 +10,8 @@ import { BadgeIncrease } from '../../components/Badge.tsx'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
 import NumberStepper from '../../components/NumberStepper.tsx'
-import SessionProgress from '../../components/SessionProgress.tsx'
-import SetRow from '../../components/SetRow.tsx'
 import Sheet from '../../components/Sheet.tsx'
-import { Link } from 'react-router'
-import { IconChevronDroite, IconOptions, IconPlus } from '../../components/icons.tsx'
+import { IconPlus } from '../../components/icons.tsx'
 import {
   addSet,
   clearSessionRest,
@@ -23,7 +21,6 @@ import {
   updateSet,
   validateSetAndRest,
 } from '../../db/sessions.ts'
-import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import {
   increaseBadge,
   lastPerformance,
@@ -33,13 +30,13 @@ import {
   stepWeight,
   weightStep,
 } from '../../lib/progression.ts'
-import { formatRest } from '../../lib/rest.ts'
 import { currentSet, formatNumber, groupSetsByExercise, sessionProgress, type SessionSet } from '../../lib/sessions.ts'
 import { useSettings } from '../settings/useSettings.ts'
 import RestScreen from '../timer/RestScreen.tsx'
 import { unlockAudio } from '../timer/sound.ts'
 import ExerciseMenu from './ExerciseMenu.tsx'
 import SessionHeader from './SessionHeader.tsx'
+import SessionList from './SessionList.tsx'
 import { useActiveSession, useExercisesById, useHistorySets, useSessionSets } from './useSession.ts'
 
 function SessionPage() {
@@ -140,7 +137,7 @@ function SessionPage() {
       <main className="flex flex-1 flex-col gap-3 px-4 pt-1 pb-4">
         {header}
         <div className="flex flex-1 flex-col justify-center gap-2 px-2">
-          <h1 className="text-title-l font-extrabold tracking-[-0.02em]">Séance libre</h1>
+          <h1 className="text-title-l font-extrabold tracking-[-0.02em]">{session.title ?? 'Séance libre'}</h1>
           <p className="text-body text-muted">
             Ajoute ton premier exercice. Ses séries seront pré-remplies avec ta dernière fois.
           </p>
@@ -191,123 +188,31 @@ function SessionPage() {
     <main className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-1 pb-4">
       {header}
 
-      {/* Pastilles des exercices de la séance */}
-      <nav aria-label="Exercices de la séance" className="-mr-4 flex shrink-0 items-center gap-2">
-        <div className="flex flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {blocks.map((b) => {
-            const on = b.exerciseOrder === activeOrder
-            return (
-              <button
-                key={b.exerciseOrder}
-                type="button"
-                aria-current={on ? 'step' : undefined}
-                onClick={() => setSelected(b.exerciseOrder)}
-                className={`inline-flex min-h-12 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3.5 text-body font-semibold whitespace-nowrap ${
-                  on ? 'border-inverse bg-inverse text-on-inverse' : 'border-border-strong text-text'
-                }`}
-              >
-                {exercises.get(b.exerciseId)?.name ?? 'Exercice'}{' '}
-                <span className="num opacity-80">
-                  {b.doneCount}/{b.sets.length}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-        <Link
-          to="/seance/exercices"
-          aria-label="Ajouter un exercice"
-          className="mr-4 flex size-12 shrink-0 items-center justify-center rounded-full border-[1.5px] border-border-strong text-text"
-        >
-          <IconPlus size={20} />
-        </Link>
-      </nav>
-
-      {/* Exercice en cours */}
-      <div className="flex shrink-0 items-start gap-2">
-        <div className="flex-1">
-          <h1 className="text-title-l font-extrabold tracking-[-0.02em]">{exercise?.name ?? 'Exercice'}</h1>
-          <div className="text-body text-muted">
-            <span className="num text-num-s text-text">
-              {editing?.targetRepsMin ? (
-                <>
-                  {block!.sets.length} × {editing.targetRepsMin}
-                  {editing.targetRepsMax && editing.targetRepsMax !== editing.targetRepsMin
-                    ? `–${editing.targetRepsMax}`
-                    : ''}{' '}
-                  reps
-                </>
-              ) : (
-                plural(block!.sets.length, 'série')
-              )}
-            </span>
-            {block!.variant ? ` · ${VARIANT_LABELS[block!.variant]}` : ''}
-            {' · repos '}
-            <span className="num">{formatRest(settings.restSeconds)}</span>
-          </div>
-        </div>
-        <button
-          type="button"
-          aria-label="Options de l’exercice"
-          onClick={() => setMenuOpen(true)}
-          className="-mr-2 flex size-12 shrink-0 items-center justify-center rounded-md text-text"
-        >
-          <IconOptions />
-        </button>
-      </div>
-
-      {/* Séries */}
-      <Card className="flex shrink-0 flex-col gap-1 p-1">
-        {block!.sets.map((s) => (
-          <SetRow
-            key={s.id}
-            index={s.order}
-            weight={s.weight > 0 ? `${formatNumber(s.weight)} kg` : '—'}
-            reps={s.reps}
-            state={s.done ? 'done' : s.id === editing?.id ? 'current' : 'next'}
-          />
-        ))}
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => addSet(session.id, block!.exerciseOrder)}
-            className="min-h-12 px-2.5 text-body font-semibold text-text"
-          >
-            + Série
-          </button>
-          {blocks.length > 1 && (
-            <button
-              type="button"
-              onClick={() => {
-                const next = blocks.find((b) => b.exerciseOrder > block!.exerciseOrder) ?? blocks[0]
-                setSelected(next.exerciseOrder)
-              }}
-              className="flex min-h-12 items-center gap-1 pr-1.5 pl-2.5 text-body text-text"
-            >
-              <span className="text-muted">Ensuite :</span>
-              <span className="font-semibold">
-                {exercises.get((blocks.find((b) => b.exerciseOrder > block!.exerciseOrder) ?? blocks[0]).exerciseId)?.name}
-              </span>
-              <IconChevronDroite size={18} />
-            </button>
-          )}
-        </div>
-      </Card>
-
-      <div className="flex flex-1 flex-col justify-center">
-        <SessionProgress done={progress.done} total={progress.total} />
-      </div>
+      <SessionList
+        blocks={blocks}
+        openOrder={activeOrder}
+        editingId={editing?.id}
+        exercises={exercises}
+        history={history}
+        onOpen={setSelected}
+        onAddSet={(order: number) => void addSet(session.id, order)}
+        onMenu={() => setMenuOpen(true)}
+      />
 
       {/* Pavé de saisie de la série en cours */}
       {editing ? (
         <>
-          <Card className="flex shrink-0 flex-col gap-2.5 p-3">
-            <div className="flex items-center justify-between">
-              <span className="text-body-strong font-bold">Série {editing.order}</span>
-              {badge && <BadgeIncrease>{badge}</BadgeIncrease>}
+          <Card className="flex shrink-0 flex-col gap-2 px-3 pt-2.5 pb-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="truncate text-body font-bold">
+                {exercise?.name ?? 'Exercice'} · série {editing.order}
+              </span>
+              {/* Pas de proposition de charge quand la double progression est désactivée (programme) */}
+              {badge && editing.progression !== false && <BadgeIncrease>{badge}</BadgeIncrease>}
             </div>
             {exercise?.type !== 'poids-du-corps' && (
               <NumberStepper
+                compact
                 label="Charge"
                 ariaLabel="Charge"
                 value={formatNumber(editing.weight)}
@@ -329,22 +234,9 @@ function SessionPage() {
               />
             )}
             <NumberStepper
-              label={
-                <>
-                  Reps
-                  {editing.targetRepsMin ? (
-                    <>
-                      {' · '}
-                      <span className="text-text">
-                        objectif {editing.targetRepsMin}
-                        {editing.targetRepsMax && editing.targetRepsMax !== editing.targetRepsMin
-                          ? `–${editing.targetRepsMax}`
-                          : ''}
-                      </span>
-                    </>
-                  ) : null}
-                </>
-              }
+              compact
+              // L'objectif est affiché dans la liste, à côté du nom de l'exercice
+              label="Reps"
               ariaLabel={
                 editing.targetRepsMin
                   ? `Répétitions, objectif ${editing.targetRepsMin} à ${editing.targetRepsMax ?? editing.targetRepsMin}`

@@ -35,10 +35,10 @@ const past = (reps: number[], weight = 100): SessionSet[] =>
   }))
 
 describe('planDaySets', () => {
-  it('première fois : le nombre de séries du programme, barre à vide, bas de la fourchette', () => {
+  it('première fois : le nombre de séries du programme, barre à vide, 0 rep (les séries suivront la première)', () => {
     const sets = planDaySets([squat], [])
     expect(sets).toHaveLength(3)
-    expect(sets[0]).toMatchObject({ weight: 20, reps: 4, targetRepsMin: 4, targetRepsMax: 6, restSeconds: 180, exerciseOrder: 1, order: 1 })
+    expect(sets[0]).toMatchObject({ weight: 20, reps: 0, targetRepsMin: 4, targetRepsMax: 6, restSeconds: 180, exerciseOrder: 1, order: 1 })
   })
 
   it('reprend charges et reps de la dernière fois', () => {

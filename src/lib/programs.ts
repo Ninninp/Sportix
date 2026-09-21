@@ -77,7 +77,9 @@ export type PlannedSet = Pick<
  * - charge : celle de la dernière fois (même exercice, même variante), + un pas si la double
  *   progression est activée et que toutes les séries ont atteint le haut de la fourchette ;
  * - reps : celles de la dernière fois (le score à battre), ou le bas de la fourchette quand la
- *   charge augmente ; sans double progression, le nombre fixe du programme.
+ *   charge augmente ; sans double progression, le nombre fixe du programme ;
+ * - première fois sur l'exercice : 0 rep, comme en séance libre. Les séries suivantes, encore
+ *   vides, reprennent alors ce qui est saisi sur la première (validateSetAndRest).
  */
 export function planDaySets(
   exercises: ProgramExercise[],
@@ -99,7 +101,7 @@ export function planDaySets(
           exerciseOrder: index + 1,
           order: i + 1,
           weight: Math.max(min, (previous?.weight ?? min) + step),
-          reps: !pe.doubleProgression || increase || !previous ? pe.repsMin : previous.reps,
+          reps: !previous ? 0 : !pe.doubleProgression || increase ? pe.repsMin : previous.reps,
           targetRepsMin: pe.repsMin,
           targetRepsMax: pe.repsMax,
           restSeconds: pe.restSeconds,

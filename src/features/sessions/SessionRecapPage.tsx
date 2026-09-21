@@ -63,7 +63,7 @@ function SessionRecapPage() {
     <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pt-3 pb-4">
       <header className="shrink-0">
         <p className="text-body text-muted">
-          {date.charAt(0).toUpperCase() + date.slice(1)} · Séance libre
+          {date.charAt(0).toUpperCase() + date.slice(1)} · {session.title ?? 'Séance libre'}
         </p>
         <h1 className="text-display font-extrabold tracking-[-0.02em]">Séance terminée</h1>
       </header>

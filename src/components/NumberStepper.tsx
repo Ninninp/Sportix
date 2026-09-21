@@ -19,6 +19,8 @@ type Props = {
   onType?: (text: string) => void
   /** Clavier proposé : avec virgule (charge) ou chiffres seuls (reps). */
   inputMode?: 'decimal' | 'numeric'
+  /** Version compacte (séance en liste, J5) : bloc de 52 px, chiffres de 30 px. */
+  compact?: boolean
 }
 
 function NumberStepper({
@@ -33,7 +35,12 @@ function NumberStepper({
   canDecrement = true,
   onType,
   inputMode = 'numeric',
+  compact = false,
 }: Props) {
+  // Tailles : bloc 60 px (étiquette 14 + nombre 34) ou compact 52 px (13 + 32)
+  const size = compact
+    ? { box: 'h-13', label: 'text-[11px] leading-[13px]', row: 'h-[32px]', num: 'text-[30px] leading-[32px]' }
+    : { box: 'h-15', label: 'text-caption leading-[14px]', row: 'h-[34px]', num: 'text-num-l leading-[34px]' }
   // Texte en cours de frappe (null : on affiche la valeur enregistrée)
   const [draft, setDraft] = useState<string | null>(null)
   const cancelled = useRef(false)
@@ -74,7 +81,7 @@ function NumberStepper({
     }
   }
 
-  const button = 'w-14 shrink-0 bg-surface-2 text-[26px] font-bold text-text disabled:text-border-strong'
+  const button = `w-14 shrink-0 bg-surface-2 ${compact ? 'text-[24px]' : 'text-[26px]'} font-bold text-text disabled:text-border-strong`
 
   // overflow-clip (et non hidden) : coupe les coins sans créer de zone qui défile. Sinon, au
   // toucher du nombre, le navigateur fait défiler le bloc de quelques pixels pour montrer le champ.
@@ -82,7 +89,7 @@ function NumberStepper({
     <div
       role="group"
       aria-label={ariaLabel}
-      className="flex h-15 items-stretch overflow-clip rounded-md border-[1.5px] border-border-strong bg-surface"
+      className={`flex ${size.box} items-stretch overflow-clip rounded-md border-[1.5px] border-border-strong bg-surface`}
     >
       <button type="button" aria-label={minusLabel} disabled={!canDecrement} className={button} {...hold('onDecrement')}>
         −
@@ -91,8 +98,8 @@ function NumberStepper({
           (14 + 34 px) pour laisser de l'air en haut et en bas. Les chiffres n'ont pas de jambage,
           34 px suffisent à un nombre de 38 px. */}
       <div className="flex flex-1 flex-col items-center justify-center">
-        <span className="text-caption leading-[14px] font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
-        <span className="flex h-[34px] items-baseline justify-center gap-1 has-[input:focus]:gap-3.5">
+        <span className={`${size.label} font-semibold tracking-[0.06em] text-muted uppercase`}>{label}</span>
+        <span className={`flex ${size.row} items-baseline justify-center gap-1 has-[input:focus]:gap-3.5`}>
           {onType ? (
             // Le champ se cale sur le texte réellement affiché : une copie invisible du texte
             // donne sa taille à la case, et le champ occupe exactement cette case. (Une largeur
@@ -100,7 +107,7 @@ function NumberStepper({
             // Pendant la saisie, le fond gris déborde autour du nombre (ombres pleines à gauche et à droite, qui ne prennent pas
             // de place : au repos rien ne bouge) et l'unité s'écarte pour ne pas le toucher.
             <span className="inline-grid rounded-sm focus-within:bg-surface-2 focus-within:shadow-[-8px_0_0_var(--color-surface-2),8px_0_0_var(--color-surface-2)]">
-              <span aria-hidden="true" className="num invisible col-start-1 row-start-1 text-num-l leading-[34px] tracking-[-0.02em] whitespace-pre">
+              <span aria-hidden="true" className={`num invisible col-start-1 row-start-1 ${size.num} tracking-[-0.02em] whitespace-pre`}>
                 {(draft ?? value) || ' '}
               </span>
               <input
@@ -127,11 +134,11 @@ function NumberStepper({
                   setDraft(null)
                 }}
                 // Hauteur imposée : Safari agrandit sinon le champ au-delà de la hauteur de ligne
-                className="num col-start-1 row-start-1 h-[34px] w-0 min-w-full bg-transparent p-0 text-center text-num-l leading-[34px] tracking-[-0.02em] text-text outline-none"
+                className={`num col-start-1 row-start-1 ${size.row} w-0 min-w-full bg-transparent p-0 text-center ${size.num} tracking-[-0.02em] text-text outline-none`}
               />
             </span>
           ) : (
-            <span className="num text-num-l leading-[34px] tracking-[-0.02em]">{value}</span>
+            <span className={`num ${size.num} tracking-[-0.02em]`}>{value}</span>
           )}
           <span className="text-body font-semibold text-muted">{unit}</span>
         </span>

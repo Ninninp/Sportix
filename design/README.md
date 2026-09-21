@@ -10,7 +10,7 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 | D3 — Directions visuelles | [Sportix — Directions D3](https://claude.ai/artifact/41NwjzST7hReMtjdy2jfyb) | Validé le 18/09/2026 | [`directions-d3/`](directions-d3/) |
 | D4 — Design system | [Sportix — Design system D4](https://claude.ai/artifact/GiTgJ8PJXS3Psz1BkCaWej) | Validé le 19/09/2026 | [`design-system-d4/`](design-system-d4/) · [`tokens.md`](tokens.md) · [`icon.svg`](../public/icon.svg) |
 | D5 — Maquettes MVP | [Sportix — Maquettes D5](https://claude.ai/artifact/97yLtU5WwzEf6hWSRHqJRq) | Validé le 19/09/2026 — **référence visuelle des jalons J1 à J4** | [`maquettes-d5/`](maquettes-d5/) |
-| J5 — Programmes | [Sportix — Maquettes J5](https://claude.ai/artifact/YVb56UsegHkqsWQcj4eFQK) | Premier jet le 21/09/2026, **à valider** | [`maquettes-j5/`](maquettes-j5/) |
+| J5 — Programmes | [Sportix — Maquettes J5](https://claude.ai/artifact/YVb56UsegHkqsWQcj4eFQK) | Validé le 21/09/2026 — **référence du J5** (séance « en liste », accueil façon Lyfta) | [`maquettes-j5/`](maquettes-j5/) |
 
 Les planches D5 et J5 sont produites par [`maquettes-d5/generer.mjs`](maquettes-d5/generer.mjs) (les J5 dans `maquettes-j5/`, avec leur propre `canvas.json`) : chaque écran y est décrit une fois, puis généré dans les deux thèmes à partir des tokens (`node design/maquettes-d5/generer.mjs`). Les planches `S-…` sont en thème sombre, `C-…` en clair ; `Main.dc.html` est l'accueil sombre.
 

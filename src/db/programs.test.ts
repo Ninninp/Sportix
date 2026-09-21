@@ -96,6 +96,18 @@ describe('séance lancée depuis un jour', () => {
     expect(sets.filter((s) => s.exerciseId === 'squat').every((s) => s.targetRepsMin === 4 && s.restSeconds === 180)).toBe(true)
   })
 
+  it('première fois : les séries suivantes reprennent ce qui est saisi sur la première', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    const [a] = await listDays(id, db)
+    await addDayExercise(a.id, 'squat', 'barre', db)
+    const sessionId = await startProgramSession(a.id, db)
+    const sets = (await getSessionSets(sessionId, db)).sort((x, y) => x.order - y.order)
+    await validateSetAndRest(sessionId, sets[0].id, { weight: 60, reps: 10 }, db)
+    const after = (await getSessionSets(sessionId, db)).sort((x, y) => x.order - y.order)
+    expect(after.map((s) => [s.weight, s.reps])).toEqual([[60, 10], [60, 10], [60, 10]])
+  })
+
   it('le repos après une série est celui de l’exercice dans le programme', async () => {
     freshDb()
     const id = await createProgram('P', 'A', db)

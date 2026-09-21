@@ -20,7 +20,7 @@ function SessionHeader({ session, onEnd, onRest = false }: Props) {
         <IconChevronBas />
       </Link>
       <div className="flex-1">
-        <div className="text-body font-bold">Séance libre</div>
+        <div className="text-body font-bold">{session.title ?? 'Séance libre'}</div>
         <div className={`num text-body ${onRest ? '' : 'text-muted'}`}>{formatDuration(sessionDuration(session, now))}</div>
       </div>
       <button
