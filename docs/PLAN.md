@@ -119,6 +119,7 @@ src/
 - Note : pas de vibration web sur iOS.
 
 ### J5 — Programmes / routines (3–4 jours)
+> 21/09/2026 : maquettes en cours de validation (canvas « Sportix — Maquettes J5 », `design/README.md`). Règles proposées : un seul programme actif ; séance du jour = jour suivant, dans l'ordre, le dernier jour fait ; « Autre jour » pour en choisir un autre ; toutes les séries du jour créées au démarrage ; repos par exercice.
 - **Design** : maquettes création de programme + lancement de séance.
 - Programme → jours → exercices avec cibles ; « Démarrer la séance du jour ».
 - **Objectif** : lancer une séance complète en 2 taps.

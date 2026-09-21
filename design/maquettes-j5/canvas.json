@@ -1,0 +1,244 @@
+{
+  "v": 3,
+  "attachments": {},
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-21T12:00:00Z"
+  },
+  "title": "Sportix — Maquettes J5",
+  "launch": {
+    "view": "canvas",
+    "page": "j5"
+  },
+  "pages": [
+    {
+      "id": "j5",
+      "name": "J5 · Programmes"
+    }
+  ],
+  "boards": {
+    "S-Programmes-vide.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Programmes · aucun — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Programmes.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Programmes — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Programme-nouveau.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Nouveau programme (panneau) — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Programme-detail.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 1240,
+      "title": "Détail d’un programme (page qui défile) — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Programme-exercice.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Exercice du programme (panneau) — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "Main.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · séance du jour (J5) — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Jour-choix.dc.html": {
+      "x": 2820,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Choisir un autre jour (panneau) — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "S-Seance-programme.dc.html": {
+      "x": 3290,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance lancée depuis le programme — sombre",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Programmes-vide.dc.html": {
+      "x": 0,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Programmes · aucun — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Programmes.dc.html": {
+      "x": 470,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Programmes — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Programme-nouveau.dc.html": {
+      "x": 940,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Nouveau programme (panneau) — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Programme-detail.dc.html": {
+      "x": 1410,
+      "y": 1660,
+      "w": 390,
+      "h": 1240,
+      "title": "Détail d’un programme (page qui défile) — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Programme-exercice.dc.html": {
+      "x": 1880,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Exercice du programme (panneau) — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Accueil-J5.dc.html": {
+      "x": 2350,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · séance du jour (J5) — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Jour-choix.dc.html": {
+      "x": 2820,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Choisir un autre jour (panneau) — clair",
+      "page": "j5",
+      "is_interactive": true
+    },
+    "C-Seance-programme.dc.html": {
+      "x": 3290,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Séance lancée depuis le programme — clair",
+      "page": "j5",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "S-Programmes-vide.dc.html",
+    "S-Programmes.dc.html",
+    "S-Programme-nouveau.dc.html",
+    "S-Programme-detail.dc.html",
+    "S-Programme-exercice.dc.html",
+    "Main.dc.html",
+    "S-Jour-choix.dc.html",
+    "S-Seance-programme.dc.html",
+    "C-Programmes-vide.dc.html",
+    "C-Programmes.dc.html",
+    "C-Programme-nouveau.dc.html",
+    "C-Programme-detail.dc.html",
+    "C-Programme-exercice.dc.html",
+    "C-Accueil-J5.dc.html",
+    "C-Jour-choix.dc.html",
+    "C-Seance-programme.dc.html"
+  ],
+  "notes": {
+    "j5-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J5 · Programmes — thème sombre",
+      "kind": "title1",
+      "page": "j5",
+      "maxW": 3680
+    },
+    "j5-C": {
+      "x": 0,
+      "y": 1360,
+      "text": "J5 · Programmes — thème clair",
+      "kind": "title1",
+      "page": "j5",
+      "maxW": 3680
+    },
+    "j5-jour": {
+      "x": 3760,
+      "y": 0,
+      "w": 400,
+      "page": "j5",
+      "size": "s",
+      "color": "orange",
+      "text": "Séance du jour : le jour qui suit, dans l’ordre du programme, le dernier jour fait (A → B → A…). « Autre jour » en choisit un autre pour aujourd’hui, sans changer l’ordre."
+    },
+    "j5-actif": {
+      "x": 3760,
+      "y": 420,
+      "w": 400,
+      "page": "j5",
+      "size": "s",
+      "text": "Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme."
+    },
+    "j5-demarrer": {
+      "x": 3760,
+      "y": 840,
+      "w": 400,
+      "page": "j5",
+      "size": "s",
+      "color": "teal",
+      "text": "Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages."
+    },
+    "j5-seance": {
+      "x": 3760,
+      "y": 1264,
+      "w": 400,
+      "page": "j5",
+      "size": "s",
+      "text": "Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre »."
+    },
+    "j5-ajout": {
+      "x": 3760,
+      "y": 1688,
+      "w": 400,
+      "page": "j5",
+      "size": "s",
+      "text": "« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice."
+    }
+  },
+  "designSystems": []
+}

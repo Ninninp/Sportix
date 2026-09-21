@@ -16,7 +16,9 @@ const THEMES = [
     danger: '#B42318', onDanger: '#FFFFFF', knob: '#FFFFFF' },
 ];
 
-const file = (t, id) => (t.key === 'S' && id === 'Accueil' ? 'Main.dc.html' : `${t.key}-${id}.dc.html`);
+// Planche d'entrée de chaque canvas (Main.dc.html) : l'accueil sombre. MAIN change pour le canvas J5.
+let MAIN = 'Accueil';
+const file = (t, id) => (t.key === 'S' && id === MAIN ? 'Main.dc.html' : `${t.key}-${id}.dc.html`);
 
 // ---------- Icônes (tracés Lucide) ----------
 const P = {
@@ -91,8 +93,8 @@ const progress = (t, done, total, fills, line = t.strong, fill = t.text, txt = t
     .map((f) => `<div style="box-sizing: border-box; height: 8px; border-radius: 4px; border: 1.5px solid ${line}; overflow: hidden;"><div style="width: ${f}%; height: 100%; background: ${fill};"></div></div>`)
     .join('')}</div></div>`;
 
-const nav = (t, active) => {
-  const tabs = [['seance', 'Séance', 'dumbbell', file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
+const nav = (t, active, links = {}) => {
+  const tabs = [['seance', 'Séance', 'dumbbell', links.seance ?? file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', links.prog ?? '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
   return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 56px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
     .map(([k, l, i, h]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ''} style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: ${k === active ? 700 : 500}; color: ${k === active ? t.text : t.muted}; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: ${k === active ? t.text : 'transparent'};"></span>${ic(i)}<span>${l}</span></a>`)
     .join('')}</nav>`;
@@ -102,8 +104,8 @@ const nav = (t, active) => {
 const sheet = (t, label, inner) =>
   `<div aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgb(0 0 0 / 0.5);"></div><section role="dialog" aria-label="${label}" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 8px 16px 50px; border-radius: 16px 16px 0 0; background: ${t.surface}; color: ${t.text}; box-shadow: 0 -8px 24px rgb(0 0 0 / 0.25); display: flex; flex-direction: column; gap: 16px;"><div aria-hidden="true" style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: ${t.strong};"></div>${inner}</section>`;
 
-const frame = (t, { main, navActive = null, overlay = '', bg = t.bg, color = t.text, pad = '8px 16px 16px', gap = 12, h = 844, bar = '' }) =>
-  `<div style="width: 390px; height: ${h}px; position: relative; display: flex; flex-direction: column; background: ${bg}; color: ${color}; overflow: hidden;"><div aria-hidden="true" style="height: 47px; flex-shrink: 0;"></div><main style="flex-grow: 1; min-height: 0; overflow: hidden; box-sizing: border-box; padding: ${pad}; display: flex; flex-direction: column; gap: ${gap}px;">${main}</main>${bar}${navActive ? nav(t, navActive) : ''}<div aria-hidden="true" style="height: ${navActive ? 26 : 34}px; flex-shrink: 0; background: ${navActive ? t.surface : 'transparent'};"></div>${overlay}</div>`;
+const frame = (t, { main, navActive = null, navLinks = {}, overlay = '', bg = t.bg, color = t.text, pad = '8px 16px 16px', gap = 12, h = 844, bar = '' }) =>
+  `<div style="width: 390px; height: ${h}px; position: relative; display: flex; flex-direction: column; background: ${bg}; color: ${color}; overflow: hidden;"><div aria-hidden="true" style="height: 47px; flex-shrink: 0;"></div><main style="flex-grow: 1; min-height: 0; overflow: hidden; box-sizing: border-box; padding: ${pad}; display: flex; flex-direction: column; gap: ${gap}px;">${main}</main>${bar}${navActive ? nav(t, navActive, navLinks) : ''}<div aria-hidden="true" style="height: ${navActive ? 26 : 34}px; flex-shrink: 0; background: ${navActive ? t.surface : 'transparent'};"></div>${overlay}</div>`;
 
 const listRow = (t, name, sub, href, right = ic('chevR', 20), first = false) =>
   `<a href="${href}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 12px 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span style="color: ${t.muted}; display: flex;">${right}</span></a>`;
@@ -347,6 +349,90 @@ S['Reglages'] = { title: 'Réglages (page qui défile)', page: 'reglages', h: 11
 S['Seance-reduite'] = { title: 'Séance réduite (barre compacte)', page: 'j4', render: (t) => frame(t, { navActive: 'reglages', gap: 16, main: reglagesMain(t),
   bar: `<div style="flex-shrink: 0; padding: 8px 8px; background: ${t.bg};"><a href="${file(t, 'Repos')}" aria-label="Revenir à la séance, repos 1:24" style="box-sizing: border-box; min-height: 56px; padding: 0 6px 0 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; align-items: center; gap: 12px; text-decoration: none;"><span style="flex-grow: 1; display: flex; flex-direction: column;"><span style="font-size: 15px; font-weight: 700;">Séance en cours · repos</span><span style="font-size: 13px; color: ${t.onInverseMuted};">Squat · série 3 ensuite</span></span><span class="num" style="font-size: 22px;">1:24</span><span style="min-height: 44px; min-width: 64px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 1.5px solid ${t.onInverse}; font-size: 15px; font-weight: 700;">+15 s</span></a></div>` }) };
 
+// ===== J5 · Programmes =====
+// Un programme = des jours (ex. « Force A — Jambes ») ; chaque jour = des exercices avec variante,
+// séries, fourchette de reps, repos et double progression (parcours.md § 1 et § 2).
+const J5NAV = (t) => ({ seance: file(t, 'Accueil-J5'), prog: file(t, 'Programmes') });
+const pill = (t, s) => `<span style="flex-shrink: 0; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: ${t.inverse}; color: ${t.onInverse};">${s}</span>`;
+const DAY_A = [['Squat', 'Barre', '3 × 4–6', '3:00'], ['Presse à cuisses', 'Machine', '3 × 8–12', '2:00'], ['Leg curl', 'Machine', '3 × 10–15', '1:30'], ['Fentes bulgares', 'Haltères', '3 × 8–10', '1:30'], ['Mollets debout', 'Machine', '4 × 12–15', '1:00']];
+const DAY_B = [['Développé couché', 'Barre', '3 × 6–8', '2:30'], ['Tractions', 'Poids du corps', '3 × 6–10', '2:30'], ['Développé militaire', 'Haltères', '3 × 8–10', '2:00'], ['Rowing', 'Poulie', '3 × 10–12', '1:30'], ['Élévations latérales', 'Haltères', '3 × 12–15', '1:00']];
+
+// Ligne d'exercice d'un jour : nom, variante et repos ; séries × reps à droite
+const progExRow = (t, [n, v, sets, rest], first = false) =>
+  `<a href="${file(t, 'Programme-exercice')}" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 8px 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${n}</span><span style="font-size: 13px; color: ${t.muted};">${v} · repos <span class="num" style="font-weight: 500;">${rest}</span></span></span><span class="num" style="font-size: 18px; white-space: nowrap;">${sets}</span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`;
+const dayCard = (t, name, info, exs, next = false) =>
+  card(t, `<div style="display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 8px 0 16px;"><h2 style="margin: 0; flex-grow: 1; font-size: 20px; line-height: 24px; font-weight: 800; letter-spacing: -0.01em;">${name}</h2>${next ? pill(t, 'Prochaine') : `<span style="font-size: 13px; color: ${t.muted};">${info}</span>`}${iconBtn(t, 'more', `Options du jour ${name}`, '#')}</div>` +
+    exs.map((e, i) => progExRow(t, e, i === 0)).join('') +
+    `<div style="border-top: 1px solid ${t.border};"><a href="#" style="min-height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 16px; text-decoration: none; color: ${t.text}; font-size: 15px; font-weight: 600;">${ic('plus', 20)}Ajouter un exercice</a></div>`,
+    'flex-shrink: 0; overflow: hidden;');
+
+S['Programmes-vide'] = { title: 'Programmes · aucun', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main:
+  `<h1 style="${H1} flex-shrink: 0;">Programmes</h1>` +
+  `<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 0 16px;"><span style="width: 64px; height: 64px; border-radius: 32px; background: ${t.surface2}; color: ${t.muted}; display: flex; align-items: center; justify-content: center;">${ic('list', 28)}</span><h2 style="margin: 8px 0 0; font-size: 22px; line-height: 26px; font-weight: 700;">Aucun programme</h2><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Un programme regroupe tes jours d’entraînement (ex. Push, Pull, Legs). Ta prochaine séance est alors prête sur l’accueil, en un appui.</p></div>` +
+  btn.pri(t, `${ic('plus', 20)}Créer un programme`, file(t, 'Programme-nouveau')) }) };
+
+const progCard = (t, name, sub, days, active) =>
+  `<a href="${file(t, 'Programme-detail')}" style="flex-shrink: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: 14px 12px 14px 16px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;"><span style="display: flex; align-items: center; gap: 8px;"><span style="flex-grow: 1; font-size: 20px; line-height: 24px; font-weight: 800; letter-spacing: -0.01em;">${name}</span>${active ? pill(t, 'Actif') : ''}<span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></span><span style="font-size: 13px; color: ${t.muted}; margin-top: -6px;">${sub}</span><span style="display: flex; flex-direction: column;">${days
+    .map(([d, n], i) => `<span style="display: flex; align-items: center; justify-content: space-between; min-height: 36px; ${i ? `border-top: 1px solid ${t.border};` : ''}"><span style="font-size: 15px; font-weight: 600;">${d}</span><span style="font-size: 13px; color: ${t.muted};">${n}</span></span>`).join('')}</span></a>`;
+const progList = (t) =>
+  `<h1 style="${H1} flex-shrink: 0;">Programmes</h1>` +
+  progCard(t, 'Force A/B', 'Prochaine séance : Force A — Jambes', [['Force A — Jambes', '5 exercices'], ['Force B — Haut du corps', '5 exercices']], true) +
+  progCard(t, 'Hypertrophie PPL', '3 jours', [['Push', '6 exercices'], ['Pull', '5 exercices'], ['Legs', '6 exercices']], false) +
+  `<div style="flex-grow: 1;"></div>` +
+  btn.pri(t, `${ic('plus', 20)}Nouveau programme`, file(t, 'Programme-nouveau'));
+
+S['Programmes'] = { title: 'Programmes', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: progList(t) }) };
+
+S['Programme-nouveau'] = { title: 'Nouveau programme (panneau)', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: progList(t),
+  overlay: sheet(t, 'Nouveau programme',
+    `<h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Nouveau programme</h2>` +
+    field(t, 'Nom du programme', 'Force A/B', 'Ex. Force A/B, PPL') +
+    field(t, 'Premier jour', 'Force A — Jambes', 'Ex. Push, Jambes, Haut du corps') +
+    `<p style="margin: -4px 0 0; font-size: 13px; line-height: 18px; color: ${t.muted};">Tu ajouteras ses exercices, puis les autres jours, sur la page du programme.</p>` +
+    `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, 'Créer le programme', file(t, 'Programme-detail'))}${btn.link(t, 'Annuler', file(t, 'Programmes'), t.text)}</div>`) }) };
+
+const detailMain = (t) =>
+  header(t, 'Force A/B', file(t, 'Programmes'), 'Retour aux programmes', iconBtn(t, 'more', 'Options du programme (renommer, supprimer)', '#'), 24) +
+  card(t, `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 0 16px;"><span style="display: flex; flex-direction: column;"><span style="font-size: 17px;">Programme actif</span><span style="font-size: 13px; color: ${t.muted};">Sa prochaine séance est proposée sur l’accueil</span></span><input class="sw" type="checkbox" role="switch" checked></label>`, 'flex-shrink: 0;') +
+  dayCard(t, 'Force A — Jambes', '', DAY_A, true) +
+  dayCard(t, 'Force B — Haut du corps', 'jeudi', DAY_B) +
+  btn.sec(t, `${ic('plus', 20)}Ajouter un jour`, '#');
+
+S['Programme-detail'] = { title: 'Détail d’un programme (page qui défile)', page: 'j5', h: 1240, render: (t) => frame(t, { h: 1240, navActive: 'prog', navLinks: J5NAV(t), main: detailMain(t) }) };
+
+// Petit réglage − valeur + (comme « Objectif » du menu ⋯ en séance)
+const mini = (t, label, value, aria) =>
+  `<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px;"><span style="font-size: 17px;">${label}</span><span role="group" aria-label="${aria}" style="display: flex; align-items: center; gap: 8px;"><button aria-label="${aria} : moins" style="width: 48px; height: 48px; border: 0; border-radius: 12px; background: ${t.surface2}; color: ${t.text}; font: inherit; font-size: 22px; font-weight: 700; cursor: pointer;">−</button><span class="num" style="min-width: 52px; text-align: center; font-size: 22px;">${value}</span><button aria-label="${aria} : plus" style="width: 48px; height: 48px; border: 0; border-radius: 12px; background: ${t.surface2}; color: ${t.text}; font: inherit; font-size: 22px; font-weight: 700; cursor: pointer;">+</button></span></div>`;
+
+S['Programme-exercice'] = { title: 'Exercice du programme (panneau)', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: detailMain(t),
+  overlay: sheet(t, 'Squat dans Force A — Jambes',
+    `<div><div style="font-size: 22px; line-height: 26px; font-weight: 700;">Squat</div><div style="font-size: 15px; color: ${t.muted};">Force A — Jambes</div></div>` +
+    `<div style="display: flex; flex-direction: column; gap: 8px;">${lbl(t, 'Variante')}${chips(t, ['Barre', 'Smith', 'Machine'], [0])}</div>` +
+    `<div style="display: flex; flex-direction: column;">${mini(t, 'Séries', '3', 'Séries')}${mini(t, 'Reps, au moins', '4', 'Reps minimum')}${mini(t, 'Reps, au plus', '6', 'Reps maximum')}${mini(t, 'Repos', '3:00', 'Repos')}</div>` +
+    `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px;"><span style="display: flex; flex-direction: column;"><span style="font-size: 17px;">Double progression</span><span style="font-size: 13px; color: ${t.muted};">Propose +2,5 kg quand toutes les séries atteignent 6 reps</span></span><input class="sw" type="checkbox" role="switch" checked></label>` +
+    `<div style="display: flex; justify-content: space-between; align-items: center;"><a href="${file(t, 'Programme-detail')}" style="min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 0 4px; font-size: 15px; font-weight: 600; color: ${t.danger}; text-decoration: none;">${ic('trash', 20)}Retirer du jour</a>${btn.link(t, 'OK', file(t, 'Programme-detail'), t.text)}</div>`) }) };
+
+const homeJ5 = (t) =>
+  thinRow(t, `<span style="display: flex; color: ${t.muted};">${ic('history', 20)}</span><span style="flex-grow: 1; font-size: 15px;"><strong>Jeudi</strong> <span style="color: ${t.muted};">· Force B · 52 min</span></span>`, '#', 'Dernière séance jeudi, voir l’historique') +
+  week(t) +
+  heroBig(t, { title: 'Force A — Jambes', sub: 'Prochaine séance · Force A/B · 5 exercices', href: file(t, 'Seance-programme'), cta: 'Démarrer la séance',
+    rows: [exLine(t, 'Squat', '3 × 4–6 · 102,5 kg', true), exLine(t, 'Presse à cuisses', '3 × 8–12 · 140 kg'), exLine(t, 'Leg curl', '3 × 10–15 · 45 kg'), exLine(t, 'Fentes bulgares', '3 × 8–10 · 16 kg'), exLine(t, 'Mollets debout', '4 × 12–15 · 60 kg')] }) +
+  `<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; flex-shrink: 0;">${btn.sec(t, 'Autre jour', file(t, 'Jour-choix'), `min-height: 52px; border-color: ${t.strong};`)}${btn.sec(t, `${ic('plus', 20)}Séance libre`, '#', `min-height: 52px; border-color: ${t.strong};`)}</div>`;
+
+S['Accueil-J5'] = { title: 'Accueil · séance du jour (J5)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t) }) };
+
+const dayOption = (t, name, sub, on, first = false) =>
+  `<a href="${file(t, 'Accueil-J5')}" aria-current="${on}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 12px; ${on ? `border: 7px solid ${t.inverse};` : `border: 1.5px solid ${t.strong};`}"></span></a>`;
+
+S['Jour-choix'] = { title: 'Choisir un autre jour (panneau)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t),
+  overlay: sheet(t, 'Quelle séance aujourd’hui ?',
+    `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Quelle séance aujourd’hui ?</h2><p style="margin: 4px 0 0; font-size: 15px; color: ${t.muted};">Force A/B</p></div>` +
+    card(t, dayOption(t, 'Force A — Jambes', 'Prochaine dans l’ordre du programme', true, true) + dayOption(t, 'Force B — Haut du corps', 'Faite jeudi', false), 'overflow: hidden;') +
+    btn.link(t, 'Fermer', file(t, 'Accueil-J5'), t.text)) }) };
+
+S['Seance-programme'] = { title: 'Séance lancée depuis le programme', page: 'j5', render: (t) =>
+  S['Seance'].render(t).replace('>Séance libre<', '>Force A — Jambes<') };
+
 // ---------- Écriture des fichiers ----------
 const page = (t, title, h, body) => `<!doctype html>
 <html lang="fr">
@@ -388,25 +474,46 @@ const PAGES = [
   { id: 'reglages', name: 'Réglages', order: ['Reglages'] },
 ];
 
-const boards = {}, order = [], notes = {};
-for (const pg of PAGES) {
-  const rowH = Math.max(...pg.order.map((id) => S[id].h || 844));
-  THEMES.forEach((t, row) => {
-    const y = row * (rowH + 420);
-    notes[`${pg.id}-${t.key}`] = { x: 0, y: y - 300, text: `${pg.name} — thème ${t.name}`, kind: 'title1', page: pg.id, maxW: Math.max(1200, pg.order.length * 470 - 80) };
-    pg.order.forEach((id, i) => {
-      const s = S[id], h = s.h || 844, f = file(t, id);
-      writeFileSync(new URL(f, OUT), page(t, s.title, h, s.render(t)));
-      boards[f] = { x: i * 470, y, w: 390, h, title: `${s.title} — ${t.name}`, page: pg.id, is_interactive: true };
-      order.push(f);
+// Écrit les planches d'un canvas (deux thèmes) et son index canvas.json dans `dir`
+const writeCanvas = (dir, { title, at, pages, launch, extraNotes = {} }) => {
+  const out = new URL(dir, import.meta.url);
+  mkdirSync(out, { recursive: true });
+  const boards = {}, order = [], notes = {};
+  for (const pg of pages) {
+    const rowH = Math.max(...pg.order.map((id) => S[id].h || 844));
+    THEMES.forEach((t, row) => {
+      const y = row * (rowH + 420);
+      notes[`${pg.id}-${t.key}`] = { x: 0, y: y - 300, text: `${pg.name} — thème ${t.name}`, kind: 'title1', page: pg.id, maxW: Math.max(1200, pg.order.length * 470 - 80) };
+      pg.order.forEach((id, i) => {
+        const s = S[id], h = s.h || 844, f = file(t, id);
+        writeFileSync(new URL(f, out), page(t, s.title, h, s.render(t)));
+        boards[f] = { x: i * 470, y, w: 390, h, title: `${s.title} — ${t.name}`, page: pg.id, is_interactive: true };
+        order.push(f);
+      });
     });
-  });
-}
-notes['j4-anim'] = { x: 4 * 470, y: 0, w: 380, page: 'j4', color: 'orange', size: 's',
-  text: 'Animation « +15 s » (à coder au J4) : si on touche « +15 s de repos » sur l’écran de fin de repos, il repasse en repos actif en 320 ms : le « 102,5 kg » rétrécit jusqu’à la carte « Ensuite », le chrono grandit à sa place et décompte depuis 0:15.' };
+  }
+  Object.assign(notes, extraNotes);
+  writeFileSync(new URL('canvas.json', out), JSON.stringify({
+    v: 3, attachments: {}, createdOnFiles: { v: 1, at }, title,
+    launch, pages: pages.map(({ id, name }) => ({ id, name })), boards, order, notes, designSystems: [],
+  }, null, 2) + '\n');
+  console.log(title, ':', order.length, 'planches');
+};
 
-writeFileSync(new URL('canvas.json', OUT), JSON.stringify({
-  v: 3, attachments: {}, createdOnFiles: { v: 1, at: '2026-09-19T13:17:10Z' }, title: 'Sportix — Maquettes D5',
-  launch: { view: 'canvas', page: 'j3' }, pages: PAGES.map(({ id, name }) => ({ id, name })), boards, order, notes, designSystems: [],
-}, null, 2) + '\n');
-console.log(order.length, 'planches');
+writeCanvas('./', { title: 'Sportix — Maquettes D5', at: '2026-09-19T13:17:10Z', pages: PAGES, launch: { view: 'canvas', page: 'j3' }, extraNotes: {
+  'j4-anim': { x: 4 * 470, y: 0, w: 380, page: 'j4', color: 'orange', size: 's',
+    text: 'Animation « +15 s » (à coder au J4) : si on touche « +15 s de repos » sur l’écran de fin de repos, il repasse en repos actif en 320 ms : le « 102,5 kg » rétrécit jusqu’à la carte « Ensuite », le chrono grandit à sa place et décompte depuis 0:15.' },
+} });
+
+// ===== Canvas J5 (programmes) : son propre dossier, son propre lien =====
+MAIN = 'Accueil-J5';
+const J5_ORDER = ['Programmes-vide', 'Programmes', 'Programme-nouveau', 'Programme-detail', 'Programme-exercice', 'Accueil-J5', 'Jour-choix', 'Seance-programme'];
+const noteJ5 = (y, text, color) => ({ x: J5_ORDER.length * 470, y, w: 400, page: 'j5', size: 's', ...(color ? { color } : {}), text });
+writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-09-21T12:00:00Z',
+  pages: [{ id: 'j5', name: 'J5 · Programmes', order: J5_ORDER }], launch: { view: 'canvas', page: 'j5' }, extraNotes: {
+    'j5-jour': noteJ5(0, 'Séance du jour : le jour qui suit, dans l’ordre du programme, le dernier jour fait (A → B → A…). « Autre jour » en choisit un autre pour aujourd’hui, sans changer l’ordre.', 'orange'),
+    'j5-actif': noteJ5(420, 'Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme.'),
+    'j5-demarrer': noteJ5(840, 'Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages.', 'teal'),
+    'j5-seance': noteJ5(1264, 'Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre ».'),
+    'j5-ajout': noteJ5(1688, '« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice.'),
+  } });
