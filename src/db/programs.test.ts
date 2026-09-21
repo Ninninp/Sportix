@@ -14,10 +14,12 @@ import {
   listDayExercises,
   listDays,
   listPrograms,
+  moveDay,
   removeDayExercise,
   startProgramSession,
   updateDayExercise,
 } from './programs.ts'
+import { nextDay } from '../lib/programs.ts'
 import { SportixDB } from './schema.ts'
 import { endSession, getActiveSession, getSessionSets, listFinishedSessions, validateSetAndRest } from './sessions.ts'
 import { getSettings, updateSettings } from './settings.ts'
@@ -79,6 +81,38 @@ describe('programmes', () => {
     await deleteDay(bId, db)
     expect((await listDays(id, db)).map((d) => d.name)).toEqual(['A'])
     expect(await listDayExercises(bId, db)).toEqual([])
+  })
+})
+
+describe('ordre des jours', () => {
+  // L'ordre des jours est celui de la rotation (nextDay) : le changer change la séance proposée.
+  it('monte et descend un jour, sans dépasser les bords', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    await addDay(id, 'B', db)
+    await addDay(id, 'C', db)
+    const noms = async () => (await listDays(id, db)).map((d) => d.name)
+    const [, b] = await listDays(id, db)
+
+    await moveDay(b.id, -1, db)
+    expect(await noms()).toEqual(['B', 'A', 'C'])
+    await moveDay(b.id, -1, db) // déjà en haut : rien ne bouge
+    expect(await noms()).toEqual(['B', 'A', 'C'])
+    await moveDay(b.id, 1, db)
+    await moveDay(b.id, 1, db)
+    expect(await noms()).toEqual(['A', 'C', 'B'])
+    await moveDay(b.id, 1, db) // déjà en bas
+    expect(await noms()).toEqual(['A', 'C', 'B'])
+  })
+
+  it('la séance proposée suit le nouvel ordre', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    const bId = await addDay(id, 'B', db)
+    // Sans séance faite, la prochaine est le premier jour du programme
+    expect(nextDay((await listDays(id, db)), [])?.name).toBe('A')
+    await moveDay(bId, -1, db)
+    expect(nextDay((await listDays(id, db)), [])?.name).toBe('B')
   })
 })
 

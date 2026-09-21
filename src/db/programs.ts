@@ -78,6 +78,25 @@ export async function renameDay(id: string, name: string, db: SportixDB = defaul
   await db.programDays.update(id, { name: name.trim() })
 }
 
+/**
+ * Monte (-1) ou descend (+1) un jour dans le programme, en échangeant son rang avec son voisin.
+ * L'ordre des jours est celui de la rotation : c'est lui qui décide de la séance proposée
+ * après la dernière faite (`nextDay`). Tout se passe dans une transaction, comme les autres
+ * écritures déclenchées par un appui (deux appuis rapprochés ne peuvent pas se marcher dessus).
+ */
+export async function moveDay(id: string, direction: -1 | 1, db: SportixDB = defaultDb): Promise<void> {
+  await db.transaction('rw', db.programDays, async () => {
+    const day = await db.programDays.get(id)
+    if (!day) return
+    const days = await listDays(day.programId, db)
+    const from = days.findIndex((d) => d.id === id)
+    const to = from + direction
+    if (from < 0 || to < 0 || to >= days.length) return // déjà en haut ou en bas
+    await db.programDays.update(days[from].id, { order: days[to].order })
+    await db.programDays.update(days[to].id, { order: days[from].order })
+  })
+}
+
 export async function deleteDay(id: string, db: SportixDB = defaultDb): Promise<void> {
   await db.transaction('rw', db.programDays, db.programExercises, async () => {
     await db.programExercises.where('dayId').equals(id).delete()

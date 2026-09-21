@@ -32,7 +32,7 @@ Le design est traité comme une **phase dédiée (Phase D) avant le code**, puis
 | Navigation | React Router |
 | Style | Tailwind CSS, configuré avec les **tokens du design system** |
 | Graphiques | Recharts |
-| Dates / calendrier | date-fns |
+| Dates / calendrier | `Date` natif (date-fns écarté le 21/09/2026) |
 | Tests | Vitest (logique métier) |
 
 ## Modèle de données (Dexie)
@@ -124,9 +124,10 @@ src/
 - Programme → jours → exercices avec cibles ; « Démarrer la séance du jour ».
 - **Objectif** : lancer une séance complète en 2 taps.
 
-### J6 — Calendrier des blocs de spécialisation (4–5 jours)
-- **Design** : maquettes vue mensuelle, fiche bloc, bandeau « Bloc Force — semaine 2/4 ». C'est l'écran le plus original : prévoir 2 variantes.
-- Création/modification/suppression des blocs ; calendrier date-fns ; bloc actif sur l'accueil ; `blockId` sur les séances ; détection des chevauchements.
+### J6 — Calendrier des blocs de spécialisation (4–5 jours) — maquettes validées le 21/09/2026, code en cours
+> Maquettes : canvas « Sportix — Maquettes J6 » (lien dans `design/README.md`), 7 écrans × 2 thèmes. Deux variantes ont été dessinées comme prévu, puis départagées le 21/09/2026 : **la vue mensuelle l'emporte**, la « frise des blocs » est écartée. Règle retenue : **un bloc commence un lundi et dure un nombre entier de semaines** (la semaine du bloc = la semaine du calendrier), deload facultatif. Dexie v5 (`blocks`, `blockGoals`) et `blockId` sur les séances. **date-fns abandonné** (décidé le 21/09/2026) : les calculs de semaines et la grille du mois tiennent en `Date` natif, comme `src/lib/week.ts` ; une dépendance de moins dans le bundle.
+- **Design** : maquettes vue mensuelle, fiche bloc, bandeau « Bloc Force — semaine 2/4 ». ✅ fait (2 variantes, l'une retenue).
+- Création/modification/suppression des blocs ; bloc actif sur l'accueil ; `blockId` sur les séances ; détection des chevauchements.
 - **Objectif** : planifier 3 mois et voir où on en est d'un coup d'œil.
 
 ### J7 — Stats & progression (4–5 jours)

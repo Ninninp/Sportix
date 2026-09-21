@@ -9,8 +9,8 @@ import Card from '../../components/Card.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import Switch from '../../components/Switch.tsx'
-import { IconChevronDroite, IconCorbeille, IconOptions, IconPlus } from '../../components/icons.tsx'
-import { addDay, deleteDay, deleteProgram, renameDay, renameProgram, setActiveProgram } from '../../db/programs.ts'
+import { IconChevronDroite, IconCorbeille, IconFleche, IconFlecheBas, IconOptions, IconPlus } from '../../components/icons.tsx'
+import { addDay, deleteDay, deleteProgram, moveDay, renameDay, renameProgram, setActiveProgram } from '../../db/programs.ts'
 import { VARIANT_LABELS, type Exercise } from '../../lib/exercises.ts'
 import { nextDay, type ProgramDay, type ProgramExercise } from '../../lib/programs.ts'
 import { formatRest } from '../../lib/rest.ts'
@@ -181,6 +181,29 @@ function ProgramDetailPage() {
               </>
             ) : (
               <>
+                {menu.kind === 'day' && days.length > 1 && (
+                  <div className="flex flex-col gap-1">
+                    <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">Ordre des séances</span>
+                    <p className="text-small text-muted">
+                      Les séances tournent dans cet ordre : après « {days[days.length - 1].day.name} », on revient à «{' '}
+                      {days[0].day.name} ».
+                    </p>
+                    <div className="mt-1 flex gap-2">
+                      <MoveButton
+                        label="Monter"
+                        Icon={IconFleche}
+                        disabled={position(days, menu.day) === 0}
+                        onClick={() => void moveDay(menu.day.id, -1)}
+                      />
+                      <MoveButton
+                        label="Descendre"
+                        Icon={IconFlecheBas}
+                        disabled={position(days, menu.day) === days.length - 1}
+                        onClick={() => void moveDay(menu.day.id, 1)}
+                      />
+                    </div>
+                  </div>
+                )}
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -222,6 +245,36 @@ function ProgramDetailPage() {
         }}
       />
     </main>
+  )
+}
+
+/** Rang du jour dans le programme (le menu reste ouvert pendant qu'on le déplace). */
+function position(days: { day: ProgramDay }[], day: ProgramDay): number {
+  return days.findIndex((d) => d.day.id === day.id)
+}
+
+/** « Monter » / « Descendre » : une moitié de largeur chacun, 48 px de haut. */
+function MoveButton({
+  label,
+  Icon,
+  disabled,
+  onClick,
+}: {
+  label: string
+  Icon: typeof IconFleche
+  disabled: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-md border-[1.5px] border-border-strong text-body font-semibold text-text disabled:border-border disabled:text-faint"
+    >
+      <Icon size={20} />
+      {label}
+    </button>
   )
 }
 
