@@ -9,6 +9,7 @@ let context: AudioContext | null = null
 
 export function unlockAudio() {
   try {
+    if (context?.state === 'running') return // déjà déverrouillé : rien à refaire à chaque appui
     context ??= new AudioContext()
     if (context.state !== 'running') void context.resume()
     // Un son vide joué pendant le geste finit de déverrouiller le canal sur iOS
