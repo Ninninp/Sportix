@@ -337,7 +337,7 @@
       "page": "j5",
       "size": "s",
       "color": "red",
-      "text": "Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil (inspiré de Lyfta) : chiffres de la semaine (séances, durée, volume) avec flèche d’évolution par rapport à la semaine passée, et lien discret « Autre séance » sur la même ligne ; il ouvre le choix du jour (jours du programme + séance libre). Décidé le 21/09/2026 : comparaison à date égale (du lundi à aujourd’hui, contre la même période la semaine passée) ; flèche vers le bas en gris ; pas de badge PR sur l’accueil."
+      "text": "Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil (inspiré de Lyfta) : chiffres de la semaine (séances, durée, volume) avec flèche d’évolution par rapport à la semaine passée, et lien discret « Autre séance » sur la même ligne ; il ouvre le choix du jour (jours du programme + séance libre). Décidé le 21/09/2026 : comparaison à date égale (du lundi à aujourd’hui, contre la même période la semaine passée) ; flèche vers le bas en gris ; pas de badge PR sur l’accueil ; flèches seules (sans chiffre), à côté des libellés ; pastilles des jours rapprochées."
     },
     "j5-liste": {
       "x": 6110,
