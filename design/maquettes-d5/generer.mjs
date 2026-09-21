@@ -426,9 +426,18 @@ const trend = (t, up, s) =>
   `<span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; color: ${up ? t.text : t.muted};"><span aria-label="${up ? 'en hausse' : 'en baisse'}" style="display: flex;">${ic(up ? 'up' : 'down', 13, 3)}</span><span class="num" style="font-weight: 600;">${s}</span></span>`;
 const weekStat = (t, label, value, unit, up, delta) =>
   `<div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; color: ${t.muted};">${label}</span><span><span class="num" style="font-size: 24px; line-height: 28px;">${value}</span>${unit ? ` <span style="font-size: 15px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}</span>${trend(t, up, delta)}</div>`;
+// Pastilles des jours, remises sous les chiffres (retour du 21/09/2026) : version compacte, sans cadre.
+// Même code que l'accueil J3 : plein = jour entraîné, contour épais = aujourd'hui.
+const weekDots = (t) => `<div style="display: flex; justify-content: space-between; margin-top: 6px;">${['L', 'M', 'M', 'J', 'V', 'S', 'D']
+  .map((d, i) => {
+    const done = i === 0 || i === 1, now = i === 3;
+    const dot = done ? `background: ${t.inverse}; border: 2px solid ${t.inverse};` : now ? `border: 3px solid ${t.text};` : `border: 1.5px solid ${t.strong};`;
+    return `<div style="display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: ${now ? 800 : 600}; color: ${done || now ? t.text : t.muted};"><span style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 12px; ${dot}"></span>${d}</div>`;
+  })
+  .join('')}</div>`;
 const weekStats = (t) =>
   `<section aria-label="Cette semaine" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;"><div style="display: flex; align-items: center; justify-content: space-between; margin-right: -12px;">${lbl(t, 'Cette semaine')}${btn.link(t, 'Autre séance', file(t, 'Jour-choix'), t.muted)}</div>` +
-  `<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">${weekStat(t, 'Séances', '2', '', true, '+1')}${weekStat(t, 'Durée', '1 h 44', '', true, '+32 min')}${weekStat(t, 'Volume', '12 480', 'kg', false, '−6 %')}</div></section>`;
+  `<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">${weekStat(t, 'Séances', '2', '', true, '+1')}${weekStat(t, 'Durée', '1 h 44', '', true, '+32 min')}${weekStat(t, 'Volume', '12 480', 'kg', false, '−6 %')}</div>${weekDots(t)}</section>`;
 const homeJ5 = (t) =>
   weekStats(t) +
   heroBig(t, { title: 'Force A — Jambes', sub: 'Prochaine séance · Force A/B · 5 exercices', href: file(t, 'Seance-liste'), cta: 'Démarrer la séance',
