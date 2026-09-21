@@ -147,4 +147,25 @@ describe('menu de l’exercice', () => {
     await removeExercise(id, 1, db)
     expect(groupSetsByExercise(await getSessionSets(id, db)).map((b) => b.exerciseId)).toEqual(['presse'])
   })
+
+  it('un exercice ajouté après un retrait ne se confond pas avec un autre (rangs distincts)', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'squat', 'barre', db)
+    await addExerciseToSession(id, 'presse', 'machine', db)
+    await addExerciseToSession(id, 'developpe', 'barre', db)
+    await removeExercise(id, 2, db) // rangs restants : 1 et 3
+    await addExerciseToSession(id, 'hack-squat', 'machine', db) // doit prendre le rang 4, pas 3
+
+    const blocks = groupSetsByExercise(await getSessionSets(id, db))
+    expect(blocks.map((b) => b.exerciseId)).toEqual(['squat', 'developpe', 'hack-squat'])
+    expect(new Set(blocks.map((b) => b.exerciseOrder)).size).toBe(3)
+
+    // Retirer le dernier ne doit supprimer que lui
+    await removeExercise(id, blocks[2].exerciseOrder, db)
+    expect(groupSetsByExercise(await getSessionSets(id, db)).map((b) => b.exerciseId)).toEqual([
+      'squat',
+      'developpe',
+    ])
+  })
 })

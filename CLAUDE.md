@@ -11,7 +11,7 @@ J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)). **J1 (c
 **J3 (enregistrer une séance — MVP) codé le 20/09/2026**, pas encore validé : séance libre (démarrer, ajouter des exercices, saisir et valider les séries au pavé − / +, menu ⋯, terminer), pré-remplissage avec la dernière fois, double progression, records, récapitulatif, historique et détail, accueil J3. Vérifié en local (57 tests ; parcours complet piloté : 2 séances enchaînées, rechargement en pleine séance, +2,5 kg proposé à la 2ᵉ). `/code-review` fait le 20/09/2026, 4 remarques toutes traitées : rang d'exercice repris du plus grand utilisé (`nextExerciseOrder`, sinon deux exercices se confondaient après un retrait), maintien du doigt sur − / + qui rejouait l'action du premier appui, écran « Séance introuvable » sur le récapitulatif, retrait de `isRecord` (code mort).
 
 **Reprendre le J3 ici :**
-1. Écrire le test de non-régression du rang d'exercice (`src/db/sessions.test.ts`) : ajouter 3 exercices, retirer le 2ᵉ, en ajouter un 4ᵉ → 3 blocs distincts, et `removeExercise` n'en supprime qu'un. (Commencé, pas écrit.)
+1. ~~Test de non-régression du rang d'exercice~~ : écrit le 21/09/2026 (`src/db/sessions.test.ts`, 58 tests).
 2. **Test réel à la salle** : c'est l'objectif du jalon. Noter les frictions, elles alimentent le J4.
 3. Puis J4 (minuteur de repos) : maquettes déjà validées en D5, plus l'animation « +15 s » notée dans `design/README.md`, et l'écran de Réglages (repos par défaut, son, pas de charge par variante) prévu avec ce jalon.
 
