@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extendRest, formatRest, isRestFinished, restFraction, restRemaining, shouldRing, startRest } from './rest.ts'
+import { extendRest, formatRest, isRestFinished, msUntilNextSecond, restFraction, restRemaining, shouldRing, startRest } from './rest.ts'
 
 const T0 = 1_000_000
 
@@ -61,5 +61,19 @@ describe('formatRest', () => {
     expect(formatRest(15)).toBe('0:15')
     expect(formatRest(84)).toBe('1:24')
     expect(formatRest(600)).toBe('10:00')
+  })
+})
+
+describe('msUntilNextSecond', () => {
+  it('attend le prochain changement de seconde du chrono, pas une seconde « au hasard »', () => {
+    expect(msUntilNextSecond(T0 + 250, T0)).toBe(765) // chrono de séance : prochaine seconde à T0 + 1000
+    expect(msUntilNextSecond(T0 + 1015, T0)).toBe(1000) // juste après un changement : une seconde pile
+  })
+
+  it('marche aussi avant l’ancre (décompte du repos, dont les secondes tombent sur la fin)', () => {
+    const endsAt = T0 + 60_000
+    const now = T0 + 400 // 59,6 s restantes : l'affichage passe de 1:00 à 0:59 à T0 + 1000
+    expect(msUntilNextSecond(now, endsAt)).toBe(615)
+    expect(restRemaining(startRest(60, T0), now + 615)).toBe(59)
   })
 })

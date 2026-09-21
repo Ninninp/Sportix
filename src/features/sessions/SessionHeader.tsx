@@ -3,10 +3,13 @@
 import { Link } from 'react-router'
 import { IconChevronBas } from '../../components/icons.tsx'
 import { formatDuration, sessionDuration, type Session } from '../../lib/sessions.ts'
+import { useNow } from '../timer/useNow.ts'
 
 type Props = { session: Session; onEnd: () => void; onRest?: boolean }
 
 function SessionHeader({ session, onEnd, onRest = false }: Props) {
+  // Le chrono se rafraîchit pile à chaque changement de seconde depuis le début de la séance
+  const now = useNow(session.startedAt)
   return (
     <header className={`-mx-2 flex shrink-0 items-center gap-1 ${onRest ? 'text-on-rest' : 'text-text'}`}>
       <Link
@@ -18,7 +21,7 @@ function SessionHeader({ session, onEnd, onRest = false }: Props) {
       </Link>
       <div className="flex-1">
         <div className="text-body font-bold">Séance libre</div>
-        <div className={`num text-body ${onRest ? '' : 'text-muted'}`}>{formatDuration(sessionDuration(session))}</div>
+        <div className={`num text-body ${onRest ? '' : 'text-muted'}`}>{formatDuration(sessionDuration(session, now))}</div>
       </div>
       <button
         type="button"

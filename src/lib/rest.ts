@@ -58,3 +58,14 @@ export function formatRest(seconds: number): string {
   const s = Math.max(0, Math.round(seconds))
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
+
+/**
+ * Délai avant le prochain changement de seconde d'un chrono dont les secondes « tombent » sur
+ * `anchor` (début de la séance, fin du repos), + une petite marge pour être sûr d'être passé.
+ * Rafraîchir à ce moment précis, et non toutes les x ms, évite les secondes qui durent 0,75 s
+ * puis 1,25 s, ou qui sautent.
+ */
+export function msUntilNextSecond(now: number, anchor: number, margin = 15): number {
+  const phase = (((now - anchor) % 1000) + 1000) % 1000 // position dans la seconde, toujours ≥ 0
+  return 1000 - phase + margin
+}

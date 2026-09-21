@@ -10,7 +10,8 @@ import { useNow } from '../timer/useNow.ts'
 import { useExercisesById, useSessionSets } from './useSession.ts'
 
 function SessionBar({ session }: { session: Session }) {
-  const now = useNow(true, 500)
+  // Secondes calées sur la fin du repos pendant un repos, sinon sur le début de la séance
+  const now = useNow(session.rest?.endsAt ?? session.startedAt)
   const sets = useSessionSets(session.id)
   const exercises = useExercisesById()
   if (sets === undefined || exercises === undefined) return null

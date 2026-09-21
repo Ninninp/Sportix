@@ -3,7 +3,7 @@
 // Les onglets du bas sont masqués sur cet écran (décision de D2).
 // Terminer demande toujours une confirmation : un appui de trop en salle ne doit pas clore la séance.
 // Valider une série lance le repos (J4) : l'écran de repos remplace alors la saisie.
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { BadgeIncrease } from '../../components/Badge.tsx'
 import Button from '../../components/Button.tsx'
@@ -42,16 +42,6 @@ import ExerciseMenu from './ExerciseMenu.tsx'
 import SessionHeader from './SessionHeader.tsx'
 import { useActiveSession, useExercisesById, useHistorySets, useSessionSets } from './useSession.ts'
 
-/** Chrono de la séance, remis à jour chaque seconde. */
-function useTicker(active: boolean) {
-  const [, setTick] = useState(0)
-  useEffect(() => {
-    if (!active) return
-    const timer = window.setInterval(() => setTick((t) => t + 1), 1000)
-    return () => window.clearInterval(timer)
-  }, [active])
-}
-
 function SessionPage() {
   const navigate = useNavigate()
   const session = useActiveSession()
@@ -62,7 +52,6 @@ function SessionPage() {
   const [selected, setSelected] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
-  useTicker(session !== null && session !== undefined)
 
   if (
     session === undefined ||
@@ -176,7 +165,6 @@ function SessionPage() {
         <RestScreen
           session={{ ...session, rest: session.rest }}
           progress={progress}
-          sound={settings.restSound}
           upcoming={
             upcomingSet && {
               name: upcomingExercise?.name ?? 'Exercice',

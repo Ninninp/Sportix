@@ -95,22 +95,33 @@
   font-weight: 700;
 }
 
-/* Animation « +15 s » après la fin du repos (design/README.md, duration-slow = 320 ms) :
-   RestScreen passe par document.startViewTransition. La charge de la série suivante (« rest-next »)
-   rétrécit jusqu'à la carte « Ensuite », le chrono (« rest-clock ») grandit à la place, le fond
-   `rest` s'efface en fondu. */
-::view-transition-group(*),
-::view-transition-old(*),
-::view-transition-new(*) {
-  animation-duration: 320ms;
-  animation-timing-function: var(--ease-out);
+/* Animations du repos (duration-slow = 320 ms, tokens.md), en CSS simple : elles marchent sur
+   tous les iPhone (la première version passait par les View Transitions, absentes avant iOS 18).
+   - Fin du repos : l'aplat `rest` jaillit depuis le décompte et couvre l'écran.
+   - « +15 s de repos » depuis l'écran de fin (design/README.md) : l'aplat s'efface, le chrono
+     grandit à la place de la charge, la carte « Ensuite » descend se ranger en bas. */
+@keyframes sx-fin-repos {
+  from {
+    clip-path: circle(0% at 50% 40%);
+  }
+  to {
+    clip-path: circle(150% at 50% 40%);
+  }
 }
-::view-transition-new(rest-clock) {
-  animation-name: sx-grandir;
+@keyframes sx-effacer {
+  to {
+    opacity: 0;
+  }
 }
 @keyframes sx-grandir {
   from {
     transform: scale(0.35);
+    opacity: 0;
+  }
+}
+@keyframes sx-ranger {
+  from {
+    transform: translateY(-160px) scale(1.15);
     opacity: 0;
   }
 }
