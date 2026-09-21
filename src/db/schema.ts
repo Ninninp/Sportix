@@ -10,12 +10,14 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { Exercise } from '../lib/exercises.ts'
 import type { Session, SessionSet } from '../lib/sessions.ts'
+import type { Settings } from '../lib/settings.ts'
 import { SEED_EXERCISES } from './seed.ts'
 
 export class SportixDB extends Dexie {
   exercises!: EntityTable<Exercise, 'id'>
   sessions!: EntityTable<Session, 'id'>
   sets!: EntityTable<SessionSet, 'id'>
+  settings!: EntityTable<StoredSettings, 'id'>
 
   constructor(name = 'sportix') {
     super(name)
@@ -33,6 +35,13 @@ export class SportixDB extends Dexie {
       sets: 'id, sessionId, exerciseId, doneAt, [sessionId+order]',
     })
 
+    // Version 3 (J4) : les réglages (repos par défaut, son, pas de charge), une seule ligne « app ».
+    // Le repos en cours, lui, est un simple champ de la séance : pas besoin d'index, donc pas de
+    // changement de la table `sessions`.
+    this.version(3).stores({
+      settings: 'id',
+    })
+
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.
     // Le `return` est indispensable : Dexie attend cette promesse avant de clore la transaction.
     // Sans lui, la base pourrait s'ouvrir avant la fin de l'insertion (bibliothèque vide).
@@ -44,6 +53,9 @@ export class SportixDB extends Dexie {
     })
   }
 }
+
+/** Réglages tels qu'enregistrés : seuls ceux qui ont été modifiés (les autres prennent leur valeur par défaut). */
+export type StoredSettings = Partial<Settings> & { id: 'app' }
 
 /** La base de l'app (une seule pour tout le code). */
 export const db = new SportixDB()

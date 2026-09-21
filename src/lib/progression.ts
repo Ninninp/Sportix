@@ -7,8 +7,11 @@
 import type { Variant } from './exercises.ts'
 import type { SessionSet } from './sessions.ts'
 
-/** Pas de charge par variante, en kg (valeurs par défaut de parcours.md § 5). */
-export const WEIGHT_STEPS: Record<Variant | 'aucune', number> = {
+/** Pas de charge (boutons − / +) pour chaque variante, en kg. « aucune » : exercice sans variante. */
+export type WeightSteps = Record<Variant | 'aucune', number>
+
+/** Pas de charge par variante, en kg (valeurs par défaut de parcours.md § 5, modifiables dans Réglages). */
+export const WEIGHT_STEPS: WeightSteps = {
   barre: 2.5,
   smith: 2.5,
   halteres: 2,
@@ -17,8 +20,8 @@ export const WEIGHT_STEPS: Record<Variant | 'aucune', number> = {
   aucune: 2.5,
 }
 
-export function weightStep(variant: Variant | null): number {
-  return WEIGHT_STEPS[variant ?? 'aucune']
+export function weightStep(variant: Variant | null, steps: WeightSteps = WEIGHT_STEPS): number {
+  return steps[variant ?? 'aucune']
 }
 
 /**
@@ -31,8 +34,13 @@ export function minWeight(variant: Variant | null): number {
 }
 
 /** Charge après un appui sur − (-1) ou + (+1) : un pas de la variante, jamais sous le minimum. */
-export function stepWeight(weight: number, variant: Variant | null, direction: 1 | -1): number {
-  return Math.max(minWeight(variant), weight + direction * weightStep(variant))
+export function stepWeight(
+  weight: number,
+  variant: Variant | null,
+  direction: 1 | -1,
+  steps: WeightSteps = WEIGHT_STEPS,
+): number {
+  return Math.max(minWeight(variant), weight + direction * weightStep(variant, steps))
 }
 
 /** Ce qu'on sait de la dernière fois, pour un exercice et une variante donnés. */
@@ -77,12 +85,16 @@ export type PrefilledSet = {
  * - reps : les reps faites la dernière fois sur CETTE série (le score à battre),
  *   ou le bas de la fourchette quand la charge augmente.
  */
-export function prefillSets(last: LastPerformance | null, variant: Variant | null): PrefilledSet[] {
+export function prefillSets(
+  last: LastPerformance | null,
+  variant: Variant | null,
+  steps: WeightSteps = WEIGHT_STEPS,
+): PrefilledSet[] {
   const min = minWeight(variant)
   if (!last || last.sets.length === 0) return [{ weight: min, reps: 0 }]
 
   const increase = suggestsWeightIncrease(last)
-  const step = increase ? weightStep(variant) : 0
+  const step = increase ? weightStep(variant, steps) : 0
 
   return last.sets.map((s) => ({
     weight: Math.max(min, s.weight + step),
@@ -93,9 +105,13 @@ export function prefillSets(last: LastPerformance | null, variant: Variant | nul
 }
 
 /** Texte du badge « ↑ charge » affiché pendant la saisie, ou null s'il n'y a rien à proposer. */
-export function increaseBadge(last: LastPerformance | null, variant: Variant | null): string | null {
+export function increaseBadge(
+  last: LastPerformance | null,
+  variant: Variant | null,
+  steps: WeightSteps = WEIGHT_STEPS,
+): string | null {
   if (!suggestsWeightIncrease(last)) return null
-  const step = weightStep(variant)
+  const step = weightStep(variant, steps)
   return `charge +${new Intl.NumberFormat('fr-FR').format(step)} kg`
 }
 

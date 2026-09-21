@@ -1,0 +1,43 @@
+// Réglages de l'app (onglet Réglages, J4) : valeurs par défaut et règles de saisie.
+// Enregistrés en base (table `settings`, voir src/db/settings.ts) ; ce fichier ne fait que calculer.
+import { WEIGHT_STEPS, type WeightSteps } from './progression.ts'
+
+export type Settings = {
+  /** Repos par défaut entre deux séries, en secondes (au J5, un programme pourra le fixer par exercice). */
+  restSeconds: number
+  /** Son joué à la fin du repos. */
+  restSound: boolean
+  /** Pas de charge des boutons − / + pour chaque variante. */
+  weightSteps: WeightSteps
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+  restSeconds: 120, // 2:00, valeur des maquettes D5
+  restSound: true,
+  weightSteps: WEIGHT_STEPS,
+}
+
+/** Bornes et pas du réglage « Repos par défaut » : de 0:15 à 10:00, de 15 s en 15 s. */
+export const REST_MIN = 15
+export const REST_MAX = 600
+export const REST_STEP = 15
+
+/** Pas de charge proposés dans Réglages (disques courants), en kg. */
+export const WEIGHT_STEP_CHOICES = [0.5, 1, 1.25, 2, 2.5, 5] as const
+
+/**
+ * Réglages complets à partir de ce qui est enregistré : un réglage jamais modifié (ou ajouté par
+ * une version plus récente de l'app) prend sa valeur par défaut.
+ */
+export function withDefaults(stored?: Partial<Settings>): Settings {
+  return {
+    ...DEFAULT_SETTINGS,
+    ...stored,
+    weightSteps: { ...DEFAULT_SETTINGS.weightSteps, ...stored?.weightSteps },
+  }
+}
+
+/** Repos après un appui sur − / + dans Réglages : 15 s de plus ou de moins, dans les bornes. */
+export function stepRest(seconds: number, direction: 1 | -1): number {
+  return Math.min(REST_MAX, Math.max(REST_MIN, seconds + direction * REST_STEP))
+}

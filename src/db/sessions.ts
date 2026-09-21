@@ -2,8 +2,10 @@
 // en salle, l'app peut être fermée ou tuée par le système à tout moment.
 import type { Variant } from '../lib/exercises.ts'
 import { lastPerformance, prefillSets } from '../lib/progression.ts'
+import { extendRest, startRest } from '../lib/rest.ts'
 import { groupSetsByExercise, type Session, type SessionSet } from '../lib/sessions.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
+import { getSettings } from './settings.ts'
 
 /**
  * Rang du prochain exercice de la séance. On repart du plus grand rang utilisé, jamais du
@@ -48,9 +50,13 @@ export async function addExerciseToSession(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [current, history] = await Promise.all([getSessionSets(sessionId, db), getHistorySets(sessionId, db)])
+  const [current, history, settings] = await Promise.all([
+    getSessionSets(sessionId, db),
+    getHistorySets(sessionId, db),
+    getSettings(db),
+  ])
   const exerciseOrder = nextExerciseOrder(current)
-  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant)
+  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps)
 
   await db.sets.bulkAdd(
     prefilled.map((p, i) => ({
@@ -80,6 +86,47 @@ export async function validateSet(
   db: SportixDB = defaultDb,
 ): Promise<void> {
   await db.sets.update(setId, { ...values, done: true, doneAt: Date.now() })
+}
+
+/**
+ * Valide la série ET lance le repos (durée des réglages), en une seule écriture atomique :
+ * si l'app est tuée juste après l'appui, on ne retrouve jamais une série faite sans son repos.
+ */
+export async function validateSetAndRest(
+  sessionId: string,
+  setId: string,
+  values: { weight: number; reps: number },
+  db: SportixDB = defaultDb,
+): Promise<void> {
+  const { restSeconds } = await getSettings(db)
+  const now = Date.now()
+  await db.transaction('rw', db.sets, db.sessions, async () => {
+    const validated = await db.sets.get(setId)
+    await db.sets.update(setId, { ...values, done: true, doneAt: now })
+    // Séries suivantes du même exercice encore vides (0 rep : jamais remplies, puisqu'on ne peut
+    // pas valider 0 rep) : elles reprennent ces valeurs. Cas d'un exercice nouveau où l'on a prévu
+    // ses séries avant de remplir la première.
+    if (validated) {
+      const blanks = (await getSessionSets(sessionId, db)).filter(
+        (s) => s.exerciseOrder === validated.exerciseOrder && s.order > validated.order && !s.done && s.reps === 0,
+      )
+      await Promise.all(blanks.map((s) => db.sets.update(s.id, values)))
+    }
+    await db.sessions.update(sessionId, { rest: startRest(restSeconds, now) })
+  })
+}
+
+/** « +15 s » : recule la fin du repos, ou relance 15 s si le repos était terminé. */
+export async function extendSessionRest(sessionId: string, db: SportixDB = defaultDb): Promise<void> {
+  await db.transaction('rw', db.sessions, async () => {
+    const session = await db.sessions.get(sessionId)
+    if (session?.rest) await db.sessions.update(sessionId, { rest: extendRest(session.rest) })
+  })
+}
+
+/** « Passer » ou « C'est parti » : fin du repos, retour à la saisie. */
+export async function clearSessionRest(sessionId: string, db: SportixDB = defaultDb): Promise<void> {
+  await db.sessions.update(sessionId, { rest: undefined })
 }
 
 /** Ajoute une série à un exercice de la séance, copiée sur la dernière de cet exercice. */
@@ -118,10 +165,14 @@ export async function changeVariant(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [sets, history] = await Promise.all([getSessionSets(sessionId, db), getHistorySets(sessionId, db)])
+  const [sets, history, settings] = await Promise.all([
+    getSessionSets(sessionId, db),
+    getHistorySets(sessionId, db),
+    getSettings(db),
+  ])
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
-  const prefilled = prefillSets(lastPerformance(history, block.exerciseId, variant), variant)
+  const prefilled = prefillSets(lastPerformance(history, block.exerciseId, variant), variant, settings.weightSteps)
 
   await Promise.all(
     block.sets.map((s, i) =>
@@ -149,13 +200,17 @@ export async function replaceExercise(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [sets, history] = await Promise.all([getSessionSets(sessionId, db), getHistorySets(sessionId, db)])
+  const [sets, history, settings] = await Promise.all([
+    getSessionSets(sessionId, db),
+    getHistorySets(sessionId, db),
+    getSettings(db),
+  ])
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
 
   const remaining = block.sets.filter((s) => !s.done)
   if (remaining.length === 0) return
-  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant)
+  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps)
   const doneCount = block.sets.length - remaining.length
   // Le nouvel exercice prend la place suivante s'il reste des séries faites à l'ancien.
   const newOrder = doneCount > 0 ? nextExerciseOrder(sets) : exerciseOrder
@@ -196,7 +251,7 @@ export async function setTargetReps(
 export async function endSession(sessionId: string, db: SportixDB = defaultDb): Promise<void> {
   const sets = await getSessionSets(sessionId, db)
   await db.sets.bulkDelete(sets.filter((s) => !s.done).map((s) => s.id))
-  await db.sessions.update(sessionId, { endedAt: Date.now() })
+  await db.sessions.update(sessionId, { endedAt: Date.now(), rest: undefined })
 }
 
 /** Abandonne une séance : elle et ses séries sont effacées (rien n'a été fait). */

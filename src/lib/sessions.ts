@@ -1,5 +1,6 @@
 // Séances et séries : types et calculs purs (sans base de données ni affichage).
 import type { Variant } from './exercises.ts'
+import type { Rest } from './rest.ts'
 
 export type Session = {
   id: string
@@ -8,6 +9,8 @@ export type Session = {
   /** Absent tant que la séance est en cours. */
   endedAt?: number
   note?: string
+  /** Repos en cours (après une série validée) ; absent hors repos. Voir src/lib/rest.ts. */
+  rest?: Rest
 }
 
 export type SessionSet = {
@@ -127,4 +130,10 @@ export function sessionSummary(session: Session, sets: SessionSet[], now = Date.
     setCount: sets.filter((s) => s.done).length,
     exerciseCount: groupSetsByExercise(sets).length,
   }
+}
+
+/** Objectif de reps affiché : « 8–12 », « 5 » (valeur unique), ou null sans objectif. */
+export function formatTarget(min?: number, max?: number): string | null {
+  if (!min) return null
+  return max && max !== min ? `${min}–${max}` : String(min)
 }

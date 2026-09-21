@@ -95,6 +95,26 @@
   font-weight: 700;
 }
 
+/* Animation « +15 s » après la fin du repos (design/README.md, duration-slow = 320 ms) :
+   RestScreen passe par document.startViewTransition. La charge de la série suivante (« rest-next »)
+   rétrécit jusqu'à la carte « Ensuite », le chrono (« rest-clock ») grandit à la place, le fond
+   `rest` s'efface en fondu. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-new(rest-clock) {
+  animation-name: sx-grandir;
+}
+@keyframes sx-grandir {
+  from {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+}
+
 /* Réglage iOS « Réduire les animations » : on coupe les mouvements */
 @media (prefers-reduced-motion: reduce) {
   *,

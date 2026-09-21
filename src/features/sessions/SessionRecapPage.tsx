@@ -9,6 +9,7 @@ import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import { increaseBadge } from '../../lib/progression.ts'
 import { findRecords } from '../../lib/records.ts'
 import { formatDuration, formatNumber, formatWeight, groupSetsByExercise, sessionSummary } from '../../lib/sessions.ts'
+import { useSettings } from '../settings/useSettings.ts'
 import { useExercisesById, useHistorySets, useSession, useSessionSets } from './useSession.ts'
 
 function Tile({ label, value }: { label: string; value: string }) {
@@ -26,8 +27,16 @@ function SessionRecapPage() {
   const sets = useSessionSets(sessionId)
   const history = useHistorySets(sessionId)
   const exercises = useExercisesById()
+  const settings = useSettings()
 
-  if (session === undefined || sets === undefined || history === undefined || exercises === undefined) return null
+  if (
+    session === undefined ||
+    sets === undefined ||
+    history === undefined ||
+    exercises === undefined ||
+    settings === undefined
+  )
+    return null
   // Adresse ouverte avec un identifiant inconnu (lien périmé) : on le dit au lieu d'un écran vide.
   if (session === null) {
     return (
@@ -45,7 +54,7 @@ function SessionRecapPage() {
   const blocks = groupSetsByExercise(sets)
   // Ce que la double progression proposera la prochaine fois, exercice par exercice
   const nextTime = blocks
-    .map((b) => ({ block: b, badge: increaseBadge({ sessionId, sets: b.sets }, b.variant) }))
+    .map((b) => ({ block: b, badge: increaseBadge({ sessionId, sets: b.sets }, b.variant, settings.weightSteps) }))
     .filter((x) => x.badge !== null)
 
   const date = new Date(session.startedAt).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })

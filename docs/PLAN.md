@@ -111,7 +111,8 @@ src/
 - Sauvegarde automatique à chaque saisie.
 - **Objectif** : **utiliser l'app pour de vrai à la salle** pendant 1 semaine.
 
-### J4 — Minuteur de repos (1–2 jours)
+### J4 — Minuteur de repos (1–2 jours) — code fait le 21/09/2026, à valider
+> Repos = horodatage de fin enregistré dans la séance (`session.rest`, `src/lib/rest.ts`), lancé dans la même écriture que la validation de la série. Écrans repos actif / prolongé / terminé (plein écran `rest`), animation « +15 s » (View Transitions, iOS 18+), barre « Séance en cours » au-dessus des onglets. Son Web Audio déverrouillé au geste « Valider » (iOS : pas de son écran verrouillé, suit le bouton silencieux), Wake Lock pendant le repos, vibration Android. Réglages en base (Dexie v3, table `settings`) : repos par défaut (2:00), son, pas de charge par variante. Reste : test sur l'iPhone à la salle.
 - Démarre en cochant une série ; +15 s / passer ; basé sur un horodatage de fin (reste juste écran verrouillé).
 - Vibration (Android) + son ; Wake Lock pour garder l'écran allumé.
 - **Objectif** : le timer reste exact après verrouillage/déverrouillage.

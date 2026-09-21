@@ -1,12 +1,15 @@
 // Tests des séances en base (fausse IndexedDB en mémoire).
 import 'fake-indexeddb/auto'
+import Dexie from 'dexie'
 import { afterEach, describe, expect, it } from 'vitest'
 import { groupSetsByExercise } from '../lib/sessions.ts'
 import {
   addExerciseToSession,
   addSet,
   changeVariant,
+  clearSessionRest,
   endSession,
+  extendSessionRest,
   getActiveSession,
   getSessionSets,
   listFinishedSessions,
@@ -14,8 +17,10 @@ import {
   replaceExercise,
   startSession,
   validateSet,
+  validateSetAndRest,
 } from './sessions.ts'
 import { SportixDB } from './schema.ts'
+import { getSettings, updateSettings } from './settings.ts'
 
 let db: SportixDB
 let n = 0
@@ -167,5 +172,94 @@ describe('menu de l’exercice', () => {
       'squat',
       'developpe',
     ])
+  })
+})
+
+describe('repos (J4)', () => {
+  it('valider une série lance le repos des réglages, en même temps', async () => {
+    freshDb()
+    await updateSettings({ restSeconds: 180 }, db)
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'squat', 'barre', db)
+    const [set] = await getSessionSets(id, db)
+    const before = Date.now()
+    await validateSetAndRest(id, set.id, { weight: 100, reps: 5 }, db)
+
+    const session = await getActiveSession(db)
+    expect(session?.rest?.duration).toBe(180)
+    expect(session!.rest!.endsAt).toBeGreaterThanOrEqual(before + 180_000)
+    expect((await getSessionSets(id, db))[0]).toMatchObject({ done: true, weight: 100, reps: 5 })
+  })
+
+  it('+15 s, passer, et fin de séance sans repos qui traîne', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'squat', 'barre', db)
+    const [set] = await getSessionSets(id, db)
+    await validateSetAndRest(id, set.id, { weight: 100, reps: 5 }, db)
+    await extendSessionRest(id, db)
+    expect((await getActiveSession(db))?.rest?.duration).toBe(135) // 2:00 par défaut + 15 s
+    await clearSessionRest(id, db)
+    expect((await getActiveSession(db))?.rest).toBeUndefined()
+
+    await validateSetAndRest(id, set.id, { weight: 100, reps: 5 }, db)
+    await endSession(id, db)
+    expect((await listFinishedSessions(db))[0].rest).toBeUndefined()
+  })
+})
+
+describe('séries prévues à l’avance', () => {
+  it('les séries suivantes encore vides reprennent les valeurs de la série validée', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'squat', 'barre', db) // exercice nouveau : 1 série vide
+    await addSet(id, 1, db)
+    await addSet(id, 1, db)
+    const sets = (await getSessionSets(id, db)).sort((a, b) => a.order - b.order)
+    await db.sets.update(sets[2].id, { reps: 6 }) // la 3ᵉ a déjà été réglée à la main : on n'y touche pas
+    await validateSetAndRest(id, sets[0].id, { weight: 100, reps: 5 }, db)
+
+    const after = (await getSessionSets(id, db)).sort((a, b) => a.order - b.order)
+    expect(after.map((s) => [s.weight, s.reps, s.done])).toEqual([
+      [100, 5, true],
+      [100, 5, false],
+      [20, 6, false],
+    ])
+  })
+})
+
+describe('réglages', () => {
+  it('le pas de charge des réglages sert à la proposition de charge', async () => {
+    freshDb()
+    await updateSettings({ weightSteps: { ...(await getSettings(db)).weightSteps, barre: 5 } }, db)
+    await seance([12, 12, 12]) // objectif atteint : +1 pas la prochaine fois
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'developpe', 'barre', db)
+    expect((await getSessionSets(id, db)).map((s) => s.weight)).toEqual([85, 85, 85])
+  })
+
+  it('modifier un réglage garde les autres', async () => {
+    freshDb()
+    await updateSettings({ restSeconds: 90 }, db)
+    await updateSettings({ restSound: false }, db)
+    expect(await getSettings(db)).toMatchObject({ restSeconds: 90, restSound: false })
+  })
+})
+
+describe('migration vers la version 3 (J4)', () => {
+  it('garde les séances et séries enregistrées avec la version 2', async () => {
+    const name = `test-migration-${++n}`
+    // Base telle qu'installée sur le téléphone avant le J4 (versions 1 et 2 seulement)
+    const old = new Dexie(name)
+    old.version(1).stores({ exercises: 'id, name, muscleGroup, deletedAt' })
+    old.version(2).stores({ sessions: 'id, startedAt, endedAt', sets: 'id, sessionId, exerciseId, doneAt, [sessionId+order]' })
+    await old.table('sessions').add({ id: 's1', startedAt: 1, endedAt: 2 })
+    await old.table('sets').add({ id: 'x1', sessionId: 's1', exerciseId: 'squat', variant: 'barre', exerciseOrder: 1, order: 1, weight: 100, reps: 5, done: true, doneAt: 2 })
+    old.close()
+
+    db = new SportixDB(name)
+    expect(await listFinishedSessions(db)).toHaveLength(1)
+    expect(await getSessionSets('s1', db)).toHaveLength(1)
+    expect((await getSettings(db)).restSeconds).toBe(120)
   })
 })

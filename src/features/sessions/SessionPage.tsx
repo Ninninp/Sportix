@@ -2,8 +2,9 @@
 // progression, pavé de saisie Charge / Reps et bouton « Valider la série ».
 // Les onglets du bas sont masqués sur cet écran (décision de D2).
 // Terminer demande toujours une confirmation : un appui de trop en salle ne doit pas clore la séance.
+// Valider une série lance le repos (J4) : l'écran de repos remplace alors la saisie.
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useNavigate } from 'react-router'
 import { BadgeIncrease } from '../../components/Badge.tsx'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
@@ -11,8 +12,17 @@ import NumberStepper from '../../components/NumberStepper.tsx'
 import SessionProgress from '../../components/SessionProgress.tsx'
 import SetRow from '../../components/SetRow.tsx'
 import Sheet from '../../components/Sheet.tsx'
-import { IconChevronBas, IconChevronDroite, IconOptions, IconPlus } from '../../components/icons.tsx'
-import { addSet, discardSession, endSession, startSession, updateSet, validateSet } from '../../db/sessions.ts'
+import { Link } from 'react-router'
+import { IconChevronDroite, IconOptions, IconPlus } from '../../components/icons.tsx'
+import {
+  addSet,
+  clearSessionRest,
+  discardSession,
+  endSession,
+  startSession,
+  updateSet,
+  validateSetAndRest,
+} from '../../db/sessions.ts'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import {
   increaseBadge,
@@ -23,16 +33,13 @@ import {
   stepWeight,
   weightStep,
 } from '../../lib/progression.ts'
-import {
-  currentSet,
-  formatDuration,
-  formatNumber,
-  groupSetsByExercise,
-  sessionDuration,
-  sessionProgress,
-  type SessionSet,
-} from '../../lib/sessions.ts'
+import { formatRest } from '../../lib/rest.ts'
+import { currentSet, formatNumber, groupSetsByExercise, sessionProgress, type SessionSet } from '../../lib/sessions.ts'
+import { useSettings } from '../settings/useSettings.ts'
+import RestScreen from '../timer/RestScreen.tsx'
+import { unlockAudio } from '../timer/sound.ts'
 import ExerciseMenu from './ExerciseMenu.tsx'
+import SessionHeader from './SessionHeader.tsx'
 import { useActiveSession, useExercisesById, useHistorySets, useSessionSets } from './useSession.ts'
 
 /** Chrono de la séance, remis à jour chaque seconde. */
@@ -51,12 +58,20 @@ function SessionPage() {
   const sets = useSessionSets(session?.id)
   const history = useHistorySets(session?.id)
   const exercises = useExercisesById()
+  const settings = useSettings()
   const [selected, setSelected] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
   useTicker(session !== null && session !== undefined)
 
-  if (session === undefined || sets === undefined || exercises === undefined || history === undefined) return null
+  if (
+    session === undefined ||
+    sets === undefined ||
+    exercises === undefined ||
+    history === undefined ||
+    settings === undefined
+  )
+    return null
 
   // Aucune séance en cours : on en propose une (arrivée directe sur l'adresse /seance)
   if (session === null) {
@@ -85,27 +100,13 @@ function SessionPage() {
   const editing: SessionSet | undefined = block?.sets.find((s) => !s.done)
   const exercise = block ? exercises.get(block.exerciseId) : undefined
   const progress = sessionProgress(sets)
-  const badge = block ? increaseBadge(lastPerformance(history, block.exerciseId, block.variant), block.variant) : null
-  const step = block ? weightStep(block.variant) : 2.5
+  const steps = settings.weightSteps
+  const badge = block
+    ? increaseBadge(lastPerformance(history, block.exerciseId, block.variant), block.variant, steps)
+    : null
+  const step = block ? weightStep(block.variant, steps) : 2.5
 
-  const header = (
-    <header className="-mx-2 flex shrink-0 items-center gap-1">
-      <Link
-        to="/"
-        aria-label="Réduire la séance (elle continue)"
-        className="flex size-12 shrink-0 items-center justify-center rounded-md text-text"
-      >
-        <IconChevronBas />
-      </Link>
-      <div className="flex-1">
-        <div className="text-body font-bold">Séance libre</div>
-        <div className="num text-body text-muted">{formatDuration(sessionDuration(session))}</div>
-      </div>
-      <Button variant="link" onClick={() => setConfirmEnd(true)}>
-        Terminer
-      </Button>
-    </header>
-  )
+  const header = <SessionHeader session={session} onEnd={() => setConfirmEnd(true)} />
 
   // Confirmation de fin de séance. Sans aucune série validée, il n'y a rien à garder :
   // la séance est abandonnée au lieu de laisser une séance vide dans l'historique.
@@ -166,6 +167,38 @@ function SessionPage() {
 
   const unit = exercise?.type === 'charge' ? 'kg' : ''
 
+  // Repos en cours : la série qui suit est celle de l'exercice affiché, sinon la prochaine de la séance
+  if (session.rest) {
+    const upcomingSet = editing ?? nextSet
+    const upcomingExercise = upcomingSet ? exercises.get(upcomingSet.exerciseId) : undefined
+    return (
+      <>
+        <RestScreen
+          session={{ ...session, rest: session.rest }}
+          progress={progress}
+          sound={settings.restSound}
+          upcoming={
+            upcomingSet && {
+              name: upcomingExercise?.name ?? 'Exercice',
+              order: upcomingSet.order,
+              weight: upcomingExercise?.type === 'poids-du-corps' ? null : upcomingSet.weight,
+              reps: upcomingSet.reps,
+              targetRepsMin: upcomingSet.targetRepsMin,
+              targetRepsMax: upcomingSet.targetRepsMax,
+            }
+          }
+          onEnd={() => setConfirmEnd(true)}
+          onDone={() => {
+            // Retour à la saisie sur la série annoncée dans « Ensuite »
+            if (!editing) setSelected(null)
+            void clearSessionRest(session.id)
+          }}
+        />
+        {endSheet}
+      </>
+    )
+  }
+
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-1 pb-4">
       {header}
@@ -221,6 +254,8 @@ function SessionPage() {
               )}
             </span>
             {block!.variant ? ` · ${VARIANT_LABELS[block!.variant]}` : ''}
+            {' · repos '}
+            <span className="num">{formatRest(settings.restSeconds)}</span>
           </div>
         </div>
         <button
@@ -292,8 +327,12 @@ function SessionPage() {
                 minusLabel={`Retirer ${formatNumber(step)} kg`}
                 plusLabel={`Ajouter ${formatNumber(step)} kg`}
                 canDecrement={editing.weight > minWeight(editing.variant)}
-                onDecrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, -1) })}
-                onIncrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, 1) })}
+                onDecrement={() =>
+                  updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, -1, steps) })
+                }
+                onIncrement={() =>
+                  updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, 1, steps) })
+                }
                 inputMode="decimal"
                 onType={(text) => {
                   const weight = parseWeight(text, editing.variant)
@@ -339,7 +378,10 @@ function SessionPage() {
           <Button
             className="text-[20px] font-extrabold"
             disabled={editing.reps < 1}
-            onClick={() => validateSet(editing.id, { weight: editing.weight, reps: editing.reps })}
+            onClick={() => {
+              unlockAudio() // iOS : le son de fin de repos doit être autorisé pendant un geste
+              void validateSetAndRest(session.id, editing.id, { weight: editing.weight, reps: editing.reps })
+            }}
           >
             Valider la série
           </Button>
