@@ -23,11 +23,15 @@ export async function getActiveSession(db: SportixDB = defaultDb): Promise<Sessi
 }
 
 export async function startSession(db: SportixDB = defaultDb): Promise<string> {
-  const existing = await getActiveSession(db)
-  if (existing) return existing.id // on ne démarre jamais deux séances à la fois
   const id = crypto.randomUUID()
-  await db.sessions.add({ id, startedAt: Date.now() })
-  return id
+  // Vérification et création dans la même transaction : deux appuis rapprochés sur « Démarrer »
+  // ne peuvent pas créer deux séances (la seconde transaction voit la première).
+  return db.transaction('rw', db.sessions, async () => {
+    const existing = await getActiveSession(db)
+    if (existing) return existing.id // on ne démarre jamais deux séances à la fois
+    await db.sessions.add({ id, startedAt: Date.now() })
+    return id
+  })
 }
 
 export function getSessionSets(sessionId: string, db: SportixDB = defaultDb): Promise<SessionSet[]> {

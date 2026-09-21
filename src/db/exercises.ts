@@ -18,9 +18,17 @@ export async function updateExercise(id: string, draft: ExerciseDraft, db: Sport
   await db.exercises.update(id, clean(draft))
 }
 
-/** Suppression « douce » : l'exercice n'est plus proposé mais reste lisible pour l'historique. */
+/**
+ * Suppression « douce » : l'exercice n'est plus proposé mais reste lisible pour l'historique.
+ * Il est en revanche **retiré des programmes** : sans cela il continuerait d'être ajouté à chaque
+ * nouvelle séance du jour concerné, alors que la confirmation annonce « il ne sera plus proposé ».
+ * L'écran de suppression prévient quand des programmes l'utilisent (`countExerciseInPrograms`).
+ */
 export async function softDeleteExercise(id: string, db: SportixDB = defaultDb): Promise<void> {
-  await db.exercises.update(id, { deletedAt: Date.now() })
+  await db.transaction('rw', db.exercises, db.programExercises, async () => {
+    await db.exercises.update(id, { deletedAt: Date.now() })
+    await db.programExercises.filter((pe) => pe.exerciseId === id).delete()
+  })
 }
 
 export function getExercise(id: string, db: SportixDB = defaultDb): Promise<Exercise | undefined> {

@@ -18,6 +18,7 @@ import { formatNumber, groupSetsByExercise, type SessionSet } from '../../lib/se
 import { isStandalone } from '../../lib/standalone.ts'
 import { formatHoursMinutes, weekDays, weekStats, type Trend } from '../../lib/week.ts'
 import { useProgram } from '../programs/usePrograms.ts'
+import { useNowOnResume } from '../timer/useNow.ts'
 import { useActiveSession, useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
 import { useSettings } from '../settings/useSettings.ts'
 
@@ -55,6 +56,26 @@ function HeroRow({ first, name, increase, value }: { first: boolean; name: strin
   )
 }
 
+type HeroRowData = { key: string; name: string; increase?: boolean; value?: string }
+
+/**
+ * La carte n'affiche que les 5 premiers exercices. Au-delà, la place manque sur un iPhone 14 et les
+ * dernières lignes étaient coupées en deux par le bas de la carte, sans rien pour le signaler.
+ */
+const MAX_HERO_ROWS = 5
+function heroRows(rows: HeroRowData[]) {
+  const shown = rows.slice(0, MAX_HERO_ROWS)
+  const rest = rows.length - shown.length
+  return (
+    <>
+      {shown.map((r, i) => (
+        <HeroRow key={r.key} first={i === 0} name={r.name} increase={r.increase} value={r.value} />
+      ))}
+      {rest > 0 && <HeroRow first={false} name={`+ ${rest} exercice${rest > 1 ? 's' : ''}`} />}
+    </>
+  )
+}
+
 /** Choix fait avec « Autre séance », pour aujourd'hui seulement : un jour du programme, ou libre. */
 type Choice = { dayId: string } | 'libre' | null
 
@@ -68,8 +89,9 @@ function HomePage() {
   const program = useProgram(settings?.activeProgramId)
   const [choice, setChoice] = useState<Choice>(null)
   const [choosing, setChoosing] = useState(false)
-  // Heure lue à l'ouverture de l'accueil : suffit pour la semaine et le jour (pas de chrono ici)
-  const [now] = useState(() => Date.now())
+  // Pas de chrono sur l'accueil, mais l'heure est relue à chaque retour au premier plan : sinon
+  // une app rouverte le lendemain garderait les chiffres et la pastille « aujourd'hui » de la veille.
+  const now = useNowOnResume()
 
   if (
     active === undefined ||
@@ -111,9 +133,13 @@ function HomePage() {
     hero = {
       title: active.title ?? 'Séance en cours',
       sub: `Commencée à ${new Date(active.startedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
-      rows: groupSetsByExercise(sets.filter((s) => s.sessionId === active.id)).map((b, i) => (
-        <HeroRow key={b.exerciseOrder} first={i === 0} name={nameOf(b.exerciseId)} value={`${b.doneCount}/${b.sets.length}`} />
-      )),
+      rows: heroRows(
+        groupSetsByExercise(sets.filter((s) => s.sessionId === active.id)).map((b) => ({
+          key: String(b.exerciseOrder),
+          name: nameOf(b.exerciseId),
+          value: `${b.doneCount}/${b.sets.length}`,
+        })),
+      ),
       cta: 'Reprendre la séance',
       onStart: async () => {},
     }
@@ -121,9 +147,9 @@ function HomePage() {
     hero = {
       title: planned.day.name,
       sub: `${choice ? 'Séance choisie' : 'Prochaine séance'} · ${program.program.name} · ${plural(planned.exercises.length, 'exercice')}`,
-      rows: planned.exercises.map((pe, i) => (
-        <HeroRow key={pe.id} first={i === 0} name={nameOf(pe.exerciseId)} increase={increaseSuggested(pe, history)} />
-      )),
+      rows: heroRows(
+        planned.exercises.map((pe) => ({ key: pe.id, name: nameOf(pe.exerciseId), increase: increaseSuggested(pe, history) })),
+      ),
       cta: 'Démarrer la séance',
       onStart: async () => void (await startProgramSession(planned.day.id)),
     }
@@ -131,7 +157,7 @@ function HomePage() {
     hero = {
       title: 'Séance libre',
       sub: recent.length > 0 ? 'Tes dernières charges, reprises automatiquement' : 'Pas besoin de programme pour commencer',
-      rows: recent.map((r, i) => <HeroRow key={r.exerciseId} first={i === 0} name={nameOf(r.exerciseId)} increase={r.increase} value={r.value} />),
+      rows: heroRows(recent.map((r) => ({ key: r.exerciseId, name: nameOf(r.exerciseId), increase: r.increase, value: r.value }))),
       cta: 'Démarrer la séance',
       onStart: async () => void (await startSession()),
     }

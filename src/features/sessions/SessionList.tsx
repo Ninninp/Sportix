@@ -72,12 +72,15 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
                   <IconOptions />
                 </button>
               </div>
+              {/* Vrai tableau pour les lecteurs d'écran : un `role="row"` doit être contenu dans un
+                  `role="table"`, sinon VoiceOver ignore les lignes et ne lit pas charge et reps. */}
+              <div role="table" aria-label={`Séries — ${name}`} className="flex flex-col gap-1">
               <div role="row" className={`${COLUMNS} px-2.5 text-[11px] font-semibold tracking-[0.06em] text-muted uppercase`}>
-                <span>N°</span>
-                <span>Dernière fois</span>
-                <span className="text-right">Kg</span>
-                <span className="text-right">Reps</span>
-                <span />
+                <span role="columnheader">N°</span>
+                <span role="columnheader">Dernière fois</span>
+                <span role="columnheader" className="text-right">Kg</span>
+                <span role="columnheader" className="text-right">Reps</span>
+                <span role="columnheader" />
               </div>
               {b.sets.map((s, i) => {
                 const previous = last?.sets[i]
@@ -92,13 +95,13 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
                       state === 'done' ? 'bg-surface-2 text-muted' : state === 'now' ? 'bg-inverse text-on-inverse' : 'text-faint'
                     }`}
                   >
-                    <span className="num text-body">{s.order}</span>
-                    <span className={`num text-body font-medium ${state === 'now' ? 'text-on-inverse-muted' : ''}`}>
+                    <span role="cell" className="num text-body">{s.order}</span>
+                    <span role="cell" className={`num text-body font-medium ${state === 'now' ? 'text-on-inverse-muted' : ''}`}>
                       {previous ? `${previous.weight > 0 ? `${formatNumber(previous.weight)} × ` : '× '}${previous.reps}` : '—'}
                     </span>
-                    <span className="num text-right text-[22px]">{s.weight > 0 ? formatNumber(s.weight) : '—'}</span>
-                    <span className="num text-right text-[22px]">{s.reps}</span>
-                    <span className="flex justify-end">
+                    <span role="cell" className="num text-right text-[22px]">{s.weight > 0 ? formatNumber(s.weight) : '—'}</span>
+                    <span role="cell" className="num text-right text-[22px]">{s.reps}</span>
+                    <span role="cell" className="flex justify-end">
                       {state === 'done' ? (
                         <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-text text-bg">
                           <IconCoche size={18} strokeWidth={3} />
@@ -113,6 +116,7 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
                   </div>
                 )
               })}
+              </div>
               <button
                 type="button"
                 onClick={() => onAddSet(b.exerciseOrder)}

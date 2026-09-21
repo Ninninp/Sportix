@@ -41,6 +41,16 @@ describe('weekStats (à date égale)', () => {
     expect(stats.volume).toEqual({ value: 1000, trend: 'down' }) // 1 000 kg contre 2 000 kg
   })
 
+  // Relecture du J5 : la période comparée était calculée en 7 × 24 h. La semaine du changement
+  // d'heure (dimanche 25 octobre 2026 en France) dure 169 h : la comparaison démarrait au lundi
+  // 1 h au lieu de 0 h et oubliait une séance du petit matin, d'où une fausse hausse.
+  it('reste juste la semaine du changement d’heure', () => {
+    const now = new Date(2026, 9, 26, 18, 0).getTime() // lundi 26 octobre, 18 h
+    const early = session('f', new Date(2026, 9, 19, 0, 30).getTime(), 60) // lundi 19 octobre, 0 h 30
+    const stats = weekStats([early], [], now)
+    expect(stats.sessions).toEqual({ value: 0, trend: 'down' }) // 0 cette semaine contre 1 la semaine passée
+  })
+
   it('égalité : ni hausse ni baisse', () => {
     expect(weekStats([], [], NOW).sessions).toEqual({ value: 0, trend: 'same' })
   })

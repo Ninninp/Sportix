@@ -7,7 +7,7 @@ import MiniStepper from '../../components/MiniStepper.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import Switch from '../../components/Switch.tsx'
 import { IconCorbeille } from '../../components/icons.tsx'
-import { removeDayExercise, updateDayExercise } from '../../db/programs.ts'
+import { changeDayExercise, removeDayExercise, updateDayExercise } from '../../db/programs.ts'
 import { VARIANT_LABELS, type Exercise, type Variant } from '../../lib/exercises.ts'
 import type { ProgramExercise } from '../../lib/programs.ts'
 import { formatRest } from '../../lib/rest.ts'
@@ -20,6 +20,11 @@ type Props = { exercise: ProgramExercise | undefined; info: Exercise | undefined
 
 function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
   const update = (changes: Partial<ProgramExercise>) => pe && void updateDayExercise(pe.id, changes)
+  // Boutons − / + : la nouvelle valeur part de la base, pas de l'affichage (qui a un cycle de
+  // retard). Sans cela, trois appuis rapides sur « + » n'en comptaient qu'un ou deux.
+  // Les bornes sont revérifiées ici pour la même raison.
+  const step = (changes: (current: ProgramExercise) => Partial<ProgramExercise>) => pe && void changeDayExercise(pe.id, changes)
+  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
   return (
     <Sheet open={pe !== undefined} onClose={onClose} label={info?.name ?? 'Exercice'}>
       {pe && (
@@ -45,8 +50,8 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
               value={String(pe.sets)}
               canDecrement={pe.sets > 1}
               canIncrement={pe.sets < MAX_SETS}
-              onDecrement={() => update({ sets: pe.sets - 1 })}
-              onIncrement={() => update({ sets: pe.sets + 1 })}
+              onDecrement={() => step((c) => ({ sets: clamp(c.sets - 1, 1, MAX_SETS) }))}
+              onIncrement={() => step((c) => ({ sets: clamp(c.sets + 1, 1, MAX_SETS) }))}
             />
             <Switch
               inset
@@ -65,8 +70,8 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
                   value={String(pe.repsMin)}
                   canDecrement={pe.repsMin > 1}
                   canIncrement={pe.repsMin < pe.repsMax}
-                  onDecrement={() => update({ repsMin: pe.repsMin - 1 })}
-                  onIncrement={() => update({ repsMin: pe.repsMin + 1 })}
+                  onDecrement={() => step((c) => ({ repsMin: clamp(c.repsMin - 1, 1, c.repsMax) }))}
+                  onIncrement={() => step((c) => ({ repsMin: clamp(c.repsMin + 1, 1, c.repsMax) }))}
                 />
                 <MiniStepper
                   label="Reps, au plus"
@@ -74,8 +79,8 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
                   value={String(pe.repsMax)}
                   canDecrement={pe.repsMax > pe.repsMin}
                   canIncrement={pe.repsMax < MAX_REPS}
-                  onDecrement={() => update({ repsMax: pe.repsMax - 1 })}
-                  onIncrement={() => update({ repsMax: pe.repsMax + 1 })}
+                  onDecrement={() => step((c) => ({ repsMax: clamp(c.repsMax - 1, c.repsMin, MAX_REPS) }))}
+                  onIncrement={() => step((c) => ({ repsMax: clamp(c.repsMax + 1, c.repsMin, MAX_REPS) }))}
                 />
               </>
             ) : (
@@ -85,8 +90,8 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
                 value={String(pe.repsMin)}
                 canDecrement={pe.repsMin > 1}
                 canIncrement={pe.repsMin < MAX_REPS}
-                onDecrement={() => update({ repsMin: pe.repsMin - 1, repsMax: pe.repsMin - 1 })}
-                onIncrement={() => update({ repsMin: pe.repsMin + 1, repsMax: pe.repsMin + 1 })}
+                onDecrement={() => step((c) => ({ repsMin: clamp(c.repsMin - 1, 1, MAX_REPS), repsMax: clamp(c.repsMin - 1, 1, MAX_REPS) }))}
+                onIncrement={() => step((c) => ({ repsMin: clamp(c.repsMin + 1, 1, MAX_REPS), repsMax: clamp(c.repsMin + 1, 1, MAX_REPS) }))}
               />
             )}
             <MiniStepper
@@ -95,8 +100,8 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
               value={formatRest(pe.restSeconds)}
               canDecrement={pe.restSeconds > REST_MIN}
               canIncrement={pe.restSeconds < REST_MAX}
-              onDecrement={() => update({ restSeconds: stepRest(pe.restSeconds, -1) })}
-              onIncrement={() => update({ restSeconds: stepRest(pe.restSeconds, 1) })}
+              onDecrement={() => step((c) => ({ restSeconds: stepRest(c.restSeconds, -1) }))}
+              onIncrement={() => step((c) => ({ restSeconds: stepRest(c.restSeconds, 1) }))}
             />
           </div>
 

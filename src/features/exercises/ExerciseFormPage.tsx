@@ -11,6 +11,7 @@ import Sheet from '../../components/Sheet.tsx'
 import TextField from '../../components/TextField.tsx'
 import { IconCorbeille } from '../../components/icons.tsx'
 import { addExercise, getExercise, softDeleteExercise, updateExercise } from '../../db/exercises.ts'
+import { countExerciseInPrograms } from '../../db/programs.ts'
 import {
   EXERCISE_TYPES,
   EXERCISE_TYPE_LABELS,
@@ -43,6 +44,8 @@ function ExerciseFormPage() {
   // (result.value undefined) : sans ça, l'écran peut afficher « introuvable » pendant le chargement.
   const result = useLiveQuery(async () => ({ value: id ? await getExercise(id) : undefined }), [id])
   const saved = result?.value
+  // Combien de jours de programme utilisent cet exercice : la suppression l'en retirera, autant le dire.
+  const usedInPrograms = useLiveQuery(async () => (id ? countExerciseInPrograms(id) : 0), [id]) ?? 0
 
   // `draft` = ce que l'utilisateur a modifié ; tant qu'il n'a rien touché, on affiche soit un
   // formulaire vide (création), soit l'exercice venu de la base (modification, d'où le `null`
@@ -179,6 +182,8 @@ function ExerciseFormPage() {
           <h2 className="text-title font-bold">Supprimer « {saved?.name} » ?</h2>
           <p className="text-body text-muted">
             Il ne sera plus proposé. Tes séances passées le gardent dans l’historique.
+            {usedInPrograms > 0 &&
+              ` Il sera retiré de ${usedInPrograms === 1 ? 'la séance de programme' : `${usedInPrograms} séances de programme`} où il figure.`}
           </p>
         </div>
         <div className="flex flex-col gap-2">

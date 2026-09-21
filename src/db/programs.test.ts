@@ -2,9 +2,12 @@
 import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
 import { afterEach, describe, expect, it } from 'vitest'
+import { addExercise, softDeleteExercise } from './exercises.ts'
 import {
   addDay,
   addDayExercise,
+  changeDayExercise,
+  countExerciseInPrograms,
   createProgram,
   deleteDay,
   deleteProgram,
@@ -128,6 +131,65 @@ describe('séance lancée depuis un jour', () => {
     expect(await startProgramSession(a.id, db)).toBe(first)
     await endSession(first, db)
     expect(await listFinishedSessions(db)).toHaveLength(1)
+  })
+
+  // Relecture du J5 : le test « y a-t-il déjà une séance ? » se faisait avant les lectures, donc
+  // hors transaction. Deux appuis rapprochés sur « Démarrer la séance » créaient deux séances,
+  // dont une restait ouverte pour toujours et revenait après avoir terminé la première.
+  it('deux démarrages simultanés ne créent qu’une seule séance', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    const [a] = await listDays(id, db)
+    await addDayExercise(a.id, 'squat', 'barre', db)
+
+    const [one, two] = await Promise.all([startProgramSession(a.id, db), startProgramSession(a.id, db)])
+    expect(two).toBe(one)
+    expect(await db.sessions.count()).toBe(1)
+
+    await endSession(one, db)
+    expect(await getActiveSession(db)).toBeUndefined()
+  })
+})
+
+describe('réglages d’un exercice de programme', () => {
+  // Relecture du J5 : les boutons − / + écrivaient une valeur calculée depuis l'affichage, qui a un
+  // cycle de retard sur la base. Trois appuis rapides n'en comptaient qu'un.
+  it('trois « + » rapprochés comptent pour trois', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    const [a] = await listDays(id, db)
+    const pe = await addDayExercise(a.id, 'squat', 'barre', db)
+    const before = (await listDayExercises(a.id, db))[0].sets
+
+    await Promise.all([
+      changeDayExercise(pe, (c) => ({ sets: c.sets + 1 }), db),
+      changeDayExercise(pe, (c) => ({ sets: c.sets + 1 }), db),
+      changeDayExercise(pe, (c) => ({ sets: c.sets + 1 }), db),
+    ])
+    expect((await listDayExercises(a.id, db))[0].sets).toBe(before + 3)
+  })
+})
+
+describe('exercice supprimé de la bibliothèque', () => {
+  // Relecture du J5 : la suppression ne posait que `deletedAt`. L'exercice restait dans les jours de
+  // programme et revenait dans chaque nouvelle séance, alors que l'app annonce « plus proposé ».
+  it('est retiré des jours de programme, et les séances déjà enregistrées n’y touchent pas', async () => {
+    freshDb()
+    const squat = await addExercise({ name: 'Squat', muscleGroup: 'jambes', type: 'charge', variants: ['barre'] }, db)
+    const id = await createProgram('P', 'A', db)
+    const [a] = await listDays(id, db)
+    await addDayExercise(a.id, squat, 'barre', db)
+    await addDayExercise(a.id, 'presse', 'machine', db)
+    expect(await countExerciseInPrograms(squat, db)).toBe(1)
+
+    const sessionId = await startProgramSession(a.id, db)
+    const setsBefore = (await getSessionSets(sessionId, db)).length
+    await softDeleteExercise(squat, db)
+
+    expect(await countExerciseInPrograms(squat, db)).toBe(0)
+    expect((await listDayExercises(a.id, db)).map((e) => e.exerciseId)).toEqual(['presse'])
+    // La séance en cours garde ses séries : seul le programme change
+    expect(await getSessionSets(sessionId, db)).toHaveLength(setsBefore)
   })
 })
 

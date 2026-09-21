@@ -4,8 +4,6 @@
 // période de la semaine passée (du lundi précédent au même jour et à la même heure).
 import { sessionDuration, sessionVolume, type Session, type SessionSet } from './sessions.ts'
 
-const DAY = 24 * 60 * 60 * 1000
-
 /** Lundi 0 h de la semaine de `now` (heure locale). */
 export function mondayOf(now: number): number {
   const d = new Date(now)
@@ -33,10 +31,18 @@ function totals(sessions: Session[], sets: SessionSet[], from: number, to: numbe
   }
 }
 
+/** Le même instant une semaine plus tôt (calculé en jours de calendrier, pas en 7 × 24 h : aux
+ *  changements d'heure une semaine dure 167 ou 169 heures, et la comparaison se décalerait d'une heure). */
+function weekBefore(time: number): number {
+  const d = new Date(time)
+  d.setDate(d.getDate() - 7)
+  return d.getTime()
+}
+
 export function weekStats(sessions: Session[], sets: SessionSet[], now = Date.now()): WeekStats {
   const monday = mondayOf(now)
   const current = totals(sessions, sets, monday, now + 1, now)
-  const previous = totals(sessions, sets, monday - 7 * DAY, now + 1 - 7 * DAY, now)
+  const previous = totals(sessions, sets, weekBefore(monday), weekBefore(now) + 1, now)
   return {
     sessions: { value: current.count, trend: trendOf(current.count, previous.count) },
     durationMs: { value: current.durationMs, trend: trendOf(current.durationMs, previous.durationMs) },

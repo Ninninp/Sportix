@@ -6,6 +6,23 @@
 import { useEffect, useState } from 'react'
 import { msUntilNextSecond } from '../../lib/rest.ts'
 
+/**
+ * Heure relue à chaque retour au premier plan, sans chrono. Pour les écrans dont l'affichage
+ * dépend du jour ou de la semaine (l'accueil) : iOS reprend la PWA sans la recharger, donc une
+ * app laissée ouverte la veille afficherait encore les chiffres d'hier et la mauvaise pastille.
+ */
+export function useNowOnResume(): number {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') setNow(Date.now())
+    }
+    document.addEventListener('visibilitychange', refresh)
+    return () => document.removeEventListener('visibilitychange', refresh)
+  }, [])
+  return now
+}
+
 /** `anchor` undefined : pas de chrono, pas de rafraîchissement. */
 export function useNow(anchor: number | undefined): number {
   const [now, setNow] = useState(() => Date.now())

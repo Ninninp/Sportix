@@ -114,8 +114,30 @@ export async function updateDayExercise(
   await db.programExercises.update(id, changes)
 }
 
+/**
+ * Modification calculée à partir de la ligne **en base**, et non de celle affichée à l'écran.
+ * Indispensable pour les boutons − / + : l'affichage ne se met à jour qu'après l'aller-retour
+ * avec la base, donc deux appuis rapprochés partiraient sinon tous les deux de l'ancienne valeur
+ * (« 8 → 9 » deux fois au lieu de « 8 → 10 »). Dexie exécute ces transactions l'une après l'autre.
+ */
+export async function changeDayExercise(
+  id: string,
+  changes: (current: ProgramExercise) => Partial<Omit<ProgramExercise, 'id' | 'dayId'>>,
+  db: SportixDB = defaultDb,
+): Promise<void> {
+  await db.transaction('rw', db.programExercises, async () => {
+    const current = await db.programExercises.get(id)
+    if (current) await db.programExercises.update(id, changes(current))
+  })
+}
+
 export async function removeDayExercise(id: string, db: SportixDB = defaultDb): Promise<void> {
   await db.programExercises.delete(id)
+}
+
+/** Dans combien de jours de programme cet exercice figure-t-il ? (prévenir avant de le supprimer) */
+export async function countExerciseInPrograms(exerciseId: string, db: SportixDB = defaultDb): Promise<number> {
+  return (await db.programExercises.toArray()).filter((pe) => pe.exerciseId === exerciseId).length
 }
 
 /**
@@ -123,8 +145,6 @@ export async function removeDayExercise(id: string, db: SportixDB = defaultDb): 
  * S'il y a déjà une séance en cours, on la reprend (jamais deux séances à la fois).
  */
 export async function startProgramSession(dayId: string, db: SportixDB = defaultDb): Promise<string> {
-  const existing = await getActiveSession(db)
-  if (existing) return existing.id
   const [day, exercises, history, settings] = await Promise.all([
     db.programDays.get(dayId),
     listDayExercises(dayId, db),
@@ -134,9 +154,14 @@ export async function startProgramSession(dayId: string, db: SportixDB = default
   if (!day) throw new Error('Jour de programme introuvable')
   const id = crypto.randomUUID()
   const planned = planDaySets(exercises, history, settings.weightSteps)
-  await db.transaction('rw', db.sessions, db.sets, async () => {
+  // Le test « y a-t-il déjà une séance en cours ? » est **dans** la transaction d'écriture : sinon,
+  // deux appuis rapprochés sur « Démarrer la séance » (les lectures ci-dessus prennent un instant)
+  // répondraient tous les deux « non » et créeraient deux séances, dont une invisible à jamais.
+  return db.transaction('rw', db.sessions, db.sets, async () => {
+    const existing = await getActiveSession(db)
+    if (existing) return existing.id
     await db.sessions.add({ id, startedAt: Date.now(), programDayId: dayId, title: day.name })
     await db.sets.bulkAdd(planned.map((p) => ({ ...p, id: crypto.randomUUID(), sessionId: id, done: false })))
+    return id
   })
-  return id
 }
