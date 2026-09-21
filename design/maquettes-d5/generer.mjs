@@ -418,12 +418,21 @@ const progExSheet = (t, dp) => sheet(t, 'Squat dans Force A — Jambes',
 S['Programme-exercice'] = { title: 'Exercice du programme · double progression', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: detailMain(t), overlay: progExSheet(t, true) }) };
 S['Programme-exercice-fixe'] = { title: 'Exercice du programme · reps fixes', page: 'j5', render: (t) => frame(t, { navActive: 'prog', navLinks: J5NAV(t), main: detailMain(t), overlay: progExSheet(t, false) }) };
 
+// Accueil J5 (retour du 21/09/2026, inspiré de Lyfta) : les chiffres de la semaine en texte,
+// chacun avec une petite flèche d'évolution par rapport à la semaine passée ; « Autre séance »
+// en lien discret sur la même ligne que le titre. Plus de pastilles des jours.
+P.down = '<path d="M12 5v14M5 12l7 7 7-7"></path>';
+const trend = (t, up, s) =>
+  `<span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; color: ${up ? t.text : t.muted};"><span aria-label="${up ? 'en hausse' : 'en baisse'}" style="display: flex;">${ic(up ? 'up' : 'down', 13, 3)}</span><span class="num" style="font-weight: 600;">${s}</span></span>`;
+const weekStat = (t, label, value, unit, up, delta) =>
+  `<div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; color: ${t.muted};">${label}</span><span><span class="num" style="font-size: 24px; line-height: 28px;">${value}</span>${unit ? ` <span style="font-size: 15px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}</span>${trend(t, up, delta)}</div>`;
+const weekStats = (t) =>
+  `<section aria-label="Cette semaine" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;"><div style="display: flex; align-items: center; justify-content: space-between; margin-right: -12px;">${lbl(t, 'Cette semaine')}${btn.link(t, 'Autre séance', file(t, 'Jour-choix'), t.muted)}</div>` +
+  `<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px;">${weekStat(t, 'Séances', '2', '', true, '+1')}${weekStat(t, 'Durée', '1 h 44', '', true, '+32 min')}${weekStat(t, 'Volume', '12 480', 'kg', false, '−6 %')}</div></section>`;
 const homeJ5 = (t) =>
-  week(t) +
+  weekStats(t) +
   heroBig(t, { title: 'Force A — Jambes', sub: 'Prochaine séance · Force A/B · 5 exercices', href: file(t, 'Seance-liste'), cta: 'Démarrer la séance',
-    rows: [exLine(t, 'Squat', '', true), exLine(t, 'Presse à cuisses', ''), exLine(t, 'Leg curl', ''), exLine(t, 'Fentes bulgares', ''), exLine(t, 'Mollets debout', '')] }) +
-  // Lien discret (retour du 21/09/2026) : ouvre le choix du jour, où « Séance libre » est une option
-  `<div style="display: flex; justify-content: center; flex-shrink: 0; margin: -4px 0 -8px;">${btn.link(t, 'Autre séance', file(t, 'Jour-choix'), t.muted)}</div>`;
+    rows: [exLine(t, 'Squat', '', true), exLine(t, 'Presse à cuisses', ''), exLine(t, 'Leg curl', ''), exLine(t, 'Fentes bulgares', ''), exLine(t, 'Mollets debout', '')] });
 
 S['Accueil-J5'] = { title: 'Accueil · séance du jour (J5)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t) }) };
 
@@ -583,7 +592,7 @@ writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-0
     'j5-actif': noteJ5(420, 'Un seul programme actif à la fois : c’est lui que l’accueil propose. Au J6, le bloc en cours choisira le programme.'),
     'j5-demarrer': noteJ5(840, 'Démarrer la séance (2 appuis depuis l’ouverture) : tous les exercices et toutes les séries du jour sont créés d’avance, pré-remplis avec la dernière fois (+ double progression). Le repos est celui de l’exercice dans le programme, sinon le repos par défaut des Réglages.', 'teal'),
     'j5-seance': noteJ5(1264, 'Pendant la séance, ajouter, retirer ou remplacer un exercice ne modifie pas le programme. L’historique affiche le nom du jour (« Force A — Jambes ») au lieu de « Séance libre ».'),
-    'j5-leger': noteJ5(2112, 'Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil : lien discret « Autre séance » sous la carte, qui ouvre le choix du jour (jours du programme + séance libre).', 'red'),
+    'j5-leger': noteJ5(2112, 'Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil (inspiré de Lyfta) : chiffres de la semaine (séances, durée, volume) avec flèche d’évolution par rapport à la semaine passée, et lien discret « Autre séance » sur la même ligne ; il ouvre le choix du jour (jours du programme + séance libre).', 'red'),
     'j5-liste': noteJ5(2536, 'Séance « en liste » (dernière planche, exemple inspiré de Lyfta) : toute la séance dans une liste, l’exercice en cours déplié en tableau N° · Dernière fois · Kg · Reps · ✓, les suivants repliés. Le pavé − / + et « Valider » restent en bas pour la saisie à une main. À comparer avec la séance actuelle et la séance allégée.', 'purple'),
     'j5-ajout': noteJ5(1688, '« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice.'),
   } });
