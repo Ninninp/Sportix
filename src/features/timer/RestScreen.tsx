@@ -53,7 +53,9 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
     setFromEnd(finished)
     if (finished) {
       setVeil(true)
-      window.setTimeout(() => setVeil(false), 600) // filet de sécurité si la fin d'animation n'arrive pas
+      // Retiré au bout de 250 ms même si l'iPhone ne signale pas la fin de l'animation : tant qu'il
+      // existe, la barre d'état reste colorée (0,6 s jugé trop long au test iPhone du 21/09/2026)
+      window.setTimeout(() => setVeil(false), 250)
     }
     setLocal({ from: session.rest.endsAt, rest: extendRest(rest, Date.now()) })
     void extendSessionRest(session.id)
@@ -123,7 +125,7 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
         <div
           aria-hidden="true"
           onAnimationEnd={() => setVeil(false)}
-          className="pointer-events-none fixed inset-0 z-40 animate-[sx-effacer_320ms_var(--ease-out)_forwards] bg-rest"
+          className="pointer-events-none fixed inset-0 z-40 animate-[sx-effacer_250ms_var(--ease-out)_forwards] bg-rest"
         />
       )}
       <SessionHeader session={session} onEnd={onEnd} />
