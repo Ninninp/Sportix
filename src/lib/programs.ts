@@ -55,6 +55,16 @@ export function nextDay(days: ProgramDay[], sessions: Session[]): ProgramDay | u
   return ordered[(index + 1) % ordered.length]
 }
 
+/**
+ * La prochaine fois, la charge de cet exercice augmente-t-elle d'un pas ? Oui si la double
+ * progression est activée et que toutes les séries de la dernière fois (même variante) ont atteint
+ * le haut de la fourchette du programme. Sert au pré-remplissage et au badge ↑ de l'accueil.
+ */
+export function increaseSuggested(pe: ProgramExercise, history: SessionSet[]): boolean {
+  const last = lastPerformance(history, pe.exerciseId, pe.variant)
+  return pe.doubleProgression && last !== null && last.sets.length > 0 && last.sets.every((s) => s.reps >= pe.repsMax)
+}
+
 /** Une série à créer au démarrage d'une séance de programme. */
 export type PlannedSet = Pick<
   SessionSet,
@@ -78,8 +88,7 @@ export function planDaySets(
     .sort((a, b) => a.order - b.order)
     .flatMap((pe, index) => {
       const last = lastPerformance(history, pe.exerciseId, pe.variant)
-      const increase =
-        pe.doubleProgression && last !== null && last.sets.length > 0 && last.sets.every((s) => s.reps >= pe.repsMax)
+      const increase = increaseSuggested(pe, history)
       const step = increase ? weightStep(pe.variant, steps) : 0
       const min = minWeight(pe.variant)
       return Array.from({ length: pe.sets }, (_, i) => {

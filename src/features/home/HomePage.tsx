@@ -1,30 +1,62 @@
-// Onglet Séance — accueil (maquette D5 « Accueil · J3 ») : ligne fine sur la dernière séance,
-// semaine en pastilles, puis la grande carte qui domine, avec le bouton dans la zone du pouce.
+// Onglet Séance — accueil (maquette J5 « Accueil · séance du jour », inspirée de Lyfta) :
+// - « Cette semaine » : séances, durée, volume, chacun avec une flèche d'évolution par rapport à la
+//   même période de la semaine passée (src/lib/week.ts), puis les pastilles des jours ;
+// - « Autre séance » (lien discret) : choisir un autre jour du programme, ou une séance libre ;
+// - la grande carte : séance en cours, séance du jour du programme actif, ou séance libre, avec
+//   le bouton « Démarrer la séance » dans la zone du pouce (2 appuis depuis l'ouverture de l'app).
+import { useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import Card from '../../components/Card.tsx'
-import { BadgeIncrease, BadgePR } from '../../components/Badge.tsx'
-import { IconChevronDroite, IconHistorique, IconPartager } from '../../components/icons.tsx'
+import Sheet from '../../components/Sheet.tsx'
+import { BadgeIncrease } from '../../components/Badge.tsx'
+import { IconChevronDroite, IconFleche, IconFlecheBas, IconPartager } from '../../components/icons.tsx'
+import { startProgramSession } from '../../db/programs.ts'
 import { startSession } from '../../db/sessions.ts'
-import { isStandalone } from '../../lib/standalone.ts'
 import { increaseBadge, lastPerformance } from '../../lib/progression.ts'
-import { sessionsWithRecords } from '../../lib/records.ts'
-import {
-  formatDuration,
-  formatNumber,
-  formatWeight,
-  groupSetsByExercise,
-  sessionSummary,
-  type SessionSet,
-} from '../../lib/sessions.ts'
+import { increaseSuggested, nextDay } from '../../lib/programs.ts'
+import { formatNumber, groupSetsByExercise, type SessionSet } from '../../lib/sessions.ts'
+import { isStandalone } from '../../lib/standalone.ts'
+import { formatHoursMinutes, weekDays, weekStats, type Trend } from '../../lib/week.ts'
+import { useProgram } from '../programs/usePrograms.ts'
 import { useActiveSession, useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
+import { useSettings } from '../settings/useSettings.ts'
 
-/** Lundi de la semaine en cours (les pastilles L → D). */
-function mondayOf(date: Date): Date {
-  const d = new Date(date)
-  d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7))
-  return d
+/** Flèche d'évolution à côté du libellé (rien si c'est pareil que la semaine passée). */
+function TrendArrow({ trend }: { trend: Trend }) {
+  if (trend === 'same') return null
+  const up = trend === 'up'
+  return (
+    <span aria-label={`${up ? 'en hausse' : 'en baisse'} par rapport à la semaine passée`} className={`flex ${up ? 'text-text' : 'text-muted'}`}>
+      {up ? <IconFleche size={13} strokeWidth={3} /> : <IconFlecheBas size={13} strokeWidth={3} />}
+    </span>
+  )
 }
+
+function WeekFigure({ label, trend, children }: { label: string; trend: Trend; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="flex items-center gap-1.5 text-small text-muted">
+        {label}
+        <TrendArrow trend={trend} />
+      </span>
+      <span className="num text-[24px] leading-7">{children}</span>
+    </div>
+  )
+}
+
+/** Ligne d'exercice dans la grande carte. */
+function HeroRow({ first, name, increase, value }: { first: boolean; name: string; increase?: boolean; value?: string }) {
+  return (
+    <div className={`flex min-h-[38px] items-center gap-2 ${first ? '' : 'border-t border-on-inverse/15'}`}>
+      <span className="flex-1 text-body-strong font-semibold">{name}</span>
+      {increase && <BadgeIncrease> </BadgeIncrease>}
+      {value && <span className="num text-num-s">{value}</span>}
+    </div>
+  )
+}
+
+/** Choix fait avec « Autre séance », pour aujourd'hui seulement : un jour du programme, ou libre. */
+type Choice = { dayId: string } | 'libre' | null
 
 function HomePage() {
   const navigate = useNavigate()
@@ -32,173 +64,210 @@ function HomePage() {
   const sessions = useFinishedSessions()
   const sets = useAllSets()
   const exercises = useExercisesById()
+  const settings = useSettings()
+  const program = useProgram(settings?.activeProgramId)
+  const [choice, setChoice] = useState<Choice>(null)
+  const [choosing, setChoosing] = useState(false)
+  // Heure lue à l'ouverture de l'accueil : suffit pour la semaine et le jour (pas de chrono ici)
+  const [now] = useState(() => Date.now())
 
-  if (active === undefined || sessions === undefined || sets === undefined || exercises === undefined) return null
+  if (
+    active === undefined ||
+    sessions === undefined ||
+    sets === undefined ||
+    exercises === undefined ||
+    settings === undefined ||
+    program === undefined
+  )
+    return null
 
-  const last = sessions[0]
-  const lastSets = last ? sets.filter((s) => s.sessionId === last.id) : []
-  const withRecords = sessionsWithRecords(sessions, sets)
-
-  // Semaine en cours : un point plein par jour entraîné, un contour épais pour aujourd'hui
-  const monday = mondayOf(new Date())
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(monday)
-    day.setDate(monday.getDate() + i)
-    const next = new Date(day)
-    next.setDate(day.getDate() + 1)
-    return {
-      letter: ['L', 'M', 'M', 'J', 'V', 'S', 'D'][i],
-      done: sessions.some((s) => s.startedAt >= day.getTime() && s.startedAt < next.getTime()),
-      today: new Date().toDateString() === day.toDateString(),
-    }
-  })
-  const weekCount = days.filter((d) => d.done).length
-
-  // Dernières charges : les exercices travaillés le plus récemment
+  const all = active ? [...sessions, active] : sessions
+  const stats = weekStats(all, sets, now)
+  const days = weekDays(all, now)
   const history: SessionSet[] = sets.filter((s) => s.done)
+  const nameOf = (id: string) => exercises.get(id)?.name ?? 'Exercice'
+
+  // Séance proposée : celle choisie avec « Autre séance », sinon la prochaine du programme actif
+  const programDays = program?.days ?? []
+  const next = nextDay(programDays.map((d) => d.day), sessions)
+  const planned =
+    choice === 'libre' ? undefined : (programDays.find((d) => choice !== null && d.day.id === choice.dayId) ?? programDays.find((d) => d.day.id === next?.id))
+
+  // Séance libre : les dernières charges des exercices travaillés le plus récemment
   const recent = [...new Set([...history].sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0)).map((s) => s.exerciseId))]
     .slice(0, 5)
     .map((exerciseId) => {
       const latest = history.filter((s) => s.exerciseId === exerciseId).sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0))[0]
-      const perf = lastPerformance(history, exerciseId, latest.variant)
       return {
         exerciseId,
-        name: exercises.get(exerciseId)?.name ?? 'Exercice',
         value: latest.weight > 0 ? `${formatNumber(latest.weight)} kg` : `× ${latest.reps}`,
-        increase: increaseBadge(perf, latest.variant) !== null,
+        increase: latest.progression !== false && increaseBadge(lastPerformance(history, exerciseId, latest.variant), latest.variant) !== null,
       }
     })
+
+  const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`
+  let hero: { title: string; sub: string; rows: ReactNode; cta: string; onStart: () => Promise<void> }
+  if (active) {
+    hero = {
+      title: active.title ?? 'Séance en cours',
+      sub: `Commencée à ${new Date(active.startedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`,
+      rows: groupSetsByExercise(sets.filter((s) => s.sessionId === active.id)).map((b, i) => (
+        <HeroRow key={b.exerciseOrder} first={i === 0} name={nameOf(b.exerciseId)} value={`${b.doneCount}/${b.sets.length}`} />
+      )),
+      cta: 'Reprendre la séance',
+      onStart: async () => {},
+    }
+  } else if (planned && program) {
+    hero = {
+      title: planned.day.name,
+      sub: `${choice ? 'Séance choisie' : 'Prochaine séance'} · ${program.program.name} · ${plural(planned.exercises.length, 'exercice')}`,
+      rows: planned.exercises.map((pe, i) => (
+        <HeroRow key={pe.id} first={i === 0} name={nameOf(pe.exerciseId)} increase={increaseSuggested(pe, history)} />
+      )),
+      cta: 'Démarrer la séance',
+      onStart: async () => void (await startProgramSession(planned.day.id)),
+    }
+  } else {
+    hero = {
+      title: 'Séance libre',
+      sub: recent.length > 0 ? 'Tes dernières charges, reprises automatiquement' : 'Pas besoin de programme pour commencer',
+      rows: recent.map((r, i) => <HeroRow key={r.exerciseId} first={i === 0} name={nameOf(r.exerciseId)} increase={r.increase} value={r.value} />),
+      cta: 'Démarrer la séance',
+      onStart: async () => void (await startSession()),
+    }
+  }
 
   return (
     <main className="flex min-h-0 flex-1 flex-col gap-3 px-4 pt-2 pb-4">
       <h1 className="sr-only">Sportix</h1>
 
-      {/* Ligne fine : dernière séance, ou rappel d'installation au premier lancement */}
-      {last ? (
+      {/* Premier lancement dans Safari : rappel d'installation */}
+      {sessions.length === 0 && !active && !isStandalone(window) && (
         <button
           type="button"
-          onClick={() => navigate('/historique')}
+          onClick={() => navigate('/reglages')}
           className="flex min-h-13 shrink-0 items-center gap-3 rounded-lg border border-border bg-surface pr-3 pl-4 text-left text-text"
         >
           <span className="flex text-muted">
-            <IconHistorique size={20} />
+            <IconPartager size={20} />
           </span>
           <span className="flex-1 text-body">
-            <strong>{new Date(last.startedAt).toLocaleDateString('fr-FR', { weekday: 'long' })}</strong>{' '}
-            <span className="text-muted">
-              · {formatDuration(sessionSummary(last, lastSets).durationMs)} ·{' '}
-              {formatWeight(sessionSummary(last, lastSets).volume)}
-            </span>
+            <strong>Installer Sportix</strong> <span className="text-muted">· Partager → Sur l’écran d’accueil</span>
           </span>
-          {withRecords.has(last.id) && <BadgePR />}
           <span className="flex text-muted">
             <IconChevronDroite size={18} />
           </span>
         </button>
-      ) : (
-        !isStandalone(window) && (
-          <button
-            type="button"
-            onClick={() => navigate('/reglages')}
-            className="flex min-h-13 shrink-0 items-center gap-3 rounded-lg border border-border bg-surface pr-3 pl-4 text-left text-text"
-          >
-            <span className="flex text-muted">
-              <IconPartager size={20} />
-            </span>
-            <span className="flex-1 text-body">
-              <strong>Installer Sportix</strong> <span className="text-muted">· Partager → Sur l’écran d’accueil</span>
-            </span>
-            <span className="flex text-muted">
-              <IconChevronDroite size={18} />
-            </span>
-          </button>
-        )
       )}
 
-      {/* Cette semaine */}
-      <Card className="flex shrink-0 flex-col gap-2.5 px-4 pt-3 pb-3.5">
-        <div className="flex items-center justify-between">
-          <span className="text-body font-bold">Cette semaine</span>
-          <span className="text-small text-muted">
-            {weekCount === 0 ? 'aucune séance' : `${weekCount} séance${weekCount > 1 ? 's' : ''}`}
-          </span>
+      {/* Cette semaine : chiffres, évolution, pastilles des jours */}
+      <section aria-label="Cette semaine" className="flex shrink-0 flex-col gap-1.5">
+        <div className="-mr-3 flex min-h-12 items-center justify-between">
+          <h2 className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">Cette semaine</h2>
+          {!active && programDays.length > 0 && (
+            <button type="button" onClick={() => setChoosing(true)} className="min-h-12 px-3 text-body font-semibold text-muted underline underline-offset-[3px]">
+              Autre séance
+            </button>
+          )}
         </div>
-        <div className="flex justify-between">
+        <div className="grid grid-cols-3 gap-3">
+          <WeekFigure label="Séances" trend={stats.sessions.trend}>
+            {stats.sessions.value}
+          </WeekFigure>
+          <WeekFigure label="Durée" trend={stats.durationMs.trend}>
+            {formatHoursMinutes(stats.durationMs.value)}
+          </WeekFigure>
+          <WeekFigure label="Volume" trend={stats.volume.trend}>
+            {new Intl.NumberFormat('fr-FR').format(Math.round(stats.volume.value))}{' '}
+            <span className="text-body font-semibold text-muted">kg</span>
+          </WeekFigure>
+        </div>
+        <div className="mt-1.5 flex justify-center gap-[25px]">
           {days.map((d, i) => (
             <div
               key={i}
-              className={`flex flex-col items-center gap-1 text-caption ${d.today ? 'font-extrabold text-text' : d.done ? 'font-semibold text-text' : 'font-semibold text-muted'}`}
+              className={`flex flex-col items-center gap-[3px] text-[11px] ${d.today ? 'font-extrabold text-text' : d.done ? 'font-semibold text-text' : 'font-semibold text-muted'}`}
             >
               <span
-                className={`size-[30px] rounded-full ${
-                  d.done
-                    ? 'border-2 border-inverse bg-inverse'
-                    : d.today
-                      ? 'border-[3px] border-text'
-                      : 'border-[1.5px] border-border-strong'
+                className={`size-6 rounded-full ${
+                  d.done ? 'border-2 border-inverse bg-inverse' : d.today ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'
                 }`}
               />
               {d.letter}
             </div>
           ))}
         </div>
-      </Card>
+      </section>
 
-      {/* Grande carte : séance en cours, ou nouvelle séance */}
-      <Card inverse as="section" aria-label="Séance" className="flex min-h-0 flex-1 flex-col gap-2 p-4">
+      {/* Grande carte : séance en cours, séance du jour ou séance libre */}
+      <Card inverse as="section" aria-label={hero.title} className="flex min-h-0 flex-1 flex-col gap-2 p-4">
         <div>
-          <h2 className="text-title-l font-extrabold tracking-[-0.02em]">
-            {active ? 'Séance en cours' : 'Séance libre'}
-          </h2>
-          <p className="mt-1 truncate text-[14px] leading-[18px] text-on-inverse-muted">
-            {active
-              ? `Commencée à ${new Date(active.startedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
-              : recent.length > 0
-                ? 'Tes dernières charges, reprises automatiquement'
-                : 'Pas besoin de programme pour commencer'}
-          </p>
+          <h2 className="text-title-l font-extrabold tracking-[-0.02em]">{hero.title}</h2>
+          <p className="mt-1 truncate text-[14px] leading-[18px] text-on-inverse-muted">{hero.sub}</p>
         </div>
-
-        <div className="flex flex-col">
-          {active
-            ? groupSetsByExercise(sets.filter((s) => s.sessionId === active.id)).map((b, i) => (
-                <div
-                  key={b.exerciseOrder}
-                  className={`flex min-h-[38px] items-center gap-2 ${i > 0 ? 'border-t border-on-inverse/15' : ''}`}
-                >
-                  <span className="flex-1 text-body-strong font-semibold">
-                    {exercises.get(b.exerciseId)?.name ?? 'Exercice'}
-                  </span>
-                  <span className="num text-num-s">
-                    {b.doneCount}/{b.sets.length}
-                  </span>
-                </div>
-              ))
-            : recent.map((r, i) => (
-                <div
-                  key={r.exerciseId}
-                  className={`flex min-h-[38px] items-center gap-2 ${i > 0 ? 'border-t border-on-inverse/15' : ''}`}
-                >
-                  <span className="flex-1 text-body-strong font-semibold">{r.name}</span>
-                  {r.increase && <BadgeIncrease> </BadgeIncrease>}
-                  <span className="num text-num-s">{r.value}</span>
-                </div>
-              ))}
-        </div>
-
+        <div className="flex min-h-0 flex-col overflow-hidden">{hero.rows}</div>
         <div className="flex-1" />
         <button
           type="button"
           onClick={async () => {
-            if (!active) await startSession()
+            await hero.onStart()
             navigate('/seance')
           }}
           className="flex min-h-15 shrink-0 items-center justify-center rounded-md bg-hero-action text-[20px] font-extrabold text-on-hero-action"
         >
-          {active ? 'Reprendre la séance' : 'Démarrer la séance'}
+          {hero.cta}
         </button>
       </Card>
+
+      {/* Autre séance : les jours du programme, puis la séance libre */}
+      <Sheet open={choosing} onClose={() => setChoosing(false)} label="Quelle séance aujourd’hui ?">
+        <div>
+          <h2 className="text-title font-bold">Quelle séance aujourd’hui ?</h2>
+          {program && <p className="mt-1 text-body text-muted">{program.program.name}</p>}
+        </div>
+        <Card className="divide-y divide-border overflow-hidden">
+          {programDays.map(({ day }) => (
+            <DayOption
+              key={day.id}
+              name={day.name}
+              selected={choice !== 'libre' && planned?.day.id === day.id}
+              onSelect={() => {
+                setChoice(day.id === next?.id ? null : { dayId: day.id })
+                setChoosing(false)
+              }}
+            />
+          ))}
+        </Card>
+        <Card className="overflow-hidden">
+          <DayOption
+            name="Séance libre"
+            selected={choice === 'libre'}
+            onSelect={() => {
+              setChoice('libre')
+              setChoosing(false)
+            }}
+          />
+        </Card>
+        <button type="button" onClick={() => setChoosing(false)} className="min-h-12 text-body font-semibold text-text underline underline-offset-[3px]">
+          Fermer
+        </button>
+      </Sheet>
     </main>
+  )
+}
+
+/** Une ligne du choix de séance, avec son rond de sélection. */
+function DayOption({ name, selected, onSelect }: { name: string; selected: boolean; onSelect: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onSelect}
+      className="flex min-h-16 w-full items-center gap-3 px-4 text-left text-text active:bg-surface-2"
+    >
+      <span className="flex-1 text-body-strong font-semibold">{name}</span>
+      <span aria-hidden="true" className={`size-6 rounded-full ${selected ? 'border-[7px] border-inverse' : 'border-[1.5px] border-border-strong'}`} />
+    </button>
   )
 }
 
