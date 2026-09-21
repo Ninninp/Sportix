@@ -527,6 +527,175 @@ S['Seance-liste'] = { title: 'Séance · en liste (exemple inspiré de Lyfta)', 
     'flex-shrink: 0; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;') +
   btn.pri(t, 'Valider la série', '#', 'font-size: 20px; font-weight: 800;') }) };
 
+
+// ===================================================================================
+// J6 — Calendrier des blocs de spécialisation
+// Deux variantes de l'écran principal (docs/PLAN.md en demande deux) :
+//   A. « Frise » : les blocs les uns sous les autres, chacun avec sa barre de semaines.
+//   B. « Mois »  : un vrai calendrier mensuel, avec une colonne de semaines à gauche
+//      (S1, S2, D…) pour lire la périodisation sans quitter la grille.
+// Exemple commun : bloc « Force », 5 semaines du lundi 14 septembre au dimanche 18 octobre
+// 2026, deload en semaine 4, semaine en cours = S2 ; aujourd'hui = jeudi 24 septembre.
+// ===================================================================================
+const J6NAV = (t) => ({ seance: file(t, 'Accueil-J6'), cal: file(t, 'Calendrier-frise') });
+
+// Barre des semaines d'un bloc : pleine = passée, inversée = en cours, pointillés = deload.
+const weekBar = (t, { weeks, current, deload, done = [], onInverse = false }) => {
+  const line = onInverse ? t.onInverseMuted : t.strong;
+  const fill = onInverse ? t.onInverse : t.text;
+  const txt = onInverse ? t.inverse : t.bg;
+  const seg1 = (i) => {
+    const n = i + 1;
+    const isD = n === deload;
+    const box = 'box-sizing: border-box; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;';
+    if (n === current) return `<span style="${box} background: ${fill}; color: ${txt};">S${n}</span>`;
+    if (done.includes(n)) return `<span style="${box} background: ${line};"></span>`;
+    return `<span style="${box} color: ${onInverse ? t.onInverseMuted : t.muted}; border: 1.5px ${isD ? 'dashed' : 'solid'} ${line};">${isD ? 'D' : ''}</span>`;
+  };
+  return `<span aria-hidden="true" style="display: grid; grid-template-columns: repeat(${weeks}, minmax(0, 1fr)); gap: 3px;">${Array.from({ length: weeks }, (_, i) => seg1(i)).join('')}</span>`;
+};
+
+// ---------- Variante A : la frise des blocs ----------
+const blocEnCours = (t) =>
+  `<section aria-label="Bloc Force, semaine 2 sur 5" style="flex-shrink: 0; box-sizing: border-box; padding: 16px; border-radius: 16px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; flex-direction: column; gap: 12px;">` +
+  `<div style="display: flex; align-items: baseline; gap: 8px;"><h2 style="margin: 0; font-size: 24px; line-height: 28px; font-weight: 800; letter-spacing: -0.02em; flex-grow: 1;">Force</h2><span class="num" style="font-size: 15px; color: ${t.onInverseMuted};">14 sept. → 18 oct.</span></div>` +
+  weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1], onInverse: true }) +
+  `<div style="display: flex; align-items: flex-end; gap: 12px;"><div style="flex-grow: 1;"><div style="font-size: 15px; font-weight: 600;">Semaine 2 sur 5 · Force A/B</div><div style="font-size: 13px; color: ${t.onInverseMuted}; margin-top: 2px;"><span class="num">6</span> séances faites · deload en semaine 4</div></div>` +
+  `<a href="${file(t, 'Bloc-detail')}" style="box-sizing: border-box; flex-shrink: 0; min-height: 48px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 12px; background: ${t.hero}; color: ${t.onHero}; font-size: 15px; font-weight: 700; text-decoration: none;">Ouvrir</a></div></section>`;
+
+const blocRowCard = (t, { name, dates, sub, weeks, deload, past = false }) =>
+  `<a href="${file(t, 'Bloc-detail')}" style="box-sizing: border-box; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 16px; background: ${t.surface}; border: 1px solid ${t.border}; color: ${t.text}; text-decoration: none;">` +
+  `<div style="display: flex; align-items: baseline; gap: 8px;"><span style="flex-grow: 1; font-size: 17px; font-weight: 700; ${past ? `color: ${t.muted};` : ''}">${name}</span><span class="num" style="font-size: 13px; color: ${t.muted};">${dates}</span></div>` +
+  weekBar(t, { weeks, current: 0, deload, done: past ? Array.from({ length: weeks }, (_, i) => i + 1) : [] }) +
+  `<span style="font-size: 13px; color: ${t.muted};">${sub}</span></a>`;
+
+const calHeader = (t, variante) =>
+  `<header style="display: flex; align-items: center; gap: 4px; margin-right: -8px; flex-shrink: 0;"><h1 style="${H1} flex-grow: 1;">Calendrier</h1>${iconBtn(t, 'plus', 'Nouveau bloc', file(t, 'Bloc-nouveau'), `border: 1.5px solid ${t.strong}; border-radius: 999px; width: 44px; height: 44px;`)}</header>` +
+  `<div style="flex-shrink: 0;">${seg(t, ['Frise', 'Mois'], variante, 'Affichage du calendrier')}</div>`;
+
+S['Calendrier-frise'] = { title: 'Calendrier · frise des blocs (variante A)', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), gap: 10, main:
+  calHeader(t, 0) +
+  lbl(t, 'En cours') + blocEnCours(t) +
+  lbl(t, 'À venir') +
+  blocRowCard(t, { name: 'Hypertrophie', dates: '19 oct. → 29 nov.', sub: 'Objectif Hypertrophie · 6 semaines · PPL', weeks: 6, deload: 6 }) +
+  lbl(t, 'Terminés') +
+  blocRowCard(t, { name: 'Prise de masse', dates: '3 août → 13 sept.', sub: '6 semaines · 22 séances', weeks: 6, deload: 6, past: true }) +
+  `<div style="flex-grow: 1;"></div>` }) };
+
+S['Calendrier-vide'] = { title: 'Calendrier · aucun bloc', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), main:
+  `<header style="flex-shrink: 0;"><h1 style="${H1}">Calendrier</h1></header>` +
+  card(t, `<span style="font-size: 20px; font-weight: 800;">Aucun bloc pour l’instant</span><span style="font-size: 15px; line-height: 20px; color: ${t.muted};">Un bloc, c’est un objectif sur quelques semaines (« Force, 5 semaines »). Tes séances s’y rattachent toutes seules : tu pourras comparer un bloc à l’autre.</span>`,
+    'flex-shrink: 0; padding: 16px; display: flex; flex-direction: column; gap: 8px;') +
+  `<div style="flex-grow: 1;"></div>` +
+  btn.pri(t, 'Créer un bloc', file(t, 'Bloc-nouveau'), 'width: 100%;') }) };
+
+// ---------- Variante B : le mois, avec la colonne des semaines ----------
+// Septembre 2026 : le 1er est un mardi, le 21 un lundi. Bloc Force du 14 sept. au 18 oct.
+const CAL_WEEKS = [
+  { w: '', days: [[31, 'off'], [1], [2], [3], [4], [5], [6]] },
+  { w: '', days: [[7], [8], [9], [10], [11], [12], [13]] },
+  { w: 'S1', days: [[14, 'bloc'], [15, 'bloc', 'done'], [16, 'bloc'], [17, 'bloc', 'done'], [18, 'bloc'], [19, 'bloc', 'done'], [20, 'bloc']] },
+  { w: 'S2', days: [[21, 'bloc', 'done'], [22, 'bloc'], [23, 'bloc', 'done'], [24, 'bloc', '', 'today'], [25, 'bloc'], [26, 'bloc'], [27, 'bloc']] },
+  { w: 'S3', days: [[28, 'bloc'], [29, 'bloc'], [30, 'bloc'], [1, 'off'], [2, 'off'], [3, 'off'], [4, 'off']] },
+];
+const calCell = (t, [n, kind = '', done = '', today = '']) => {
+  const off = kind === 'off';
+  const bg = kind === 'bloc' ? `background: ${t.surface2};` : '';
+  const ring = today ? `box-shadow: inset 0 0 0 2px ${t.text};` : '';
+  return `<div style="box-sizing: border-box; height: 46px; border-radius: 10px; ${bg} ${ring} display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;"><span class="num" style="font-size: 15px; font-weight: ${today ? 800 : 600}; color: ${off ? t.faint : t.text};">${n}</span><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 3px; background: ${done ? t.text : 'transparent'};"></span></div>`;
+};
+const CAL_COLS = 'display: grid; grid-template-columns: 26px repeat(7, minmax(0, 1fr)); gap: 4px;';
+const calGrid = (t) =>
+  `<div role="table" aria-label="Septembre 2026" style="flex-shrink: 0; display: flex; flex-direction: column; gap: 4px;">` +
+  `<div role="row" style="${CAL_COLS}"><span role="columnheader"></span>${['L', 'M', 'M', 'J', 'V', 'S', 'D']
+    .map((d) => `<span role="columnheader" style="text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: ${t.muted};">${d}</span>`).join('')}</div>` +
+  CAL_WEEKS.map(({ w, days }) =>
+    `<div role="row" style="${CAL_COLS}">` +
+    `<span role="rowheader" style="display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: ${w ? t.muted : 'transparent'};">${w || '·'}</span>` +
+    days.map((d) => calCell(t, d)).join('') + `</div>`).join('') + `</div>`;
+
+const legende = (t) =>
+  `<div style="flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; color: ${t.muted};">` +
+  `<span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 14px; height: 14px; border-radius: 4px; background: ${t.surface2};"></span>bloc Force</span>` +
+  `<span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 3px; background: ${t.text};"></span>séance faite</span>` +
+  `<span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="box-sizing: border-box; width: 14px; height: 14px; border-radius: 4px; border: 1.5px dashed ${t.strong};"></span>deload (semaine 4)</span></div>`;
+
+const monthNav = (t) =>
+  `<div style="flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; margin: 0 -8px;">${iconBtn(t, 'chevL', 'Mois précédent', '#')}<span style="font-size: 17px; font-weight: 700;">Septembre 2026</span>${iconBtn(t, 'chevR', 'Mois suivant', '#')}</div>`;
+
+S['Calendrier-mois'] = { title: 'Calendrier · vue mensuelle (variante B)', page: 'j6', render: (t) => frame(t, { navActive: 'cal', navLinks: J6NAV(t), gap: 10, main:
+  calHeader(t, 1) + monthNav(t) + calGrid(t) + legende(t) +
+  `<div style="flex-grow: 1;"></div>` + blocEnCours(t) }) };
+
+// ---------- Fiche d'un bloc ----------
+const weekRow = (t, { n, dates, sessions, state }) => {
+  const now = state === 'now';
+  const deload = state === 'deload';
+  return `<div style="box-sizing: border-box; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 12px; border-radius: 10px; ${now ? `background: ${t.inverse}; color: ${t.onInverse};` : deload ? `border: 1.5px dashed ${t.strong};` : ''}">` +
+    `<span class="num" style="width: 28px; font-size: 15px; font-weight: 800; color: ${now ? t.onInverse : t.muted};">${deload ? 'D' : `S${n}`}</span>` +
+    `<span class="num" style="flex-grow: 1; font-size: 15px; ${now ? '' : `color: ${t.muted};`}">${dates}</span>` +
+    `<span class="num" style="font-size: 15px; font-weight: 700;">${sessions}</span></div>`;
+};
+
+const blocDetailMain = (t) =>
+  header(t, 'Force', file(t, 'Calendrier-frise'), 'Retour au calendrier', btn.link(t, 'Modifier', file(t, 'Bloc-nouveau'), t.text)) +
+  `<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 15px; color: ${t.muted};">Objectif <strong style="color: ${t.text};">Force</strong> · programme <strong style="color: ${t.text};">Force A/B</strong></span><span class="num" style="font-size: 15px; color: ${t.muted};">Du 14 septembre au 18 octobre 2026</span></div>` +
+  `<div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">${tile(t, 'Semaine', '2/5')}${tile(t, 'Séances', '6')}${tile(t, 'Volume', '38 t')}</div>` +
+  lbl(t, 'Semaines') +
+  card(t, [
+    weekRow(t, { n: 1, dates: '14 → 20 sept.', sessions: '3 séances', state: 'done' }),
+    weekRow(t, { n: 2, dates: '21 → 27 sept.', sessions: '2 séances', state: 'now' }),
+    weekRow(t, { n: 3, dates: '28 sept. → 4 oct.', sessions: '—', state: '' }),
+    weekRow(t, { n: 4, dates: '5 → 11 oct.', sessions: '—', state: 'deload' }),
+    weekRow(t, { n: 5, dates: '12 → 18 oct.', sessions: '—', state: '' }),
+  ].join(''), 'flex-shrink: 0; padding: 6px; display: flex; flex-direction: column; gap: 4px;') +
+  `<div style="flex-grow: 1;"></div>` +
+  btn.sec(t, '+ Semaine de deload', file(t, 'Bloc-chevauchement'), 'width: 100%;') +
+  btn.link(t, 'Supprimer le bloc', '#', t.danger);
+
+S['Bloc-detail'] = { title: 'Détail d’un bloc', page: 'j6', h: 940, render: (t) =>
+  frame(t, { h: 940, navActive: 'cal', navLinks: J6NAV(t), gap: 10, main: blocDetailMain(t) }) };
+
+// Ajouter une semaine de deload allonge le bloc : s'il mord sur le suivant, on prévient.
+S['Bloc-chevauchement'] = { title: 'Deux blocs qui se chevauchent', page: 'j6', h: 940, render: (t) =>
+  frame(t, { h: 940, navActive: 'cal', navLinks: J6NAV(t), gap: 10, main: blocDetailMain(t),
+    overlay: sheet(t, 'Chevauchement',
+      `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Le bloc irait jusqu’au 25 octobre</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">« Hypertrophie » commence le 19 octobre : les deux blocs se chevaucheraient d’une semaine.</p></div>` +
+      `<div style="display: flex; flex-direction: column; gap: 8px;">${btn.pri(t, 'Décaler « Hypertrophie »', file(t, 'Bloc-detail'), 'width: 100%;')}${btn.sec(t, 'Laisser le chevauchement', file(t, 'Bloc-detail'), 'width: 100%;')}${btn.link(t, 'Annuler', file(t, 'Bloc-detail'), t.text)}</div>`) }) };
+
+// ---------- Formulaire d'un bloc ----------
+const numRow = (t, label, value, unit) =>
+  `<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px;"><span style="font-size: 17px; font-weight: 600;">${label}</span>` +
+  `<span role="group" aria-label="${label}" style="display: flex; align-items: center; gap: 8px;">` +
+  `<button aria-label="${label} : moins" style="width: 48px; height: 48px; flex-shrink: 0; border: 0; border-radius: 12px; background: ${t.surface2}; color: ${t.text}; font: inherit; font-size: 22px; font-weight: 700; cursor: pointer;">−</button>` +
+  `<span style="min-width: 96px; text-align: center;"><span class="num" style="font-size: 22px;">${value}</span>${unit ? ` <span style="font-size: 13px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}</span>` +
+  `<button aria-label="${label} : plus" style="width: 48px; height: 48px; flex-shrink: 0; border: 0; border-radius: 12px; background: ${t.surface2}; color: ${t.text}; font: inherit; font-size: 22px; font-weight: 700; cursor: pointer;">+</button></span></div>`;
+
+const blocForm = (t) =>
+  field(t, 'Nom du bloc', 'Force') +
+  fieldset(t, 'Objectif', chips(t, ['Force', 'Hypertrophie', 'Sèche', '+ Nouvel objectif'], [0])) +
+  `<label style="display: flex; flex-direction: column; gap: 6px;">${lbl(t, 'Premier jour (un lundi)')}<input type="date" value="2026-09-14" style="box-sizing: border-box; width: 100%; height: 52px; padding: 0 14px; border-radius: 12px; border: 1.5px solid ${t.strong}; background: ${t.surface}; color: ${t.text}; font: inherit; font-size: 17px; font-weight: 600;"></label>` +
+  card(t, numRow(t, 'Durée', '5', 'semaines') + `<div style="height: 1px; background: ${t.border};"></div>` + numRow(t, 'Deload en semaine', '4', ''),
+    'flex-shrink: 0; padding: 2px 14px; display: flex; flex-direction: column;') +
+  fieldset(t, 'Programme suivi', chips(t, ['Force A/B', 'PPL', 'Aucun'], [0]));
+
+S['Bloc-nouveau'] = { title: 'Nouveau bloc', page: 'j6', h: 940, render: (t) => frame(t, { h: 940, gap: 18, main:
+  header(t, 'Nouveau bloc', file(t, 'Calendrier-frise'), 'Annuler', '', 24) + blocForm(t) +
+  `<div style="flex-grow: 1;"></div>` +
+  `<div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 6px;">${btn.pri(t, 'Créer le bloc', file(t, 'Calendrier-frise'), 'width: 100%;')}<span class="num" style="text-align: center; font-size: 13px; font-weight: 500; color: ${t.muted};">Du 14 septembre au 18 octobre 2026</span></div>` }) };
+
+S['Objectif-nouveau'] = { title: 'Nouvel objectif (panneau)', page: 'j6', h: 940, render: (t) => frame(t, { h: 940, gap: 18,
+  main: header(t, 'Nouveau bloc', file(t, 'Calendrier-frise'), 'Annuler', '', 24) + blocForm(t) + `<div style="flex-grow: 1;"></div>`,
+  overlay: sheet(t, 'Nouvel objectif',
+    `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Nouvel objectif</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Il reste dans la liste : deux blocs du même objectif se comparent dans les Stats.</p></div>` +
+    field(t, 'Nom', '', 'Ex. Puissance') +
+    `<div style="display: flex; flex-direction: column; gap: 8px;">${btn.pri(t, 'Créer l’objectif', file(t, 'Bloc-nouveau'), 'width: 100%;')}${btn.sec(t, 'Annuler', file(t, 'Bloc-nouveau'), 'width: 100%;')}</div>`) }) };
+
+// Accueil complet du J6 : la ligne du bloc se pose au-dessus de l'accueil du J5.
+S['Accueil-J6'] = { title: 'Accueil · avec le bloc en cours', page: 'j6', render: (t) => frame(t, { navActive: 'seance', navLinks: J6NAV(t),
+  main: thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span>` +
+    `<span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, file(t, 'Calendrier-frise'), 'Bloc Force, semaine 2 sur 5, deload en semaine 4') + homeJ5(t) }) };
+
 // ---------- Écriture des fichiers ----------
 const page = (t, title, h, body) => `<!doctype html>
 <html lang="fr">
@@ -612,4 +781,17 @@ writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-0
     'j5-leger': noteJ5(2112, 'Écrans jugés trop chargés (21/09/2026) : phrases d’explication et lignes secondaires retirées dans le canvas (reporté aux deux thèmes). Séance : la version en liste est retenue (21/09/2026), pavé − / + réduit. Accueil (inspiré de Lyfta) : chiffres de la semaine (séances, durée, volume) avec flèche d’évolution par rapport à la semaine passée, et lien discret « Autre séance » sur la même ligne ; il ouvre le choix du jour (jours du programme + séance libre). Décidé le 21/09/2026 : comparaison à date égale (du lundi à aujourd’hui, contre la même période la semaine passée) ; flèche vers le bas en gris ; pas de badge PR sur l’accueil ; flèches seules (sans chiffre), à côté des libellés ; pastilles des jours centrées, 25 px entre chacune.', 'red'),
     'j5-liste': noteJ5(2536, 'Séance « en liste » (dernière planche, exemple inspiré de Lyfta) : toute la séance dans une liste, l’exercice en cours déplié en tableau N° · Dernière fois · Kg · Reps · ✓, les suivants repliés. Le pavé − / + et « Valider » restent en bas pour la saisie à une main. À comparer avec la séance actuelle et la séance allégée.', 'purple'),
     'j5-ajout': noteJ5(1688, '« Ajouter un exercice » ouvre le même choix d’exercice que pendant la séance (recherche, groupes, création rapide), puis le panneau de l’exercice.'),
+  } });
+
+// ===== Canvas J6 (calendrier des blocs) : son propre dossier, son propre lien =====
+MAIN = 'Calendrier-frise';
+const J6_ORDER = ['Calendrier-vide', 'Calendrier-frise', 'Calendrier-mois', 'Bloc-nouveau', 'Objectif-nouveau', 'Bloc-detail', 'Bloc-chevauchement', 'Accueil-J6'];
+const noteJ6 = (y, text, color) => ({ x: J6_ORDER.length * 470, y, w: 400, page: 'j6', size: 's', ...(color ? { color } : {}), text });
+writeCanvas('../maquettes-j6/', { title: 'Sportix — Maquettes J6', at: '2026-09-21T18:00:00Z',
+  pages: [{ id: 'j6', name: 'J6 · Calendrier des blocs' }].map((p) => ({ ...p, order: J6_ORDER })), launch: { view: 'canvas', page: 'j6' }, extraNotes: {
+    'j6-choix': noteJ6(0, 'À CHOISIR : deux variantes de l’écran principal (planches 2 et 3). A « Frise » : les blocs les uns sous les autres, le bloc en cours en grand, chacun avec sa barre de semaines — on lit la périodisation, pas les dates. B « Mois » : un vrai calendrier, une colonne S1/S2/… à gauche pour les semaines du bloc, un point par séance faite, la case du jour cerclée — on lit les dates et l’assiduité. Le sélecteur Frise / Mois en haut des deux planches suppose qu’on garde les deux ; si une seule suffit, on retire le sélecteur.', 'orange'),
+    'j6-semaine': noteJ6(520, 'Un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7.', 'teal'),
+    'j6-deload': noteJ6(1040, 'Deload : une semaine du bloc marquée « D » (pointillés). « + Semaine de deload » l’insère et allonge le bloc d’une semaine ; si le bloc suivant est touché, on propose de le décaler (planche 7). Le deload reste visible dans les Stats du J7, grisé.'),
+    'j6-rattachement': noteJ6(1560, 'Chaque séance enregistrée pendant un bloc en garde l’identifiant (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Les séances déjà faites avant la création du bloc ne sont pas rattachées.'),
+    'j6-accueil': noteJ6(2080, 'Accueil (dernière planche) : la ligne fine du bloc passe au-dessus des chiffres de la semaine. Elle mène au détail du bloc. Sans bloc en cours, la ligne disparaît et l’accueil est celui du J5.'),
   } });

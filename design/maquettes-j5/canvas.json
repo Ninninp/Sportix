@@ -7,7 +7,8 @@
   },
   "title": "Sportix — Maquettes J5",
   "launch": {
-    "view": "canvas"
+    "view": "canvas",
+    "page": "j5"
   },
   "pages": [
     {
