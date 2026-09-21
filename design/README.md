@@ -38,6 +38,7 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
 - **D5 — page J4 (repos)**, validée le 19/09/2026 sans retouche : repos actif (chrono 88 px, carte « Ensuite », +15 s / Passer), repos terminé plein écran (accent), repos prolongé, barre compacte « séance en cours » au-dessus des onglets quand la séance est réduite.
 
 - **Retours du premier test sur iPhone (19/09/2026, J1)**, reportés dans le canvas D5 et `tokens.md` : barre d'onglets de 56 px posée 8 px plus bas que la zone de sécurité ; plus de titre ni de date en haut des accueils (seul l'accueil complet garde le poids, à droite).
+- **Retours après le test à la salle (21/09/2026, J3)**, codés mais pas encore reportés dans le canvas D5 : à la barre libre la charge ne descend pas sous 20 kg ; toucher le nombre du pavé − / + ouvre le clavier numérique ; exercice fini → « + Série » et « + Exercice » (contour) au-dessus de « Terminer la séance », et terminer passe toujours par un panneau de confirmation (« Abandonner la séance » si aucune série n'est validée) ; « 3 séries » au lieu de « 3 × — reps » sans objectif ; la première fois sur un exercice n'est plus un record.
 
 ## Notes pour plus tard
 

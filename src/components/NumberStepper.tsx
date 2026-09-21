@@ -1,6 +1,8 @@
 // Pavé de saisie − / + du design system (D4) : boutons de 56 px de large, grande valeur au centre.
 // Utilisé en salle, à une main : maintenir un bouton enfoncé répète l'action.
-import { useEffect, useRef, type ReactNode } from 'react'
+// Avec `onType`, toucher la valeur ouvre le clavier numérique pour la taper directement
+// (utile pour un grand écart, ex. 20 → 60 kg, sinon 16 appuis sur +).
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 type Props = {
   label: ReactNode
@@ -13,6 +15,10 @@ type Props = {
   minusLabel: string
   plusLabel: string
   canDecrement?: boolean
+  /** Valeur tapée au clavier (texte brut : c'est l'appelant qui la lit et la valide). */
+  onType?: (text: string) => void
+  /** Clavier proposé : avec virgule (charge) ou chiffres seuls (reps). */
+  inputMode?: 'decimal' | 'numeric'
 }
 
 function NumberStepper({
@@ -25,7 +31,13 @@ function NumberStepper({
   minusLabel,
   plusLabel,
   canDecrement = true,
+  onType,
+  inputMode = 'numeric',
 }: Props) {
+  // Texte en cours de frappe (null : on affiche la valeur enregistrée)
+  const [draft, setDraft] = useState<string | null>(null)
+  const cancelled = useRef(false)
+
   // Les actions sont relues à chaque répétition : si on gardait celles du premier appui,
   // elles repartiraient toujours de la même valeur et la charge n'avancerait que d'un pas.
   const actions = useRef({ onIncrement, onDecrement })
@@ -76,7 +88,37 @@ function NumberStepper({
       <div className="flex flex-1 flex-col items-center justify-center">
         <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
         <span>
-          <span className="num text-num-l tracking-[-0.02em]">{value}</span>{' '}
+          {onType ? (
+            <input
+              type="text"
+              inputMode={inputMode}
+              enterKeyHint="done"
+              aria-label={`${ariaLabel} : saisir au clavier`}
+              value={draft ?? value}
+              // Largeur calée sur le texte, pour que l'unité reste collée au nombre
+              style={{ width: `${Math.max(1, (draft ?? value).length) + 0.4}ch` }}
+              onFocus={(e) => {
+                cancelled.current = false
+                setDraft(value)
+                e.currentTarget.select()
+              }}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.currentTarget.blur()
+                if (e.key === 'Escape') {
+                  cancelled.current = true
+                  e.currentTarget.blur()
+                }
+              }}
+              onBlur={() => {
+                if (draft !== null && !cancelled.current && draft !== value) onType(draft)
+                setDraft(null)
+              }}
+              className="num min-w-0 rounded-sm bg-transparent text-center text-num-l tracking-[-0.02em] text-text outline-none focus:bg-surface-2"
+            />
+          ) : (
+            <span className="num text-num-l tracking-[-0.02em]">{value}</span>
+          )}{' '}
           <span className="text-body font-semibold text-muted">{unit}</span>
         </span>
       </div>

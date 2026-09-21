@@ -1,6 +1,7 @@
 // Séance en cours (maquette D5 « Séance en cours ») : pastilles d'exercices, séries,
 // progression, pavé de saisie Charge / Reps et bouton « Valider la série ».
 // Les onglets du bas sont masqués sur cet écran (décision de D2).
+// Terminer demande toujours une confirmation : un appui de trop en salle ne doit pas clore la séance.
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { BadgeIncrease } from '../../components/Badge.tsx'
@@ -9,10 +10,19 @@ import Card from '../../components/Card.tsx'
 import NumberStepper from '../../components/NumberStepper.tsx'
 import SessionProgress from '../../components/SessionProgress.tsx'
 import SetRow from '../../components/SetRow.tsx'
+import Sheet from '../../components/Sheet.tsx'
 import { IconChevronBas, IconChevronDroite, IconOptions, IconPlus } from '../../components/icons.tsx'
-import { addSet, endSession, startSession, updateSet, validateSet } from '../../db/sessions.ts'
+import { addSet, discardSession, endSession, startSession, updateSet, validateSet } from '../../db/sessions.ts'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
-import { increaseBadge, lastPerformance, minWeight, stepWeight, weightStep } from '../../lib/progression.ts'
+import {
+  increaseBadge,
+  lastPerformance,
+  minWeight,
+  parseReps,
+  parseWeight,
+  stepWeight,
+  weightStep,
+} from '../../lib/progression.ts'
 import {
   currentSet,
   formatDuration,
@@ -43,6 +53,7 @@ function SessionPage() {
   const exercises = useExercisesById()
   const [selected, setSelected] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [confirmEnd, setConfirmEnd] = useState(false)
   useTicker(session !== null && session !== undefined)
 
   if (session === undefined || sets === undefined || exercises === undefined || history === undefined) return null
@@ -90,16 +101,47 @@ function SessionPage() {
         <div className="text-body font-bold">Séance libre</div>
         <div className="num text-body text-muted">{formatDuration(sessionDuration(session))}</div>
       </div>
-      <Button
-        variant="link"
-        onClick={async () => {
-          await endSession(session.id)
-          navigate(`/seance/recap/${session.id}`, { replace: true })
-        }}
-      >
+      <Button variant="link" onClick={() => setConfirmEnd(true)}>
         Terminer
       </Button>
     </header>
+  )
+
+  // Confirmation de fin de séance. Sans aucune série validée, il n'y a rien à garder :
+  // la séance est abandonnée au lieu de laisser une séance vide dans l'historique.
+  const remaining = progress.total - progress.done
+  const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`
+  const endSheet = (
+    <Sheet open={confirmEnd} onClose={() => setConfirmEnd(false)} label="Terminer la séance ?">
+      <div>
+        <div className="text-title font-bold">Terminer la séance ?</div>
+        <p className="text-body text-muted">
+          {progress.done === 0
+            ? 'Aucune série validée : la séance sera abandonnée, rien ne sera enregistré.'
+            : `${plural(progress.done, 'série')} ${progress.done > 1 ? 'validées' : 'validée'}.` +
+              (remaining > 0
+                ? ` ${remaining > 1 ? `Les ${remaining} séries non faites seront retirées.` : 'La série non faite sera retirée.'}`
+                : '')}
+        </p>
+      </div>
+      <Button
+        variant={progress.done === 0 ? 'danger' : 'primary'}
+        onClick={async () => {
+          if (progress.done === 0) {
+            await discardSession(session.id)
+            navigate('/', { replace: true })
+          } else {
+            await endSession(session.id)
+            navigate(`/seance/recap/${session.id}`, { replace: true })
+          }
+        }}
+      >
+        {progress.done === 0 ? 'Abandonner la séance' : 'Terminer'}
+      </Button>
+      <Button variant="secondary" onClick={() => setConfirmEnd(false)}>
+        Continuer la séance
+      </Button>
+    </Sheet>
   )
 
   // Séance vide : on invite à ajouter le premier exercice
@@ -117,6 +159,7 @@ function SessionPage() {
           <IconPlus size={22} />
           Ajouter un exercice
         </Button>
+        {endSheet}
       </main>
     )
   }
@@ -165,8 +208,17 @@ function SessionPage() {
           <h1 className="text-title-l font-extrabold tracking-[-0.02em]">{exercise?.name ?? 'Exercice'}</h1>
           <div className="text-body text-muted">
             <span className="num text-num-s text-text">
-              {block!.sets.length} × {editing?.targetRepsMin ?? '—'}
-              {editing?.targetRepsMax && editing.targetRepsMax !== editing.targetRepsMin ? `–${editing.targetRepsMax}` : ''} reps
+              {editing?.targetRepsMin ? (
+                <>
+                  {block!.sets.length} × {editing.targetRepsMin}
+                  {editing.targetRepsMax && editing.targetRepsMax !== editing.targetRepsMin
+                    ? `–${editing.targetRepsMax}`
+                    : ''}{' '}
+                  reps
+                </>
+              ) : (
+                plural(block!.sets.length, 'série')
+              )}
             </span>
             {block!.variant ? ` · ${VARIANT_LABELS[block!.variant]}` : ''}
           </div>
@@ -242,6 +294,11 @@ function SessionPage() {
                 canDecrement={editing.weight > minWeight(editing.variant)}
                 onDecrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, -1) })}
                 onIncrement={() => updateSet(editing.id, { weight: stepWeight(editing.weight, editing.variant, 1) })}
+                inputMode="decimal"
+                onType={(text) => {
+                  const weight = parseWeight(text, editing.variant)
+                  if (weight !== null) updateSet(editing.id, { weight })
+                }}
               />
             )}
             <NumberStepper
@@ -273,6 +330,10 @@ function SessionPage() {
               canDecrement={editing.reps > 0}
               onDecrement={() => updateSet(editing.id, { reps: Math.max(0, editing.reps - 1) })}
               onIncrement={() => updateSet(editing.id, { reps: editing.reps + 1 })}
+              onType={(text) => {
+                const reps = parseReps(text)
+                if (reps !== null) updateSet(editing.id, { reps })
+              }}
             />
           </Card>
           <Button
@@ -284,16 +345,26 @@ function SessionPage() {
           </Button>
         </>
       ) : (
-        <Button
-          className="text-[20px] font-extrabold"
-          onClick={async () => {
-            await endSession(session.id)
-            navigate(`/seance/recap/${session.id}`, { replace: true })
-          }}
-        >
-          Terminer la séance
-        </Button>
+        // Exercice fini : la suite la plus fréquente (une série de plus, un autre exercice) est
+        // à portée de pouce ; « Terminer la séance » passe par la confirmation.
+        <div className="flex shrink-0 flex-col gap-2.5">
+          <div className="flex gap-2.5">
+            <Button variant="secondary" onClick={() => addSet(session.id, block!.exerciseOrder)}>
+              <IconPlus size={20} />
+              Série
+            </Button>
+            <Button variant="secondary" to="/seance/exercices">
+              <IconPlus size={20} />
+              Exercice
+            </Button>
+          </div>
+          <Button className="text-[20px] font-extrabold" onClick={() => setConfirmEnd(true)}>
+            Terminer la séance
+          </Button>
+        </div>
       )}
+
+      {endSheet}
 
       {block && (
         <ExerciseMenu

@@ -1,12 +1,14 @@
 // Records (PR). Règle retenue au J3 : un record, c'est une CHARGE jamais soulevée sur cet
 // exercice et cette variante (au moins 1 rep). Pour les exercices sans charge (poids du corps,
 // temps), c'est le plus grand nombre de reps.
+// La première fois sur un exercice (et une variante) n'est PAS un record : il n'y a rien à battre,
+// et sinon toute première séance serait couverte de records (retour du 21/09/2026).
 import type { SessionSet } from './sessions.ts'
 
 export type Record_ = {
   set: SessionSet
-  /** Ce qui a été battu : l'ancien meilleur (absent si c'est la première fois). */
-  previous?: number
+  /** Ce qui a été battu : l'ancien meilleur. */
+  previous: number
 }
 
 const key = (s: SessionSet) => `${s.exerciseId}|${s.variant ?? ''}`
@@ -34,7 +36,7 @@ export function findRecords(sets: SessionSet[], history: SessionSet[]): Record_[
   const records: Record_[] = []
   for (const [k, set] of bySession) {
     const previous = best.get(k)
-    if (previous === undefined || value(set) > previous) records.push({ set, previous })
+    if (previous !== undefined && value(set) > previous) records.push({ set, previous })
   }
   return records
 }
@@ -54,7 +56,7 @@ export function sessionsWithRecords(
     const sets = allSets.filter((s) => s.sessionId === session.id && s.done && s.reps >= 1)
     for (const s of sets) {
       const previous = best.get(key(s))
-      if (previous === undefined || value(s) > previous) withRecords.add(session.id)
+      if (previous !== undefined && value(s) > previous) withRecords.add(session.id)
     }
     // Les meilleurs de cette séance comptent pour les suivantes
     for (const s of sets) best.set(key(s), Math.max(best.get(key(s)) ?? 0, value(s)))

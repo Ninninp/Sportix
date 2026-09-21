@@ -3,6 +3,8 @@ import {
   increaseBadge,
   lastPerformance,
   minWeight,
+  parseReps,
+  parseWeight,
   prefillSets,
   stepWeight,
   suggestsWeightIncrease,
@@ -111,5 +113,29 @@ describe('charge minimale (barre à vide)', () => {
   it('les autres variantes descendent jusqu’à 0', () => {
     expect(stepWeight(5, 'machine', -1)).toBe(0)
     expect(stepWeight(2, 'halteres', -1)).toBe(0)
+  })
+})
+
+describe('saisie au clavier', () => {
+  it('lit une charge avec virgule ou point, arrondie au quart de kg', () => {
+    expect(parseWeight('62,5', 'barre')).toBe(62.5)
+    expect(parseWeight('62.5', 'machine')).toBe(62.5)
+    expect(parseWeight('60 kg', 'barre')).toBe(60)
+    expect(parseWeight('33,3', 'halteres')).toBe(33.25)
+  })
+
+  it('remonte à 20 kg à la barre, refuse ce qui n’est pas un nombre', () => {
+    expect(parseWeight('10', 'barre')).toBe(20)
+    expect(parseWeight('10', 'poulie')).toBe(10)
+    expect(parseWeight('', 'barre')).toBeNull()
+    expect(parseWeight('abc', 'barre')).toBeNull()
+    expect(parseWeight('5000', 'barre')).toBeNull()
+  })
+
+  it('lit des reps entières', () => {
+    expect(parseReps('12')).toBe(12)
+    expect(parseReps('0')).toBe(0)
+    expect(parseReps('')).toBeNull()
+    expect(parseReps('1000')).toBeNull()
   })
 })

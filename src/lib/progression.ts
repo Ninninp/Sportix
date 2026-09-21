@@ -98,3 +98,20 @@ export function increaseBadge(last: LastPerformance | null, variant: Variant | n
   const step = weightStep(variant)
   return `charge +${new Intl.NumberFormat('fr-FR').format(step)} kg`
 }
+
+/**
+ * Charge tapée au clavier (« 62,5 », « 62.5 », « 60 kg »). Arrondie au quart de kg (plus petit
+ * disque courant : 0,25 kg), jamais sous le minimum de la variante. null si ce n'est pas un nombre :
+ * on garde alors l'ancienne valeur.
+ */
+export function parseWeight(text: string, variant: Variant | null): number | null {
+  const n = Number.parseFloat(text.replace(',', '.').replace(/[^\d.]/g, ''))
+  if (!Number.isFinite(n) || n > 999) return null
+  return Math.max(minWeight(variant), Math.round(n * 4) / 4)
+}
+
+/** Reps tapées au clavier : un entier de 0 à 999, sinon null (on garde l'ancienne valeur). */
+export function parseReps(text: string): number | null {
+  const n = Number.parseInt(text.replace(/\D/g, ''), 10)
+  return Number.isFinite(n) && n <= 999 ? n : null
+}

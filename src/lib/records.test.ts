@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findRecords } from './records.ts'
+import { findRecords, sessionsWithRecords } from './records.ts'
 import type { SessionSet } from './sessions.ts'
 
 const set = (over: Partial<SessionSet> = {}): SessionSet => ({
@@ -35,12 +35,16 @@ describe('findRecords', () => {
     expect(records[0].set.weight).toBe(105)
   })
 
-  it('sépare les variantes : la même charge à la machine est un record à part', () => {
-    expect(findRecords([set({ variant: 'machine', weight: 100 })], history)).toHaveLength(1)
+  it('sépare les variantes : la barre ne compte pas pour la machine', () => {
+    const machine = [set({ sessionId: 's1', variant: 'machine', weight: 60, doneAt: 3 })]
+    expect(findRecords([set({ variant: 'machine', weight: 65 })], [...history, ...machine])).toHaveLength(1)
+    // 65 kg à la machine ne bat pas les 100 kg à la barre, mais c'est bien un record machine
+    expect(findRecords([set({ variant: 'machine', weight: 65 })], [...history, ...machine])[0].previous).toBe(60)
   })
 
-  it('premier passage sur un exercice : c’est un record, sans ancien à battre', () => {
-    expect(findRecords([set({ exerciseId: 'nouveau' })], history)[0].previous).toBeUndefined()
+  it('premier passage sur un exercice ou une variante : pas de record (rien à battre)', () => {
+    expect(findRecords([set({ exerciseId: 'nouveau' })], history)).toEqual([])
+    expect(findRecords([set({ variant: 'machine', weight: 100 })], history)).toEqual([])
   })
 
   it('exercice au poids du corps : ce sont les reps qui comptent', () => {
@@ -52,5 +56,21 @@ describe('findRecords', () => {
   it('ignore les séries non validées ou à zéro rep', () => {
     expect(findRecords([set({ weight: 200, done: false })], history)).toEqual([])
     expect(findRecords([set({ weight: 200, reps: 0 })], history)).toEqual([])
+  })
+})
+
+describe('sessionsWithRecords', () => {
+  it('la toute première séance n’a pas de record ; la suivante en a un si elle bat la charge', () => {
+    const sessions = [
+      { id: 's1', startedAt: 1 },
+      { id: 's2', startedAt: 2 },
+      { id: 's3', startedAt: 3 },
+    ]
+    const sets = [
+      set({ sessionId: 's1', weight: 100 }),
+      set({ sessionId: 's2', weight: 100 }),
+      set({ sessionId: 's3', weight: 102.5 }),
+    ]
+    expect([...sessionsWithRecords(sessions, sets)]).toEqual(['s3'])
   })
 })
