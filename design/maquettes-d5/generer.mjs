@@ -420,12 +420,14 @@ S['Programme-exercice-fixe'] = { title: 'Exercice du programme · reps fixes', p
 
 // Accueil J5 (retour du 21/09/2026, inspiré de Lyfta) : les chiffres de la semaine en texte,
 // chacun avec une petite flèche d'évolution par rapport à la semaine passée ; « Autre séance »
-// en lien discret sur la même ligne que le titre. Plus de pastilles des jours.
+// en lien discret sur la même ligne que le titre ; pastilles des jours en dessous.
 P.down = '<path d="M12 5v14M5 12l7 7 7-7"></path>';
 const trend = (t, up, s) =>
   `<span style="display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; color: ${up ? t.text : t.muted};"><span aria-label="${up ? 'en hausse' : 'en baisse'}" style="display: flex;">${ic(up ? 'up' : 'down', 13, 3)}</span><span class="num" style="font-weight: 600;">${s}</span></span>`;
+// La flèche d'évolution est à côté du libellé (retour du 21/09/2026) : une ligne de moins, pour
+// laisser la place au bloc d'entraînement qui arrivera au J6 (voir « Accueil · aperçu avec le bloc »).
 const weekStat = (t, label, value, unit, up, delta) =>
-  `<div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 13px; color: ${t.muted};">${label}</span><span><span class="num" style="font-size: 24px; line-height: 28px;">${value}</span>${unit ? ` <span style="font-size: 15px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}</span>${trend(t, up, delta)}</div>`;
+  `<div style="display: flex; flex-direction: column; gap: 2px;"><span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: ${t.muted};">${label}${trend(t, up, delta)}</span><span><span class="num" style="font-size: 24px; line-height: 28px;">${value}</span>${unit ? ` <span style="font-size: 15px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}</span></div>`;
 // Pastilles des jours, remises sous les chiffres (retour du 21/09/2026) : version compacte, sans cadre.
 // Même code que l'accueil J3 : plein = jour entraîné, contour épais = aujourd'hui.
 const weekDots = (t) => `<div style="display: flex; justify-content: space-between; margin-top: 6px;">${['L', 'M', 'M', 'J', 'V', 'S', 'D']
@@ -444,6 +446,10 @@ const homeJ5 = (t) =>
     rows: [exLine(t, 'Squat', '', true), exLine(t, 'Presse à cuisses', ''), exLine(t, 'Leg curl', ''), exLine(t, 'Fentes bulgares', ''), exLine(t, 'Mollets debout', '')] });
 
 S['Accueil-J5'] = { title: 'Accueil · séance du jour (J5)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: homeJ5(t) }) };
+
+// Aperçu du J6 : la ligne du bloc d'entraînement (validée en D3/D5 : « Bloc Force », semaines,
+// deload) se pose en haut de l'accueil J5, pour vérifier que tout tient encore sur l'écran.
+S['Accueil-J6-apercu'] = { title: 'Accueil · aperçu avec le bloc (J6)', page: 'j5', render: (t) => frame(t, { navActive: 'seance', navLinks: J5NAV(t), main: blocRow(t) + homeJ5(t) }) };
 
 const dayOption = (t, name, sub, on, first = false) =>
   `<a href="${file(t, 'Accueil-J5')}" aria-current="${on}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; font-size: 17px; font-weight: 600;">${name}</span><span aria-hidden="true" style="box-sizing: border-box; width: 24px; height: 24px; border-radius: 12px; ${on ? `border: 7px solid ${t.inverse};` : `border: 1.5px solid ${t.strong};`}"></span></a>`;
@@ -593,7 +599,7 @@ writeCanvas('./', { title: 'Sportix — Maquettes D5', at: '2026-09-19T13:17:10Z
 
 // ===== Canvas J5 (programmes) : son propre dossier, son propre lien =====
 MAIN = 'Accueil-J5';
-const J5_ORDER = ['Programmes-vide', 'Programmes', 'Programme-nouveau', 'Programme-detail', 'Programme-exercice', 'Programme-exercice-fixe', 'Accueil-J5', 'Accueil-J5-leger', 'Jour-choix', 'Seance-programme', 'Seance-programme-leger', 'Seance-liste'];
+const J5_ORDER = ['Programmes-vide', 'Programmes', 'Programme-nouveau', 'Programme-detail', 'Programme-exercice', 'Programme-exercice-fixe', 'Accueil-J5', 'Accueil-J6-apercu', 'Accueil-J5-leger', 'Jour-choix', 'Seance-programme', 'Seance-programme-leger', 'Seance-liste'];
 const noteJ5 = (y, text, color) => ({ x: J5_ORDER.length * 470, y, w: 400, page: 'j5', size: 's', ...(color ? { color } : {}), text });
 writeCanvas('../maquettes-j5/', { title: 'Sportix — Maquettes J5', at: '2026-09-21T12:00:00Z',
   pages: [{ id: 'j5', name: 'J5 · Programmes', order: J5_ORDER }], launch: { view: 'canvas', page: 'j5' }, extraNotes: {
