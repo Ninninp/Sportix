@@ -9,6 +9,8 @@ export type Settings = {
   restSound: boolean
   /** Pas de charge des boutons − / + pour chaque variante. */
   weightSteps: WeightSteps
+  /** Programme actif (J5) : c'est sa prochaine séance que l'accueil propose. */
+  activeProgramId?: string
 }
 
 export const DEFAULT_SETTINGS: Settings = {

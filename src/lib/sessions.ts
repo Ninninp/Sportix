@@ -11,6 +11,10 @@ export type Session = {
   note?: string
   /** Repos en cours (après une série validée) ; absent hors repos. Voir src/lib/rest.ts. */
   rest?: Rest
+  /** Jour de programme d'où vient la séance (J5) ; absent pour une séance libre. */
+  programDayId?: string
+  /** Nom affiché (celui du jour au démarrage : il reste même si le programme change ensuite). */
+  title?: string
 }
 
 export type SessionSet = {
@@ -31,6 +35,10 @@ export type SessionSet = {
   targetRepsMax?: number
   done: boolean
   doneAt?: number
+  /** Repos après cette série, en secondes (celui du programme) ; absent : le repos des Réglages. */
+  restSeconds?: number
+  /** false : double progression désactivée pour cet exercice (jamais de proposition de charge). */
+  progression?: boolean
 }
 
 export type ExerciseBlock = {

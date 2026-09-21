@@ -9,6 +9,7 @@
 // Dexie applique alors les étapes manquantes au prochain lancement, sans rien perdre.
 import Dexie, { type EntityTable } from 'dexie'
 import type { Exercise } from '../lib/exercises.ts'
+import type { Program, ProgramDay, ProgramExercise } from '../lib/programs.ts'
 import type { Session, SessionSet } from '../lib/sessions.ts'
 import type { Settings } from '../lib/settings.ts'
 import { SEED_EXERCISES } from './seed.ts'
@@ -18,6 +19,9 @@ export class SportixDB extends Dexie {
   sessions!: EntityTable<Session, 'id'>
   sets!: EntityTable<SessionSet, 'id'>
   settings!: EntityTable<StoredSettings, 'id'>
+  programs!: EntityTable<Program, 'id'>
+  programDays!: EntityTable<ProgramDay, 'id'>
+  programExercises!: EntityTable<ProgramExercise, 'id'>
 
   constructor(name = 'sportix') {
     super(name)
@@ -40,6 +44,15 @@ export class SportixDB extends Dexie {
     // changement de la table `sessions`.
     this.version(3).stores({
       settings: 'id',
+    })
+
+    // Version 4 (J5) : les programmes, leurs jours et les exercices de chaque jour. Nouvelles tables
+    // seulement : les séances déjà enregistrées ne changent pas (une séance de programme porte
+    // simplement en plus `programDayId` et `title`, champs non indexés).
+    this.version(4).stores({
+      programs: 'id',
+      programDays: 'id, programId',
+      programExercises: 'id, dayId',
     })
 
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.

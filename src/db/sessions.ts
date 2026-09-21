@@ -89,8 +89,9 @@ export async function validateSet(
 }
 
 /**
- * Valide la série ET lance le repos (durée des réglages), en une seule écriture atomique :
- * si l'app est tuée juste après l'appui, on ne retrouve jamais une série faite sans son repos.
+ * Valide la série ET lance le repos, en une seule écriture atomique : si l'app est tuée juste après
+ * l'appui, on ne retrouve jamais une série faite sans son repos. Durée du repos : celle de
+ * l'exercice dans le programme (J5), sinon le repos par défaut des Réglages.
  */
 export async function validateSetAndRest(
   sessionId: string,
@@ -98,10 +99,11 @@ export async function validateSetAndRest(
   values: { weight: number; reps: number },
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const { restSeconds } = await getSettings(db)
+  const { restSeconds: defaultRest } = await getSettings(db)
   const now = Date.now()
   await db.transaction('rw', db.sets, db.sessions, async () => {
     const validated = await db.sets.get(setId)
+    const restSeconds = validated?.restSeconds ?? defaultRest
     await db.sets.update(setId, { ...values, done: true, doneAt: now })
     // Séries suivantes du même exercice encore vides (0 rep : jamais remplies, puisqu'on ne peut
     // pas valider 0 rep) : elles reprennent ces valeurs. Cas d'un exercice nouveau où l'on a prévu
