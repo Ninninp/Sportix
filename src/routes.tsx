@@ -1,10 +1,13 @@
 import { createBrowserRouter } from 'react-router'
 import App from './App.tsx'
 import ComingSoon from './components/ComingSoon.tsx'
-import { IconCalendrier, IconProgrammes, IconStats } from './components/icons.tsx'
+import { IconCalendrier, IconStats } from './components/icons.tsx'
 import ExerciseFormPage from './features/exercises/ExerciseFormPage.tsx'
 import ExerciseLibraryPage from './features/exercises/ExerciseLibraryPage.tsx'
 import HomePage from './features/home/HomePage.tsx'
+import ProgramDetailPage from './features/programs/ProgramDetailPage.tsx'
+import ProgramExercisePickerPage from './features/programs/ProgramExercisePickerPage.tsx'
+import ProgramsPage from './features/programs/ProgramsPage.tsx'
 import NotFoundPage from './features/home/NotFoundPage.tsx'
 import ExercisePickerPage from './features/sessions/ExercisePickerPage.tsx'
 import HistoryPage from './features/sessions/HistoryPage.tsx'
@@ -29,13 +32,10 @@ export const router = createBrowserRouter(
         // Historique
         { path: 'historique', element: <HistoryPage /> },
         { path: 'historique/:id', element: <SessionDetailPage /> },
-        {
-          path: 'programmes',
-          element: (
-            <ComingSoon title="Programmes" milestone="J5" Icon={IconProgrammes}
-              description="Tes routines (ex. Force A/B) et leurs jours, pour lancer la séance du jour en un geste." />
-          ),
-        },
+        // Programmes (J5)
+        { path: 'programmes', element: <ProgramsPage /> },
+        { path: 'programmes/:id', element: <ProgramDetailPage /> },
+        { path: 'programmes/:id/jours/:dayId/exercices', element: <ProgramExercisePickerPage /> },
         {
           path: 'calendrier',
           element: (

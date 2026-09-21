@@ -46,6 +46,8 @@ export const IconPlus = (p: IconProps) => <Icon {...p}><path d="M12 5v14M5 12h14
 export const IconFermer = (p: IconProps) => <Icon {...p}><path d="M18 6L6 18M6 6l12 12" /></Icon>
 export const IconChevronBas = (p: IconProps) => <Icon {...p}><path d="M6 9l6 6 6-6" /></Icon>
 export const IconFleche = (p: IconProps) => <Icon {...p}><path d="M12 19V5M5 12l7-7 7 7" /></Icon>
+export const IconFlecheBas = (p: IconProps) => <Icon {...p}><path d="M12 5v14M5 12l7 7 7-7" /></Icon>
+export const IconCoche = (p: IconProps) => <Icon {...p}><path d="M5 12.5l4.5 4.5L19 7.5" /></Icon>
 export const IconOptions = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="5" cy="12" r="1.5" />
