@@ -200,7 +200,8 @@ function BlockFormPage() {
       <Card className="flex shrink-0 flex-col px-3.5 py-0.5">
         <MiniStepper
           label="Durée"
-          value={`${form.weeks} sem.`}
+          value={String(form.weeks)}
+          unit="sem."
           ariaLabel="Durée en semaines"
           valueWidth={VALUE_WIDTH}
           canDecrement={form.weeks > MIN_WEEKS}
@@ -211,7 +212,7 @@ function BlockFormPage() {
         <div className="h-px bg-border" />
         <MiniStepper
           label="Deload"
-          value={deload > 0 ? `sem. ${deload}` : 'Aucun'}
+          value={deload > 0 ? `S${deload}` : 'Aucun'}
           ariaLabel="Semaine de deload"
           valueWidth={VALUE_WIDTH}
           canDecrement={deload > 0}
@@ -223,7 +224,8 @@ function BlockFormPage() {
         {/* Sert au « 6 faites sur 15 prévues » du calendrier : séances par semaine × semaines. */}
         <MiniStepper
           label="Par semaine"
-          value={`${weekly} séance${weekly > 1 ? 's' : ''}`}
+          value={String(weekly)}
+          unit={weekly > 1 ? 'séances' : 'séance'}
           ariaLabel="Séances par semaine"
           valueWidth={VALUE_WIDTH}
           canDecrement={weekly > MIN_WEEKLY_SESSIONS}

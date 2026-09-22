@@ -11,6 +11,9 @@ import { changeDayExercise, removeDayExercise, updateDayExercise } from '../../d
 import { VARIANT_LABELS, type Exercise, type Variant } from '../../lib/exercises.ts'
 import type { ProgramExercise } from '../../lib/programs.ts'
 import { formatRest } from '../../lib/rest.ts'
+
+/** Même largeur pour toutes les valeurs du panneau (la plus longue : « 10:00 » de repos) : boutons alignés. */
+const VALUE_WIDTH = 'w-20'
 import { REST_MAX, REST_MIN, stepRest } from '../../lib/settings.ts'
 
 const MAX_SETS = 10
@@ -45,6 +48,7 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
 
           <div className="flex flex-col">
             <MiniStepper
+              valueWidth={VALUE_WIDTH}
               label="Séries"
               ariaLabel="Séries"
               value={String(pe.sets)}
@@ -65,6 +69,7 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
             {pe.doubleProgression ? (
               <>
                 <MiniStepper
+                  valueWidth={VALUE_WIDTH}
                   label="Reps, au moins"
                   ariaLabel="Reps minimum"
                   value={String(pe.repsMin)}
@@ -74,6 +79,7 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
                   onIncrement={() => step((c) => ({ repsMin: clamp(c.repsMin + 1, 1, c.repsMax) }))}
                 />
                 <MiniStepper
+                  valueWidth={VALUE_WIDTH}
                   label="Reps, au plus"
                   ariaLabel="Reps maximum"
                   value={String(pe.repsMax)}
@@ -85,6 +91,7 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
               </>
             ) : (
               <MiniStepper
+                valueWidth={VALUE_WIDTH}
                 label="Reps"
                 ariaLabel="Reps"
                 value={String(pe.repsMin)}
@@ -95,6 +102,7 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
               />
             )}
             <MiniStepper
+              valueWidth={VALUE_WIDTH}
               label="Repos"
               ariaLabel="Repos"
               value={formatRest(pe.restSeconds)}
