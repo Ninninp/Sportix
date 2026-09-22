@@ -153,16 +153,19 @@ function CalendarPage() {
 }
 
 function DayCell({ day, onOpen }: { day: CalendarDay; onOpen?: () => void }) {
+  // Sur une couleur de bloc, tout passe en `on-block` / `on-block-muted` (tokens J6) : texte,
+  // point, cercle d'aujourd'hui et pointillés du deload restent lisibles sur toutes les teintes.
+  const onBlock = day.colors.length > 0
   const look =
     `box-border flex h-[46px] flex-col items-center justify-center gap-[3px] rounded-[10px] ` +
-    (day.deload ? 'border-[1.5px] border-dashed border-border-strong ' : '') +
-    (day.today ? 'shadow-[inset_0_0_0_2px_var(--color-text)] ' : '')
+    (day.deload ? `border-[1.5px] border-dashed ${onBlock ? 'border-on-block-muted' : 'border-border-strong'} ` : '') +
+    (day.today ? `${onBlock ? 'shadow-[inset_0_0_0_2px_var(--color-on-block)]' : 'shadow-[inset_0_0_0_2px_var(--color-text)]'} ` : '')
+  const dayColor = onBlock ? (day.inMonth ? 'text-on-block' : 'text-on-block-muted') : day.inMonth ? 'text-text' : 'text-faint'
   const label = new Date(day.time).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
   const content = (
     <>
-      {/* Hors du mois : text-faint, sauf sur un fond de bloc où il manquerait de contraste (text-muted). */}
-      <span className={`num text-body ${day.today ? 'font-extrabold' : 'font-semibold'} ${day.inMonth ? 'text-text' : day.colors.length ? 'text-muted' : 'text-faint'}`}>{day.date}</span>
-      <span aria-hidden="true" className={`size-1.5 rounded-full ${day.done ? 'bg-text' : 'bg-transparent'}`} />
+      <span className={`num text-body ${day.today ? 'font-extrabold' : 'font-semibold'} ${dayColor}`}>{day.date}</span>
+      <span aria-hidden="true" className={`size-1.5 rounded-full ${day.done ? (onBlock ? 'bg-on-block' : 'bg-text') : 'bg-transparent'}`} />
     </>
   )
   const a11y = `${label}${day.today ? ', aujourd’hui' : ''}${day.done ? ', séance faite' : ''}`

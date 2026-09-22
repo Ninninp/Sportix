@@ -23,7 +23,10 @@ function App() {
 
   return (
     <div className="flex h-dvh flex-col bg-bg text-text">
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-[env(safe-area-inset-top)]">
+      {/* overflow-x-hidden : la page ne glisse jamais de gauche à droite, même si un élément dépasse
+          (le champ date de Safari iOS est plus large que prévu). Les lignes de pastilles qui défilent
+          à l'horizontale ont leur propre défilement, elles ne sont pas concernées. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)]">
         <Outlet />
       </div>
       {fullScreen ? (

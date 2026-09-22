@@ -181,7 +181,9 @@ function BlockFormPage() {
           type="date"
           value={toInput(start)}
           onChange={(e) => e.target.value && set({ startsOn: fromInput(e.target.value) })}
-          className="h-[52px] w-full rounded-md border-[1.5px] border-border-strong bg-surface px-3.5 text-body-strong font-semibold text-text"
+          // Safari iOS donne au champ date une largeur minimale à lui, qui dépassait de l'écran :
+          // appearance-none + min-w-0 le gardent dans sa colonne (texte aligné à gauche, voir index.css).
+          className="block h-[52px] w-full min-w-0 appearance-none rounded-md border-[1.5px] border-border-strong bg-surface px-3.5 text-left text-body-strong font-semibold text-text"
         />
       </label>
 
