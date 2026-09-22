@@ -7,6 +7,7 @@
 //
 // Comme partout dans l'app, les dates se calculent en jours de calendrier (`setDate`) et jamais en
 // multiples de 24 h : aux changements d'heure une semaine dure 167 ou 169 heures.
+import { sessionVolume, type Session, type SessionSet } from './sessions.ts'
 import { mondayOf } from './week.ts'
 
 /** Objectif réutilisable (« Force », « Hypertrophie ») : c'est l'utilisateur qui les crée. */
@@ -114,6 +115,125 @@ export function normalizeStart(time: number): number {
   return mondayOf(time)
 }
 
+/**
+ * Premier jour proposé pour un nouveau bloc : le lundi de cette semaine, ou la fin du dernier
+ * bloc s'il court encore (on enchaîne les blocs sans les faire se chevaucher).
+ */
+export function suggestStart(blocks: Block[], now = Date.now()): number {
+  return Math.max(mondayOf(now), ...blocks.map(blockEnd))
+}
+
+// ---------- Suivi d'un bloc ----------
+
+export type WeekState = 'past' | 'current' | 'future'
+export type WeekSegment = { index: number; state: WeekState; deload: boolean }
+
+/** La barre S1…S5 : semaines passées, semaine en cours, semaines à venir (deload repéré). */
+export function weekSegments(block: Block, now = Date.now()): WeekSegment[] {
+  const current = weekIndexAt(block, now)
+  const finished = now >= blockEnd(block)
+  return blockWeeks(block).map(({ index, deload }) => ({
+    index,
+    deload,
+    state: finished || (current !== null && index < current) ? 'past' : index === current ? 'current' : 'future',
+  }))
+}
+
+/** Phrase lue par les lecteurs d'écran à la place de la barre : « semaine 2 sur 5, deload en semaine 4 ». */
+export function describeWeeks(segments: WeekSegment[]): string {
+  const current = segments.find((s) => s.state === 'current')
+  const deloads = segments.filter((s) => s.deload).map((s) => s.index)
+  const where = current
+    ? `semaine ${current.index} sur ${segments.length}`
+    : segments.every((s) => s.state === 'past')
+      ? 'terminé'
+      : `${segments.length} semaines, à venir`
+  return deloads.length > 0 ? `${where}, deload en semaine ${deloads.join(' et ')}` : where
+}
+
+/** Séances terminées rattachées au bloc. */
+export function blockSessions(block: Block, sessions: Session[]): Session[] {
+  return sessions.filter((s) => s.blockId === block.id && s.endedAt !== undefined)
+}
+
+/** Nombre de séances faites dans chaque semaine du bloc (index 0 = semaine 1). */
+export function sessionsPerWeek(block: Block, sessions: Session[]): number[] {
+  const counts = Array.from({ length: block.weeks }, () => 0)
+  for (const s of blockSessions(block, sessions)) {
+    const week = weekIndexAt(block, s.startedAt)
+    if (week !== null) counts[week - 1]++
+  }
+  return counts
+}
+
+/** Volume total (kg) des séances du bloc. */
+export function blockVolume(block: Block, sessions: Session[], sets: SessionSet[]): number {
+  const ids = new Set(blockSessions(block, sessions).map((s) => s.id))
+  return sessionVolume(sets.filter((set) => ids.has(set.sessionId)))
+}
+
+/** Séances prévues : un passage par jour du programme chaque semaine. null sans programme. */
+export function plannedSessions(block: Block, programDays: number): number | null {
+  return programDays > 0 ? block.weeks * programDays : null
+}
+
+// ---------- Grille du mois (onglet Calendrier) ----------
+
+export type CalendarDay = {
+  time: number
+  date: number
+  /** Faux pour les jours du mois d'avant ou d'après qui complètent la première et la dernière ligne. */
+  inMonth: boolean
+  blockId?: string
+  deload: boolean
+  /** Au moins une séance commencée ce jour-là. */
+  done: boolean
+  today: boolean
+}
+/** Une ligne de la grille = une semaine, du lundi au dimanche, avec son libellé « S2 » ou « D ». */
+export type CalendarWeek = { label: string; blockId?: string; days: CalendarDay[] }
+
+/** Premier jour du mois (0 h) qui contient cette date. */
+export function monthStart(time: number): number {
+  const d = new Date(time)
+  return new Date(d.getFullYear(), d.getMonth(), 1).getTime()
+}
+
+/** Premier jour du mois décalé de `n` mois. */
+export function addMonths(time: number, n: number): number {
+  const d = new Date(time)
+  return new Date(d.getFullYear(), d.getMonth() + n, 1).getTime()
+}
+
+export function monthGrid(month: number, blocks: Block[], sessions: Session[], now = Date.now()): CalendarWeek[] {
+  const first = new Date(monthStart(month))
+  const nextMonth = addMonths(first.getTime(), 1)
+  const todayStart = new Date(now).setHours(0, 0, 0, 0)
+  const doneDays = new Set(sessions.map((s) => new Date(s.startedAt).setHours(0, 0, 0, 0)))
+  const weeks: CalendarWeek[] = []
+  for (let monday = mondayOf(first.getTime()); monday < nextMonth; monday = addWeeks(monday, 1)) {
+    const block = activeBlock(blocks, monday)
+    const index = block ? weekIndexAt(block, monday) : null
+    const deload = block !== undefined && index !== null && isDeload(block, index)
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday)
+      d.setDate(d.getDate() + i)
+      const time = d.getTime()
+      return {
+        time,
+        date: d.getDate(),
+        inMonth: d.getMonth() === first.getMonth(),
+        blockId: block?.id,
+        deload,
+        done: doneDays.has(time),
+        today: time === todayStart,
+      }
+    })
+    weeks.push({ label: block && index !== null ? (deload ? 'D' : `S${index}`) : '', blockId: block?.id, days })
+  }
+  return weeks
+}
+
 // ---------- Formats français ----------
 
 const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.']
@@ -122,6 +242,20 @@ const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.',
 export function formatDayMonth(time: number): string {
   const d = new Date(time)
   return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`
+}
+
+/** Dates d'une semaine : « 14 → 20 sept. », ou « 28 sept. → 4 oct. » à cheval sur deux mois. */
+export function formatWeekDates(start: number, end: number): string {
+  const a = new Date(start)
+  const b = new Date(end)
+  return a.getMonth() === b.getMonth() ? `${a.getDate()} → ${formatDayMonth(end)}` : `${formatDayMonth(start)} → ${formatDayMonth(end)}`
+}
+
+/** Volume en tonnes au-delà d'une tonne : « 850 kg », « 38 t », « 1,5 t ». */
+export function formatTonnage(kg: number): string {
+  if (kg < 1000) return `${Math.round(kg)} kg`
+  const t = kg >= 10000 ? Math.round(kg / 1000) : Math.round(kg / 100) / 10
+  return `${String(t).replace('.', ',')} t`
 }
 
 /** « 14 sept. → 18 oct. » ; l'année n'apparaît que si elle diffère de l'année en cours. */

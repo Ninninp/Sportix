@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
+import type { Session, SessionSet } from './sessions.ts'
 import {
   activeBlock,
+  addMonths,
   addWeeks,
+  blockVolume,
   blockEnd,
   blockIdFor,
   blockLastDay,
@@ -10,9 +13,16 @@ import {
   formatLongSpan,
   formatMonth,
   formatSpan,
+  formatTonnage,
+  formatWeekDates,
+  monthGrid,
   normalizeStart,
   overlapping,
+  plannedSessions,
+  sessionsPerWeek,
+  suggestStart,
   weekIndexAt,
+  weekSegments,
   withDeloadWeek,
   type Block,
 } from './blocks.ts'
@@ -133,5 +143,77 @@ describe('formats français', () => {
   it('écrit les dates longues et le mois', () => {
     expect(formatLongSpan(day(2026, 8, 14), day(2026, 9, 18))).toBe('Du 14 septembre au 18 octobre 2026')
     expect(formatMonth(day(2026, 8, 1))).toBe('Septembre 2026')
+  })
+})
+
+const session = (id: string, startedAt: number, blockId?: string): Session => ({ id, startedAt, endedAt: startedAt + 3600000, blockId })
+
+describe('suivi d’un bloc', () => {
+  const b = block()
+
+  it('découpe la barre en semaines passées, en cours et à venir', () => {
+    expect(weekSegments(b, day(2026, 8, 24)).map((w) => w.state)).toEqual(['past', 'current', 'future', 'future', 'future'])
+    expect(weekSegments(b, day(2026, 9, 30)).every((w) => w.state === 'past')).toBe(true)
+    expect(weekSegments(b, day(2026, 8, 1)).every((w) => w.state === 'future')).toBe(true)
+    expect(weekSegments(b, day(2026, 8, 24))[4].deload).toBe(true)
+  })
+
+  it('compte les séances par semaine et le volume, séances du bloc seulement', () => {
+    const sessions = [
+      session('a', day(2026, 8, 15, 18), 'force'),
+      session('b', day(2026, 8, 17, 18), 'force'),
+      session('c', day(2026, 8, 22, 18), 'force'),
+      session('d', day(2026, 8, 23, 18)), // hors bloc (pas de blockId)
+    ]
+    expect(sessionsPerWeek(b, sessions)).toEqual([2, 1, 0, 0, 0])
+    const sets: SessionSet[] = ['a', 'd'].map((sessionId) => ({
+      id: sessionId, sessionId, exerciseId: 'squat', variant: 'barre', exerciseOrder: 1, order: 1, weight: 100, reps: 5, done: true,
+    }))
+    expect(blockVolume(b, sessions, sets)).toBe(500)
+    expect(plannedSessions(b, 3)).toBe(15)
+    expect(plannedSessions(b, 0)).toBeNull()
+  })
+
+  it('propose de commencer ce lundi, ou après le dernier bloc', () => {
+    expect(suggestStart([], day(2026, 8, 24))).toBe(day(2026, 8, 21))
+    expect(suggestStart([b], day(2026, 8, 24))).toBe(day(2026, 9, 19))
+  })
+})
+
+describe('monthGrid', () => {
+  const grid = monthGrid(day(2026, 8, 10), [block({ deloadWeeks: [2] })], [session('a', day(2026, 8, 15, 18), 'force')], day(2026, 8, 24, 18))
+
+  it('couvre le mois par semaines entières, du lundi au dimanche', () => {
+    expect(grid).toHaveLength(5) // du lundi 31 août au dimanche 4 octobre
+    expect(grid[0].days[0]).toMatchObject({ date: 31, inMonth: false })
+    expect(grid[4].days[6]).toMatchObject({ date: 4, inMonth: false })
+  })
+
+  it('libelle les semaines du bloc, deload compris', () => {
+    expect(grid.map((w) => w.label)).toEqual(['', '', 'S1', 'D', 'S3'])
+    expect(grid[3].days.every((d) => d.deload && d.blockId === 'force')).toBe(true)
+  })
+
+  it('marque les jours travaillés et aujourd’hui', () => {
+    expect(grid[2].days[1]).toMatchObject({ date: 15, done: true })
+    expect(grid[3].days[3]).toMatchObject({ date: 24, today: true, done: false })
+  })
+
+  it('passe d’un mois à l’autre', () => {
+    expect(addMonths(day(2026, 11, 15), 1)).toBe(day(2027, 0, 1))
+    expect(addMonths(day(2026, 0, 31), -1)).toBe(day(2025, 11, 1))
+  })
+})
+
+describe('formats du détail', () => {
+  it('écrit les dates d’une semaine', () => {
+    expect(formatWeekDates(day(2026, 8, 14), day(2026, 8, 20))).toBe('14 → 20 sept.')
+    expect(formatWeekDates(day(2026, 8, 28), day(2026, 9, 4))).toBe('28 sept. → 4 oct.')
+  })
+
+  it('écrit le volume en tonnes', () => {
+    expect(formatTonnage(850)).toBe('850 kg')
+    expect(formatTonnage(1540)).toBe('1,5 t')
+    expect(formatTonnage(38240)).toBe('38 t')
   })
 })

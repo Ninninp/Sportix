@@ -1,7 +1,10 @@
 import { createBrowserRouter } from 'react-router'
 import App from './App.tsx'
 import ComingSoon from './components/ComingSoon.tsx'
-import { IconCalendrier, IconStats } from './components/icons.tsx'
+import { IconStats } from './components/icons.tsx'
+import BlockDetailPage from './features/blocks/BlockDetailPage.tsx'
+import BlockFormPage from './features/blocks/BlockFormPage.tsx'
+import CalendarPage from './features/blocks/CalendarPage.tsx'
 import ExerciseFormPage from './features/exercises/ExerciseFormPage.tsx'
 import ExerciseLibraryPage from './features/exercises/ExerciseLibraryPage.tsx'
 import HomePage from './features/home/HomePage.tsx'
@@ -36,13 +39,11 @@ export const router = createBrowserRouter(
         { path: 'programmes', element: <ProgramsPage /> },
         { path: 'programmes/:id', element: <ProgramDetailPage /> },
         { path: 'programmes/:id/jours/:dayId/exercices', element: <ProgramExercisePickerPage /> },
-        {
-          path: 'calendrier',
-          element: (
-            <ComingSoon title="Calendrier" milestone="J6" Icon={IconCalendrier}
-              description="Tes blocs de spécialisation semaine par semaine, avec les deloads." />
-          ),
-        },
+        // Calendrier des blocs (J6)
+        { path: 'calendrier', element: <CalendarPage /> },
+        { path: 'calendrier/nouveau', element: <BlockFormPage /> },
+        { path: 'calendrier/:id', element: <BlockDetailPage /> },
+        { path: 'calendrier/:id/modifier', element: <BlockFormPage /> },
         {
           path: 'stats',
           element: (

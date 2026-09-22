@@ -4,19 +4,24 @@
 // - « Autre séance » (lien discret) : choisir un autre jour du programme, ou une séance libre ;
 // - la grande carte : séance en cours, séance du jour du programme actif, ou séance libre, avec
 //   le bouton « Démarrer la séance » dans la zone du pouce (2 appuis depuis l'ouverture de l'app).
+// - J6 : la ligne du bloc en cours (« Bloc Force » + barre des semaines), SOUS les chiffres de la
+//   semaine et juste avant la grande carte (place choisie dans le canvas J6) ; elle ouvre le bloc.
 import { useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import Card from '../../components/Card.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import { BadgeIncrease } from '../../components/Badge.tsx'
 import { IconChevronDroite, IconFleche, IconFlecheBas, IconPartager } from '../../components/icons.tsx'
 import { startProgramSession } from '../../db/programs.ts'
+import { activeBlock, describeWeeks, weekSegments } from '../../lib/blocks.ts'
 import { startSession } from '../../db/sessions.ts'
 import { increaseBadge, lastPerformance } from '../../lib/progression.ts'
 import { increaseSuggested, nextDay } from '../../lib/programs.ts'
 import { formatNumber, groupSetsByExercise, type SessionSet } from '../../lib/sessions.ts'
 import { isStandalone } from '../../lib/standalone.ts'
 import { formatHoursMinutes, weekDays, weekStats, type Trend } from '../../lib/week.ts'
+import WeekBar from '../blocks/WeekBar.tsx'
+import { useBlocks } from '../blocks/useBlocks.ts'
 import { useProgram } from '../programs/usePrograms.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
 import { useActiveSession, useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
@@ -87,6 +92,7 @@ function HomePage() {
   const exercises = useExercisesById()
   const settings = useSettings()
   const program = useProgram(settings?.activeProgramId)
+  const blocks = useBlocks()
   const [choice, setChoice] = useState<Choice>(null)
   const [choosing, setChoosing] = useState(false)
   // Pas de chrono sur l'accueil, mais l'heure est relue à chaque retour au premier plan : sinon
@@ -99,11 +105,13 @@ function HomePage() {
     sets === undefined ||
     exercises === undefined ||
     settings === undefined ||
-    program === undefined
+    program === undefined ||
+    blocks === undefined
   )
     return null
 
   const all = active ? [...sessions, active] : sessions
+  const block = activeBlock(blocks, now)
   const stats = weekStats(all, sets, now)
   const days = weekDays(all, now)
   const history: SessionSet[] = sets.filter((s) => s.done)
@@ -224,6 +232,25 @@ function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Bloc en cours : nom et barre des semaines */}
+      {block && (
+        <Link
+          to={`/calendrier/${block.id}`}
+          aria-label={`Bloc ${block.name}, ${describeWeeks(weekSegments(block, now))}`}
+          className="flex min-h-13 shrink-0 items-center gap-3 rounded-lg border border-border bg-surface pr-3 pl-4 text-text"
+        >
+          <span className="max-w-[45%] truncate text-body whitespace-nowrap">
+            <span className="text-muted">Bloc</span> <strong>{block.name}</strong>
+          </span>
+          <span className="min-w-0 flex-1">
+            <WeekBar segments={weekSegments(block, now)} height={16} />
+          </span>
+          <span className="flex text-muted">
+            <IconChevronDroite size={18} />
+          </span>
+        </Link>
+      )}
 
       {/* Grande carte : séance en cours, séance du jour ou séance libre */}
       <Card inverse as="section" aria-label={hero.title} className="flex min-h-0 flex-1 flex-col gap-2 p-4">
