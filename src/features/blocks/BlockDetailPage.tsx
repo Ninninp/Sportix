@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
+import Tile from '../../components/Tile.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import { IconCorbeille } from '../../components/icons.tsx'
@@ -28,14 +29,6 @@ import { useAllSets, useFinishedSessions } from '../sessions/useSession.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
 import { useBlock, useGoals } from './useBlocks.ts'
 
-function Tile({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="flex flex-col gap-1 p-3">
-      <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
-      <span className="num text-num-m">{value}</span>
-    </Card>
-  )
-}
 
 function BlockDetailPage() {
   const { id } = useParams()

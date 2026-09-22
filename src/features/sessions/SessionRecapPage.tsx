@@ -4,6 +4,7 @@ import { useParams } from 'react-router'
 import { BadgeIncrease, BadgePR } from '../../components/Badge.tsx'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
+import Tile from '../../components/Tile.tsx'
 import { IconTrophee } from '../../components/icons.tsx'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import { increaseBadge } from '../../lib/progression.ts'
@@ -12,14 +13,6 @@ import { formatDuration, formatNumber, formatWeight, groupSetsByExercise, sessio
 import { useSettings } from '../settings/useSettings.ts'
 import { useExercisesById, useHistorySets, useSession, useSessionSets } from './useSession.ts'
 
-function Tile({ label, value }: { label: string; value: string }) {
-  return (
-    <Card className="flex flex-col gap-1 p-3">
-      <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{label}</span>
-      <span className="num text-num-m">{value}</span>
-    </Card>
-  )
-}
 
 function SessionRecapPage() {
   const sessionId = useParams().id!
