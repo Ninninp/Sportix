@@ -7,7 +7,8 @@ import { useRestAlarm } from './features/timer/useRestAlarm.ts'
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,
 // la barre d'onglets reste en bas — sauf pendant une séance, où l'écran est plein
-// (décision prise en D2 : /seance, choix d'exercice, récapitulatif).
+// (décision prise en D2 : /seance, choix d'exercice, récapitulatif), et sur le formulaire d'un bloc
+// (nouveau / modifier), qui doit tenir sur l'écran sans défiler (maquette J6 « Nouveau bloc »).
 // Séance réduite (on navigue ailleurs pendant une séance) : une barre « Séance en cours »
 // se pose au-dessus des onglets. Le repos est surveillé ici, où que l'on soit dans l'app
 // (son, vibration, écran gardé allumé).
@@ -15,6 +16,7 @@ import { useRestAlarm } from './features/timer/useRestAlarm.ts'
 function App() {
   const { pathname } = useLocation()
   const inSession = pathname.startsWith('/seance')
+  const fullScreen = inSession || /^\/calendrier\/(nouveau|[^/]+\/modifier)$/.test(pathname)
   const active = useActiveSession()
   const settings = useSettings()
   useRestAlarm(active?.rest, settings?.restSound ?? true)
@@ -24,7 +26,7 @@ function App() {
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pt-[env(safe-area-inset-top)]">
         <Outlet />
       </div>
-      {inSession ? (
+      {fullScreen ? (
         <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
       ) : (
         <>

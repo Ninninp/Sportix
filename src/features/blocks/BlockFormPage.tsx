@@ -6,6 +6,10 @@
 //   deload ou change sa semaine (le détail du bloc n'a plus de « + Semaine de deload »).
 // - Si le bloc croise un autre bloc, on prévient avant d'enregistrer (sans l'interdire) ; s'il mord
 //   sur un bloc qui vient après lui, on propose de décaler ce bloc (maquette « Chevauchement »).
+// - Couleur du bloc : le carré à droite du nom ouvre le choix (7 couleurs, tokens `block-*`).
+// - L'écran ne doit jamais défiler (retour du 22/09/2026) : pas d'onglets ici (comme sur la maquette,
+//   voir App.tsx), et les pastilles d'objectif et de programme tiennent sur une ligne qui défile à
+//   l'horizontale, pour que la hauteur ne dépende pas de leur nombre.
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import Button from '../../components/Button.tsx'
@@ -21,7 +25,11 @@ import {
   MAX_WEEKS,
   MIN_WEEKLY_SESSIONS,
   MIN_WEEKS,
+  BLOCK_COLORS,
+  BLOCK_COLOR_LABELS,
+  blockColor,
   defaultWeeklySessions,
+  suggestColor,
   blockLastDay,
   formatLongSpan,
   normalizeStart,
@@ -30,7 +38,9 @@ import {
   type Block,
   type BlockDraft,
 } from '../../lib/blocks.ts'
+import { IconCoche } from '../../components/icons.tsx'
 import NameSheet from '../programs/NameSheet.tsx'
+import { colorVar } from './blockColors.ts'
 import { usePrograms } from '../programs/usePrograms.ts'
 import { useSettings } from '../settings/useSettings.ts'
 import { useBlock, useBlocks, useGoals } from './useBlocks.ts'
@@ -63,6 +73,7 @@ function BlockFormPage() {
   const settings = useSettings()
   const [draft, setDraft] = useState<BlockDraft | null>(null)
   const [newGoal, setNewGoal] = useState(false)
+  const [choosingColor, setChoosingColor] = useState(false)
   const [conflicts, setConflicts] = useState<Block[]>([])
 
   if (blocks === undefined || saved === undefined || goals === undefined || programs === undefined || settings === undefined) return null
@@ -92,6 +103,7 @@ function BlockFormPage() {
         deloadWeeks: saved.deloadWeeks,
         programId: saved.programId,
         weeklySessions: saved.weeklySessions ?? defaultWeeklySessions(daysOf(saved.programId)),
+        color: blockColor(saved),
       }
     : {
         name: '',
@@ -101,6 +113,7 @@ function BlockFormPage() {
         deloadWeeks: [],
         programId: activeProgram,
         weeklySessions: defaultWeeklySessions(daysOf(activeProgram)),
+        color: suggestColor(blocks),
       }
   const form = draft ?? initial
   const set = (changes: Partial<BlockDraft>) => setDraft({ ...form, ...changes })
@@ -133,14 +146,24 @@ function BlockFormPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-[18px] px-4 pt-2 pb-4">
+    <main className="flex flex-1 flex-col gap-4 px-4 pt-2 pb-4">
       <ScreenHeader title={id ? 'Modifier le bloc' : 'Nouveau bloc'} backTo={back} backLabel="Annuler" close size="m" />
 
-      <TextField label="Nom du bloc" value={form.name} onChange={(name) => set({ name })} placeholder="Ex. Force" autoCapitalize="sentences" />
+      <div className="flex items-end gap-2">
+        <TextField label="Nom du bloc" value={form.name} onChange={(name) => set({ name })} placeholder="Ex. Force" autoCapitalize="sentences" className="min-w-0 flex-1" />
+        <button
+          type="button"
+          aria-label={`Couleur du bloc : ${BLOCK_COLOR_LABELS[blockColor(form)]}, changer`}
+          onClick={() => setChoosingColor(true)}
+          className="flex size-[52px] shrink-0 items-center justify-center rounded-md border-[1.5px] border-border-strong bg-surface"
+        >
+          <span aria-hidden="true" className="size-7 rounded-full border-[1.5px] border-border-strong" style={{ background: colorVar(blockColor(form)) }} />
+        </button>
+      </div>
 
       <fieldset className="m-0 flex flex-col border-0 p-0">
         <Legend>Objectif</Legend>
-        <div role="group" aria-label="Objectif" className="flex flex-wrap gap-2">
+        <div role="group" aria-label="Objectif" className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {goals.map((g) => (
             <Chip key={g.id} selected={form.goalId === g.id} onClick={() => set({ goalId: form.goalId === g.id ? null : g.id })}>
               {g.name}
@@ -200,7 +223,7 @@ function BlockFormPage() {
 
       <fieldset className="m-0 flex flex-col border-0 p-0">
         <Legend>Programme suivi</Legend>
-        <div role="group" aria-label="Programme suivi" className="flex flex-wrap gap-2">
+        <div role="group" aria-label="Programme suivi" className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {programs.map(({ program }) => (
             <Chip key={program.id} selected={form.programId === program.id} onClick={() => set({ programId: program.id })}>
               {program.name}
@@ -225,6 +248,36 @@ function BlockFormPage() {
           </p>
         )}
       </div>
+
+      <Sheet open={choosingColor} onClose={() => setChoosingColor(false)} label="Couleur du bloc">
+        <h2 className="text-title font-bold">Couleur du bloc</h2>
+        <div role="group" aria-label="Couleur du bloc" className="grid grid-cols-4 gap-y-2">
+          {BLOCK_COLORS.map((c) => {
+            const selected = blockColor(form) === c
+            return (
+              <button
+                key={c}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => {
+                  set({ color: c })
+                  setChoosingColor(false)
+                }}
+                className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-md text-small text-muted active:bg-surface-2"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`flex size-11 items-center justify-center rounded-full text-text ${selected ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'}`}
+                  style={{ background: colorVar(c) }}
+                >
+                  {selected && <IconCoche size={20} strokeWidth={3} />}
+                </span>
+                {BLOCK_COLOR_LABELS[c]}
+              </button>
+            )
+          })}
+        </div>
+      </Sheet>
 
       <NameSheet
         open={newGoal}

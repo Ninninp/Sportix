@@ -25,6 +25,7 @@ import {
   weekIndexAt,
   weekSegments,
   shiftNextBlocks,
+  suggestColor,
   weeksBetween,
   type Block,
 } from './blocks.ts'
@@ -212,6 +213,24 @@ describe('monthGrid', () => {
   it('passe d’un mois à l’autre', () => {
     expect(addMonths(day(2026, 11, 15), 1)).toBe(day(2027, 0, 1))
     expect(addMonths(day(2026, 0, 31), -1)).toBe(day(2025, 11, 1))
+  })
+})
+
+describe('couleurs', () => {
+  it('propose la couleur qui suit celle du dernier bloc', () => {
+    expect(suggestColor([])).toBe('orange')
+    expect(suggestColor([block({ color: 'vert' })])).toBe('bleu')
+    expect(suggestColor([block({ color: 'rose' })])).toBe('sable') // on reboucle
+    expect(suggestColor([block()])).toBe('orange') // sans couleur = sable
+  })
+
+  it('donne à un jour les couleurs de tous ses blocs', () => {
+    const force = block({ color: 'orange' })
+    const hyper = block({ id: 'hyper', startsOn: day(2026, 9, 12), weeks: 4, color: 'bleu' })
+    const octobre = monthGrid(day(2026, 9, 1), [force, hyper], [], day(2026, 8, 24))
+    const semaineCommune = octobre.find((w) => w.days[0].date === 12)!
+    expect(semaineCommune.days[0]).toMatchObject({ colors: ['orange', 'bleu'], blockId: 'hyper' })
+    expect(octobre.find((w) => w.days[0].date === 5)!.days[0].colors).toEqual(['orange'])
   })
 })
 

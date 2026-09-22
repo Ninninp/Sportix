@@ -2,13 +2,13 @@
 // - la grille du mois, avec à gauche la semaine du bloc (S1, S2, D pour un deload) ;
 //   jours d'un bloc sur fond plein, point sous les jours travaillés, aujourd'hui cerclé ;
 // - on change de mois avec les flèches pour retrouver les autres blocs ;
-// - en bas, le bloc en cours (ou le prochain) : son nom et trois tuiles, qui ouvrent son détail.
+// - chaque bloc a sa couleur ; un jour commun à deux blocs (chevauchement) est coupé en deux ;
+// - en bas, le bloc en cours (ou le prochain), dans une carte qui ouvre son détail.
 // Toucher un jour d'un bloc ouvre aussi ce bloc.
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
-import Tile from '../../components/Tile.tsx'
 import { IconChevronDroite, IconChevronGauche, IconPlus } from '../../components/icons.tsx'
 import {
   activeBlock,
@@ -16,8 +16,11 @@ import {
   blockLastDay,
   blockSessions,
   describeWeeks,
+  blockColor,
+  blockEnd,
   formatDayMonth,
   formatMonth,
+  formatSpan,
   monthGrid,
   monthStart,
   plannedSessions,
@@ -29,7 +32,9 @@ import {
 import type { Session } from '../../lib/sessions.ts'
 import { useFinishedSessions } from '../sessions/useSession.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
+import { cellBackground, colorVar } from './blockColors.ts'
 import { useBlocks } from './useBlocks.ts'
+import WeekBar from './WeekBar.tsx'
 
 const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 const COLS = 'grid grid-cols-[26px_repeat(7,minmax(0,1fr))] gap-1'
@@ -62,8 +67,9 @@ function CalendarPage() {
   }
 
   const grid = monthGrid(month, blocks, sessions, now)
-  const byId = new Map(blocks.map((b) => [b.id, b]))
-  const shown = [...new Set(grid.flatMap((w) => w.days.filter((d) => d.inMonth && d.blockId).map((d) => d.blockId!)))].map((id) => byId.get(id)!)
+  // Blocs présents dans le mois (y compris celui « dessous » un chevauchement), par date de début.
+  const monthEnd = addMonths(month, 1)
+  const shown = blocks.filter((b) => b.startsOn < monthEnd && blockEnd(b) > month)
   const deloadRow = grid.find((w) => w.label === 'D')
   // Légende du point seulement s'il y a au moins une séance dans le mois affiché.
   const anyDone = grid.some((w) => w.days.some((d) => d.inMonth && d.done))
@@ -119,14 +125,13 @@ function CalendarPage() {
       </div>
 
       <div className="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-caption text-muted">
-        {/* Une seule couleur pour tous les blocs : deux blocs qui se suivent se distinguent par le
-            retour à « S1 » dans la colonne de gauche, d'où une seule entrée de légende. */}
-        {shown.length > 0 && (
-          <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden="true" className="size-3.5 shrink-0 rounded-[4px] bg-surface-2" />
-            {shown.length === 1 ? 'bloc' : 'blocs'} {shown.map((b) => b.name).join(', ')}
+        {/* Une entrée par bloc visible dans le mois, avec sa couleur. */}
+        {shown.map((b) => (
+          <span key={b.id} className="inline-flex items-center gap-1.5">
+            <span aria-hidden="true" className="size-3.5 shrink-0 rounded-[4px]" style={{ background: colorVar(blockColor(b)) }} />
+            {b.name}
           </span>
-        )}
+        ))}
         {anyDone && (
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-text" />
@@ -150,13 +155,13 @@ function CalendarPage() {
 function DayCell({ day, onOpen }: { day: CalendarDay; onOpen?: () => void }) {
   const look =
     `box-border flex h-[46px] flex-col items-center justify-center gap-[3px] rounded-[10px] ` +
-    (day.blockId ? 'bg-surface-2 ' : '') +
     (day.deload ? 'border-[1.5px] border-dashed border-border-strong ' : '') +
     (day.today ? 'shadow-[inset_0_0_0_2px_var(--color-text)] ' : '')
   const label = new Date(day.time).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
   const content = (
     <>
-      <span className={`num text-body ${day.today ? 'font-extrabold' : 'font-semibold'} ${day.inMonth ? 'text-text' : 'text-faint'}`}>{day.date}</span>
+      {/* Hors du mois : text-faint, sauf sur un fond de bloc où il manquerait de contraste (text-muted). */}
+      <span className={`num text-body ${day.today ? 'font-extrabold' : 'font-semibold'} ${day.inMonth ? 'text-text' : day.colors.length ? 'text-muted' : 'text-faint'}`}>{day.date}</span>
       <span aria-hidden="true" className={`size-1.5 rounded-full ${day.done ? 'bg-text' : 'bg-transparent'}`} />
     </>
   )
@@ -164,7 +169,7 @@ function DayCell({ day, onOpen }: { day: CalendarDay; onOpen?: () => void }) {
   return (
     <span role="cell">
       {onOpen ? (
-        <button type="button" onClick={onOpen} aria-label={`${a11y}, ouvrir le bloc`} className={`${look} w-full`}>
+        <button type="button" onClick={onOpen} aria-label={`${a11y}, ouvrir le bloc`} className={`${look} w-full`} style={{ background: cellBackground(day.colors) }}>
           {content}
         </button>
       ) : (
@@ -177,32 +182,38 @@ function DayCell({ day, onOpen }: { day: CalendarDay; onOpen?: () => void }) {
 }
 
 /**
- * Rappel du bloc en cours (ou du prochain), en bas de l'écran : son nom puis trois tuiles —
- * Semaine (ou Début pour un bloc à venir), Séances faites / prévues, Fin. Choisi le 22/09/2026
- * parmi quatre variantes, à la place de la grande carte inversée de la maquette. Le tout ouvre le bloc.
+ * Rappel du bloc en cours (ou du prochain), en bas de l'écran : carte ordinaire (pas inversée),
+ * entièrement touchable — pastille de couleur, nom et dates, barre des semaines, puis « Semaine 2/5 ·
+ * 4/15 séances ». Choisie le 22/09/2026 (option « carte claire, sans bouton ») à la place de la
+ * grande carte inversée de la maquette.
  */
 function FeaturedBlock({ block, sessions, now }: { block: Block; sessions: Session[]; now: number }) {
   const segments = weekSegments(block, now)
   const done = blockSessions(block, sessions).length
   const planned = plannedSessions(block)
   const week = weekIndexAt(block, now)
+  // Faites = séances terminées rattachées au bloc ; prévues = séances par semaine × semaines.
+  const count = planned !== null ? `${done}/${planned} séances` : `${done} séance${done > 1 ? 's' : ''}`
+  const when = week !== null ? `Semaine ${week}/${block.weeks}` : `Début le ${formatDayMonth(block.startsOn)}`
   return (
     <Link
       to={`/calendrier/${block.id}`}
-      aria-label={`Bloc ${block.name}, ${describeWeeks(segments)}, ${done} séances faites${planned !== null ? ` sur ${planned}` : ''}, ouvrir`}
-      className="flex shrink-0 flex-col gap-2 text-text"
+      aria-label={`Bloc ${block.name}, ${describeWeeks(segments)}, ${count}, ouvrir`}
+      className="flex shrink-0 flex-col gap-3 rounded-lg border border-border bg-surface p-4 text-text"
     >
-      <span className="flex min-h-12 items-center gap-2">
+      <span className="flex items-center gap-2">
+        <span aria-hidden="true" className="size-3.5 shrink-0 rounded-full" style={{ background: colorVar(blockColor(block)) }} />
         <span className="min-w-0 flex-1 truncate text-title font-extrabold tracking-[-0.02em]">{block.name}</span>
-        <span className="flex text-muted">
+        <span className="num shrink-0 text-body text-muted">{formatSpan(block.startsOn, blockLastDay(block), now)}</span>
+      </span>
+      <WeekBar segments={segments} />
+      <span className="flex items-center gap-2">
+        <span className="num flex-1 truncate text-body font-semibold">
+          {when} <span className="text-muted">· {count}</span>
+        </span>
+        <span aria-hidden="true" className="flex text-muted">
           <IconChevronDroite size={20} />
         </span>
-      </span>
-      <span aria-hidden="true" className="grid grid-cols-3 gap-2">
-        {week !== null ? <Tile label="Semaine" value={`${week}/${block.weeks}`} /> : <Tile label="Début" value={formatDayMonth(block.startsOn)} />}
-        {/* Faites = séances terminées rattachées au bloc ; prévues = séances par semaine × semaines. */}
-        <Tile label="Séances" value={planned !== null ? `${done}/${planned}` : String(done)} />
-        <Tile label="Fin" value={formatDayMonth(blockLastDay(block))} />
       </span>
     </Link>
   )

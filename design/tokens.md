@@ -33,6 +33,15 @@ Canvas de référence : [Sportix — Design system D4](https://claude.ai/artifac
 | `on-hero-action` | Texte de ce bouton | `#1A1030` | `#C6F432` |
 | `danger` | Supprimer, abandonner la séance | `#B42318` | `#FF6B5E` |
 | `on-danger` | Texte posé sur `danger` | `#FFFFFF` | `#0E0F0C` |
+| `block-sable` | Couleur de bloc « sable » (J6) | `#FFE8D2` | `#23261F` |
+| `block-orange` | Couleur de bloc « orange » (J6) | `#FFD3BF` | `#4A2616` |
+| `block-jaune` | Couleur de bloc « jaune » (J6) | `#FFEBA3` | `#3F3A12` |
+| `block-vert` | Couleur de bloc « vert » (J6) | `#D4EDC4` | `#1E3A1C` |
+| `block-bleu` | Couleur de bloc « bleu » (J6) | `#CFE0F7` | `#1A2B45` |
+| `block-violet` | Couleur de bloc « violet » (J6) | `#E3D6F5` | `#33224D` |
+| `block-rose` | Couleur de bloc « rose » (J6) | `#F8D0DF` | `#4A1F33` |
+
+**Couleurs des blocs (ajoutées le 22/09/2026, J6)** : chaque bloc du calendrier a la sienne, choisie à sa création, pour voir d'un coup d'œil où finit un bloc et où commence le suivant, et deux blocs qui se chevauchent (jour coupé en deux couleurs). Teintes pâles en clair, sourdes en sombre : `text` y fait 10,3 à 15,3:1 et `text-muted` 4,7 à 6,3:1 ; `text-faint` pouvant descendre à 3,4:1, les jours hors du mois posés sur un bloc passent en `text-muted`. `sable` = `surface-2` (couleur par défaut, et celle des blocs créés avant). Les pastilles de choix de couleur ont un contour `border-strong` (les teintes seules ne font que 1,1 à 1,7:1 contre le fond).
 | `rest-bg` | Fond plein écran de la fin de repos (= `accent`) | `#FF4B1F` | `#C6F432` |
 | `on-rest` | Tout le texte, les contours et le bouton sur la fin de repos | `#1A1030` | `#0E0F0C` |
 
@@ -148,6 +157,9 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
   --sx-inverse: #1A1030; --sx-on-inverse: #FFFFFF; --sx-on-inverse-muted: #C9C2D6;
   --sx-hero-action: #FF4B1F; --sx-on-hero-action: #1A1030;
   --sx-danger: #B42318; --sx-on-danger: #FFFFFF;
+  /* Couleurs des blocs (J6) : fond des jours du calendrier, pastille du bloc */
+  --sx-block-sable: #FFE8D2; --sx-block-orange: #FFD3BF; --sx-block-jaune: #FFEBA3; --sx-block-vert: #D4EDC4;
+  --sx-block-bleu: #CFE0F7; --sx-block-violet: #E3D6F5; --sx-block-rose: #F8D0DF;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -159,6 +171,8 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
     --sx-inverse: #F2F3EE; --sx-on-inverse: #0E0F0C; --sx-on-inverse-muted: #4A4E45;
     --sx-hero-action: #0E0F0C; --sx-on-hero-action: #C6F432;
     --sx-danger: #FF6B5E; --sx-on-danger: #0E0F0C;
+    --sx-block-sable: #23261F; --sx-block-orange: #4A2616; --sx-block-jaune: #3F3A12; --sx-block-vert: #1E3A1C;
+    --sx-block-bleu: #1A2B45; --sx-block-violet: #33224D; --sx-block-rose: #4A1F33;
   }
 }
 
@@ -185,6 +199,13 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
   --color-on-danger: var(--sx-on-danger);
   --color-rest: var(--sx-accent);
   --color-on-rest: var(--sx-on-accent);
+  --color-block-sable: var(--sx-block-sable);
+  --color-block-orange: var(--sx-block-orange);
+  --color-block-jaune: var(--sx-block-jaune);
+  --color-block-vert: var(--sx-block-vert);
+  --color-block-bleu: var(--sx-block-bleu);
+  --color-block-violet: var(--sx-block-violet);
+  --color-block-rose: var(--sx-block-rose);
 }
 
 @theme {

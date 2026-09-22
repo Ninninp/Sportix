@@ -31,11 +31,41 @@ export type Block = {
    * pas encore). Champ non indexé : pas de nouvelle version du schéma Dexie.
    */
   weeklySessions?: number
+  /** Couleur du bloc dans le calendrier (ajoutée le 22/09/2026 ; absente = « sable »). */
+  color?: BlockColor
   notes?: string
   createdAt: number
 }
 
 export type BlockDraft = Omit<Block, 'id' | 'createdAt'>
+
+/** Couleurs des blocs, dans l'ordre de la palette (tokens `block-*` de design/tokens.md). */
+export const BLOCK_COLORS = ['sable', 'orange', 'jaune', 'vert', 'bleu', 'violet', 'rose'] as const
+export type BlockColor = (typeof BLOCK_COLORS)[number]
+export const BLOCK_COLOR_LABELS: Record<BlockColor, string> = {
+  sable: 'Sable',
+  orange: 'Orange',
+  jaune: 'Jaune',
+  vert: 'Vert',
+  bleu: 'Bleu',
+  violet: 'Violet',
+  rose: 'Rose',
+}
+
+export function blockColor(block: Pick<Block, 'color'>): BlockColor {
+  return block.color ?? 'sable'
+}
+
+/**
+ * Couleur proposée pour un nouveau bloc : celle qui suit, dans la palette, la couleur du dernier
+ * bloc (le plus tard commencé). Deux blocs qui s'enchaînent ont ainsi des couleurs différentes
+ * sans que l'utilisateur ait à y penser.
+ */
+export function suggestColor(blocks: Block[]): BlockColor {
+  const last = [...blocks].sort((a, b) => b.startsOn - a.startsOn)[0]
+  if (!last) return 'orange'
+  return BLOCK_COLORS[(BLOCK_COLORS.indexOf(blockColor(last)) + 1) % BLOCK_COLORS.length]
+}
 
 export const MIN_WEEKS = 1
 export const MAX_WEEKS = 24
@@ -211,7 +241,10 @@ export type CalendarDay = {
   date: number
   /** Faux pour les jours du mois d'avant ou d'après qui complètent la première et la dernière ligne. */
   inMonth: boolean
+  /** Bloc affiché pour ce jour (le plus tard commencé si plusieurs) : il s'ouvre au toucher. */
   blockId?: string
+  /** Couleurs de tous les blocs de ce jour, du plus ancien au plus récent (2 = chevauchement). */
+  colors: BlockColor[]
   deload: boolean
   /** Au moins une séance commencée ce jour-là. */
   done: boolean
@@ -242,6 +275,11 @@ export function monthGrid(month: number, blocks: Block[], sessions: Session[], n
     const block = activeBlock(blocks, monday)
     const index = block ? weekIndexAt(block, monday) : null
     const deload = block !== undefined && index !== null && isDeload(block, index)
+    // Tous les blocs qui couvrent cette semaine (un bloc commence un lundi : même liste pour les 7 jours).
+    const colors = blocks
+      .filter((b) => weekIndexAt(b, monday) !== null)
+      .sort((a, b) => a.startsOn - b.startsOn)
+      .map(blockColor)
     const days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(monday)
       d.setDate(d.getDate() + i)
@@ -251,6 +289,7 @@ export function monthGrid(month: number, blocks: Block[], sessions: Session[], n
         date: d.getDate(),
         inMonth: d.getMonth() === first.getMonth(),
         blockId: block?.id,
+        colors,
         deload,
         done: doneDays.has(time),
         today: time === todayStart,
