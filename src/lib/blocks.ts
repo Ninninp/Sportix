@@ -26,6 +26,11 @@ export type Block = {
   deloadWeeks: number[]
   /** Programme suivi pendant le bloc, ou null. */
   programId: string | null
+  /**
+   * Séances prévues chaque semaine (ajouté le 22/09/2026, d'où le `?` : un bloc créé avant ne l'a
+   * pas encore). Champ non indexé : pas de nouvelle version du schéma Dexie.
+   */
+  weeklySessions?: number
   notes?: string
   createdAt: number
 }
@@ -34,6 +39,13 @@ export type BlockDraft = Omit<Block, 'id' | 'createdAt'>
 
 export const MIN_WEEKS = 1
 export const MAX_WEEKS = 24
+export const MIN_WEEKLY_SESSIONS = 1
+export const MAX_WEEKLY_SESSIONS = 14
+
+/** Séances par semaine proposées : une par jour du programme suivi, sinon 3. */
+export function defaultWeeklySessions(programDays: number): number {
+  return programDays > 0 ? Math.min(programDays, MAX_WEEKLY_SESSIONS) : 3
+}
 
 /** Le même instant `n` semaines plus tard (en jours de calendrier). */
 export function addWeeks(time: number, n: number): number {
@@ -184,9 +196,12 @@ export function blockVolume(block: Block, sessions: Session[], sets: SessionSet[
   return sessionVolume(sets.filter((set) => ids.has(set.sessionId)))
 }
 
-/** Séances prévues : un passage par jour du programme chaque semaine. null sans programme. */
-export function plannedSessions(block: Block, programDays: number): number | null {
-  return programDays > 0 ? block.weeks * programDays : null
+/**
+ * Séances prévues sur tout le bloc : séances par semaine × semaines (deload compris : on s'entraîne
+ * aussi pendant un deload, plus léger). null pour un bloc qui n'a pas encore ce réglage.
+ */
+export function plannedSessions(block: Block): number | null {
+  return block.weeklySessions ? block.weeks * block.weeklySessions : null
 }
 
 // ---------- Grille du mois (onglet Calendrier) ----------

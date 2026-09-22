@@ -179,7 +179,7 @@ function FeaturedBlock({ block, sessions, programs, now }: { block: Block; sessi
   const segments = weekSegments(block, now)
   const program = programs.find((p) => p.program.id === block.programId)
   const done = blockSessions(block, sessions).length
-  const planned = plannedSessions(block, program?.days.length ?? 0)
+  const planned = plannedSessions(block)
   const week = weekIndexAt(block, now)
   return (
     <Card inverse as="section" aria-label={`Bloc ${block.name}, ${describeWeeks(segments)}`} className="flex shrink-0 flex-col gap-3 p-4">
@@ -195,7 +195,7 @@ function FeaturedBlock({ block, sessions, programs, now }: { block: Block; sessi
             {program && ` · ${program.program.name}`}
           </div>
           <div className="num mt-0.5 text-small text-on-inverse-muted">
-            {/* Faites = séances terminées rattachées au bloc ; prévues = jours du programme × semaines du bloc. */}
+            {/* Faites = séances terminées rattachées au bloc ; prévues = séances par semaine × semaines du bloc. */}
             {planned !== null ? `${done} faite${done > 1 ? 's' : ''} sur ${planned} prévues` : `${done} séance${done > 1 ? 's' : ''} faite${done > 1 ? 's' : ''}`}
           </div>
         </div>

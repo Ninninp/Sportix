@@ -9,6 +9,7 @@ import {
   blockIdFor,
   blockLastDay,
   blockWeeks,
+  defaultWeeklySessions,
   formatDayMonth,
   formatLongSpan,
   formatMonth,
@@ -177,8 +178,10 @@ describe('suivi d’un bloc', () => {
       id: sessionId, sessionId, exerciseId: 'squat', variant: 'barre', exerciseOrder: 1, order: 1, weight: 100, reps: 5, done: true,
     }))
     expect(blockVolume(b, sessions, sets)).toBe(500)
-    expect(plannedSessions(b, 3)).toBe(15)
-    expect(plannedSessions(b, 0)).toBeNull()
+    expect(plannedSessions(block({ weeklySessions: 3 }))).toBe(15) // 3 par semaine × 5 semaines
+    expect(plannedSessions(b)).toBeNull() // bloc créé avant le réglage
+    expect(defaultWeeklySessions(2)).toBe(2)
+    expect(defaultWeeklySessions(0)).toBe(3)
   })
 
   it('propose de commencer ce lundi, ou après le dernier bloc', () => {

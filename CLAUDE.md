@@ -18,10 +18,10 @@ J0 et Phase D terminés (design : [`docs/PHASE-D.md`](docs/PHASE-D.md)).
 
 **Écrans du J6 codés le 22/09/2026**, pas encore validés : onglet Calendrier (`CalendarPage` : grille du mois, colonne S1/S2/D, mois précédent / suivant, carte du bloc en cours ou du prochain), `BlockFormPage` (nouveau / modifier, panneau « Nouvel objectif » ; **le deload ne se règle que là** : un seul par bloc, « Aucun » ou « sem. N » ; avertissement de chevauchement avec « Décaler « X » » / « Laisser le chevauchement » / « Changer les dates »), `BlockDetailPage` (tuiles, semaines, suppression ; plus de « + Semaine de deload », retiré le 22/09/2026 à la demande de l'utilisateur), ligne du bloc sur l'accueil (`WeekBar`). Parcours complet piloté dans Chrome (puppeteer-core hors dépôt), thèmes clair et sombre.
 
-Retours de l'utilisateur du 22/09/2026, traités : bouton « + Semaine de deload » retiré ; retouches du canvas J6 reportées (chiffres de la semaine centrés sur l'accueil, « 5 sem. » / « sem. 4 ») ; carte du calendrier en toutes lettres (« 4 faites sur 10 prévues » : prévues = jours du programme × semaines). **Question ouverte** : la règle des séances prévues ne convient pas (un programme A/B fait 3 fois par semaine donne 2 × semaines) — attendre la réponse de l'utilisateur.
+Retours de l'utilisateur du 22/09/2026, traités : bouton « + Semaine de deload » retiré ; retouches du canvas J6 reportées (chiffres de la semaine centrés sur l'accueil, « 5 sem. » / « sem. 4 ») ; carte du calendrier en toutes lettres (« 4 faites sur 15 prévues »). **Séances prévues** (choix de l'utilisateur, 22/09/2026) : réglage « Par semaine » dans le formulaire du bloc (`block.weeklySessions`, 1 à 14, proposé = nombre de jours du programme, sinon 3) ; prévues = séances par semaine × semaines, deload compris (`plannedSessions`). Champ non indexé et facultatif (blocs créés avant) : pas de nouvelle version du schéma.
 
 **Reprendre ici (J6)** :
-1. Trancher les séances prévues, test sur l'iPhone, puis `/code-review` du J6, puis validation.
+1. Test sur l'iPhone, puis `/code-review` du J6, puis validation.
 2. À prévoir (parcours § 3.6) : les séances de deload ne déclenchent pas la double progression.
 
 Reste aussi du J4 : **le test du son** sur l'iPhone (dernier point avant de pouvoir cocher le J4).

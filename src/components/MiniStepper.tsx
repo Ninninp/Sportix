@@ -9,9 +9,11 @@ type Props = {
   onIncrement: () => void
   canDecrement?: boolean
   canIncrement?: boolean
+  /** Largeur de la valeur, pour aligner les boutons de plusieurs lignes (par défaut 52 px au moins). */
+  valueWidth?: string
 }
 
-function MiniStepper({ label, value, ariaLabel, onDecrement, onIncrement, canDecrement = true, canIncrement = true }: Props) {
+function MiniStepper({ label, value, ariaLabel, onDecrement, onIncrement, canDecrement = true, canIncrement = true, valueWidth = 'min-w-13' }: Props) {
   const button = 'size-12 rounded-md bg-surface-2 text-[22px] font-bold text-text disabled:text-border-strong'
   return (
     <div className="flex min-h-13 items-center justify-between gap-3">
@@ -20,7 +22,7 @@ function MiniStepper({ label, value, ariaLabel, onDecrement, onIncrement, canDec
         <button type="button" aria-label={`${ariaLabel} : moins`} disabled={!canDecrement} onClick={onDecrement} className={button}>
           −
         </button>
-        <span className="num min-w-13 text-center text-[22px]">{value}</span>
+        <span className={`num ${valueWidth} text-center text-[22px]`}>{value}</span>
         <button type="button" aria-label={`${ariaLabel} : plus`} disabled={!canIncrement} onClick={onIncrement} className={button}>
           +
         </button>

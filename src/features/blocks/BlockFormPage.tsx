@@ -17,8 +17,11 @@ import Sheet from '../../components/Sheet.tsx'
 import TextField from '../../components/TextField.tsx'
 import { createBlock, createGoal, updateBlock } from '../../db/blocks.ts'
 import {
+  MAX_WEEKLY_SESSIONS,
   MAX_WEEKS,
+  MIN_WEEKLY_SESSIONS,
   MIN_WEEKS,
+  defaultWeeklySessions,
   blockLastDay,
   formatLongSpan,
   normalizeStart,
@@ -33,6 +36,8 @@ import { useSettings } from '../settings/useSettings.ts'
 import { useBlock, useBlocks, useGoals } from './useBlocks.ts'
 
 const DEFAULT_WEEKS = 4
+/** Même largeur pour les trois valeurs de la carte (« 3 séances » est la plus longue) : boutons alignés. */
+const VALUE_WIDTH = 'w-[108px]'
 
 /** « 2026-09-14 » (valeur d'un champ date) ↔ horodatage local à 0 h. */
 const toInput = (time: number) => {
@@ -75,15 +80,27 @@ function BlockFormPage() {
 
   // Tant que rien n'est touché : le bloc enregistré, ou un nouveau bloc qui enchaîne sur le dernier,
   // avec le programme actif. Calculé à l'affichage (pas d'effet), comme le formulaire d'exercice.
+  // Séances par semaine proposées : une par jour du programme (3 sans programme).
+  const daysOf = (programId: string | null) => programs.find((p) => p.program.id === programId)?.days.length ?? 0
+  const activeProgram = programs.some((p) => p.program.id === settings.activeProgramId) ? (settings.activeProgramId ?? null) : null
   const initial: BlockDraft = saved
-    ? { name: saved.name, goalId: saved.goalId, startsOn: saved.startsOn, weeks: saved.weeks, deloadWeeks: saved.deloadWeeks, programId: saved.programId }
+    ? {
+        name: saved.name,
+        goalId: saved.goalId,
+        startsOn: saved.startsOn,
+        weeks: saved.weeks,
+        deloadWeeks: saved.deloadWeeks,
+        programId: saved.programId,
+        weeklySessions: saved.weeklySessions ?? defaultWeeklySessions(daysOf(saved.programId)),
+      }
     : {
         name: '',
         goalId: null,
         startsOn: suggestStart(blocks),
         weeks: DEFAULT_WEEKS,
         deloadWeeks: [],
-        programId: programs.some((p) => p.program.id === settings.activeProgramId) ? (settings.activeProgramId ?? null) : null,
+        programId: activeProgram,
+        weeklySessions: defaultWeeklySessions(daysOf(activeProgram)),
       }
   const form = draft ?? initial
   const set = (changes: Partial<BlockDraft>) => setDraft({ ...form, ...changes })
@@ -91,6 +108,7 @@ function BlockFormPage() {
   // Une seule semaine de deload par bloc (0 = « Aucun »).
   const deload = form.deloadWeeks[0] ?? 0
   const setDeload = (week: number) => set({ deloadWeeks: week > 0 ? [week] : [] })
+  const weekly = form.weeklySessions ?? defaultWeeklySessions(daysOf(form.programId))
   const setWeeks = (weeks: number) => set({ weeks, deloadWeeks: form.deloadWeeks.filter((n) => n <= weeks) })
 
   const start = normalizeStart(form.startsOn)
@@ -149,6 +167,7 @@ function BlockFormPage() {
           label="Durée"
           value={`${form.weeks} sem.`}
           ariaLabel="Durée en semaines"
+          valueWidth={VALUE_WIDTH}
           canDecrement={form.weeks > MIN_WEEKS}
           canIncrement={form.weeks < MAX_WEEKS}
           onDecrement={() => setWeeks(form.weeks - 1)}
@@ -159,10 +178,23 @@ function BlockFormPage() {
           label="Deload"
           value={deload > 0 ? `sem. ${deload}` : 'Aucun'}
           ariaLabel="Semaine de deload"
+          valueWidth={VALUE_WIDTH}
           canDecrement={deload > 0}
           canIncrement={deload < form.weeks}
           onDecrement={() => setDeload(deload - 1)}
           onIncrement={() => setDeload(deload + 1)}
+        />
+        <div className="h-px bg-border" />
+        {/* Sert au « 6 faites sur 15 prévues » du calendrier : séances par semaine × semaines. */}
+        <MiniStepper
+          label="Par semaine"
+          value={`${weekly} séance${weekly > 1 ? 's' : ''}`}
+          ariaLabel="Séances par semaine"
+          valueWidth={VALUE_WIDTH}
+          canDecrement={weekly > MIN_WEEKLY_SESSIONS}
+          canIncrement={weekly < MAX_WEEKLY_SESSIONS}
+          onDecrement={() => set({ weeklySessions: weekly - 1 })}
+          onIncrement={() => set({ weeklySessions: weekly + 1 })}
         />
       </Card>
 
