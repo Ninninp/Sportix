@@ -49,11 +49,17 @@ async function reattachSessions(db: SportixDB): Promise<void> {
 }
 
 /**
- * Enregistre un bloc (nouveau si `id` est null). Avec `shiftNext`, les blocs suivants sur lesquels
- * il mord reculent d'autant de semaines que nécessaire (`shiftNextBlocks`), dans la même transaction.
+ * Enregistre le bloc `id` : le crée s'il n'existe pas encore, le remplace sinon. Avec `shiftNext`,
+ * les blocs suivants sur lesquels il mord reculent d'autant de semaines que nécessaire
+ * (`shiftNextBlocks`), dans la même transaction.
+ *
+ * Répéter l'appel avec le même `id` ne change rien de plus (relecture du J6) : le formulaire fixe
+ * l'identifiant d'un nouveau bloc à l'ouverture, si bien qu'un double appui sur « Créer le bloc »
+ * réécrit le même bloc au lieu d'en créer deux. Et au second appui sur « Décaler », le bloc suivant
+ * commence déjà après la fin : rien n'est décalé deux fois.
  */
-async function saveBlock(id: string | null, draft: BlockDraft, shiftNext: boolean, db: SportixDB): Promise<string> {
-  const blockId = id ?? crypto.randomUUID()
+export async function saveBlock(id: string, draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<string> {
+  const blockId = id
   await db.transaction('rw', db.blocks, db.sessions, async () => {
     const existing = id ? await db.blocks.get(id) : undefined
     const block: Block = { ...clean(draft), id: blockId, createdAt: existing?.createdAt ?? Date.now() }
@@ -69,7 +75,7 @@ async function saveBlock(id: string | null, draft: BlockDraft, shiftNext: boolea
 }
 
 export function createBlock(draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<string> {
-  return saveBlock(null, draft, shiftNext, db)
+  return saveBlock(crypto.randomUUID(), draft, shiftNext, db)
 }
 
 export async function updateBlock(id: string, draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<void> {

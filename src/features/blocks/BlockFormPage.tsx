@@ -19,7 +19,7 @@ import MiniStepper from '../../components/MiniStepper.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import TextField from '../../components/TextField.tsx'
-import { createBlock, createGoal, updateBlock } from '../../db/blocks.ts'
+import { createGoal, saveBlock } from '../../db/blocks.ts'
 import {
   MAX_WEEKLY_SESSIONS,
   MAX_WEEKS,
@@ -74,6 +74,9 @@ function BlockFormPage() {
   const [draft, setDraft] = useState<BlockDraft | null>(null)
   const [newGoal, setNewGoal] = useState(false)
   const [choosingColor, setChoosingColor] = useState(false)
+  // Identifiant du bloc, fixé dès l'ouverture pour un nouveau bloc : deux appuis rapprochés sur
+  // « Créer le bloc » écrivent le même bloc (saveBlock), jamais deux.
+  const [newId] = useState(() => crypto.randomUUID())
   const [conflicts, setConflicts] = useState<Block[]>([])
 
   if (blocks === undefined || saved === undefined || goals === undefined || programs === undefined || settings === undefined) return null
@@ -129,8 +132,7 @@ function BlockFormPage() {
   const ready = form.name.trim() !== ''
 
   async function save(shiftNext = false) {
-    if (id) await updateBlock(id, form, shiftNext)
-    else await createBlock(form, shiftNext)
+    await saveBlock(id ?? newId, form, shiftNext)
     navigate(id ? `/calendrier/${id}` : '/calendrier', { replace: true })
   }
 

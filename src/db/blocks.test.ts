@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { BlockDraft } from '../lib/blocks.ts'
-import { createBlock, createGoal, deleteBlock, getBlock, listBlocks, listGoals, updateBlock } from './blocks.ts'
+import { createBlock, createGoal, saveBlock, deleteBlock, getBlock, listBlocks, listGoals, updateBlock } from './blocks.ts'
 import { createProgram, listDays, startProgramSession } from './programs.ts'
 import { SportixDB } from './schema.ts'
 import { endSession, startSession } from './sessions.ts'
@@ -77,6 +77,12 @@ describe('enregistrement d’un bloc', () => {
     const id = await createBlock(draft({ name: ' Force ', startsOn: day(8, 17, 15), deloadWeeks: [6, 4, 4] }), false, db)
     const block = await getBlock(id, db)
     expect(block).toMatchObject({ name: 'Force', startsOn: day(8, 14), deloadWeeks: [4] })
+  })
+
+  it('un double appui sur « Créer le bloc » ne crée qu’un bloc', async () => {
+    freshDb()
+    await Promise.all([saveBlock('nouveau', draft(), false, db), saveBlock('nouveau', draft(), false, db)])
+    expect(await listBlocks(db)).toHaveLength(1)
   })
 
   it('liste les blocs par date de début', async () => {
