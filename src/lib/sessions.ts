@@ -15,6 +15,8 @@ export type Session = {
   programDayId?: string
   /** Nom affiché (celui du jour au démarrage : il reste même si le programme change ensuite). */
   title?: string
+  /** Bloc en cours au démarrage (J6), recalculé si les dates des blocs changent ; absent hors bloc. */
+  blockId?: string
 }
 
 export type SessionSet = {

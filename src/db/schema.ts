@@ -7,7 +7,8 @@
 //   this.version(2).stores({ sessions: 'id, date' })          // nouvelle table : rien à migrer
 //   this.version(3).stores({...}).upgrade(tx => { ... })      // transformation des données existantes
 // Dexie applique alors les étapes manquantes au prochain lancement, sans rien perdre.
-import Dexie, { type EntityTable } from 'dexie'
+import Dexie, { type EntityTable, type Transaction } from 'dexie'
+import type { Block, BlockGoal } from '../lib/blocks.ts'
 import type { Exercise } from '../lib/exercises.ts'
 import type { Program, ProgramDay, ProgramExercise } from '../lib/programs.ts'
 import type { Session, SessionSet } from '../lib/sessions.ts'
@@ -22,6 +23,8 @@ export class SportixDB extends Dexie {
   programs!: EntityTable<Program, 'id'>
   programDays!: EntityTable<ProgramDay, 'id'>
   programExercises!: EntityTable<ProgramExercise, 'id'>
+  blocks!: EntityTable<Block, 'id'>
+  blockGoals!: EntityTable<BlockGoal, 'id'>
 
   constructor(name = 'sportix') {
     super(name)
@@ -55,16 +58,33 @@ export class SportixDB extends Dexie {
       programExercises: 'id, dayId',
     })
 
+    // Version 5 (J6) : les blocs de spécialisation et leurs objectifs. Là encore, rien à migrer
+    // dans les séances : une séance porte en plus `blockId` (champ non indexé), recalculé d'après
+    // les dates à chaque changement de bloc (voir src/db/blocks.ts). Seul ajout : l'objectif
+    // d'exemple « Force », pour un téléphone qui avait déjà la base (sinon `populate` s'en charge).
+    this.version(5)
+      .stores({
+        blocks: 'id, startsOn',
+        blockGoals: 'id',
+      })
+      .upgrade((tx) => addSeedGoal(tx))
+
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.
     // Le `return` est indispensable : Dexie attend cette promesse avant de clore la transaction.
     // Sans lui, la base pourrait s'ouvrir avant la fin de l'insertion (bibliothèque vide).
     this.on('populate', (tx) => {
       const now = Date.now()
-      return tx
-        .table('exercises')
-        .bulkAdd(SEED_EXERCISES.map((e) => ({ ...e, id: crypto.randomUUID(), createdAt: now })))
+      return Promise.all([
+        tx.table('exercises').bulkAdd(SEED_EXERCISES.map((e) => ({ ...e, id: crypto.randomUUID(), createdAt: now }))),
+        addSeedGoal(tx),
+      ])
     })
   }
+}
+
+/** L'objectif de bloc fourni en exemple (modifiable, supprimable) : les autres, l'utilisateur les crée. */
+function addSeedGoal(tx: Transaction) {
+  return tx.table('blockGoals').add({ id: crypto.randomUUID(), name: 'Force', createdAt: Date.now() })
 }
 
 /** Réglages tels qu'enregistrés : seuls ceux qui ont été modifiés (les autres prennent leur valeur par défaut). */

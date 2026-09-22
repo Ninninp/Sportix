@@ -99,10 +99,12 @@ export function overlapping(block: Block, others: Block[]): Block[] {
 
 /** Ajoute une semaine de deload après `after` : le bloc s'allonge et les deloads suivants décalent. */
 export function withDeloadWeek(block: Block, after: number): BlockDraft & { id: string; createdAt: number } {
+  // Déjà à la durée maximale : pas de place pour une semaine de plus.
+  if (block.weeks >= MAX_WEEKS) return block
   const week = after + 1
   return {
     ...block,
-    weeks: Math.min(MAX_WEEKS, block.weeks + 1),
+    weeks: block.weeks + 1,
     deloadWeeks: [...block.deloadWeeks.map((n) => (n >= week ? n + 1 : n)), week].sort((a, b) => a - b),
   }
 }

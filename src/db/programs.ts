@@ -1,5 +1,6 @@
 // Accès aux programmes (J5) : programmes, jours, exercices de chaque jour, et démarrage d'une
 // séance à partir d'un jour. Chaque modification est enregistrée aussitôt (pas de bouton « Enregistrer »).
+import { blockIdFor } from '../lib/blocks.ts'
 import type { Variant } from '../lib/exercises.ts'
 import {
   DEFAULT_PROGRAM_EXERCISE,
@@ -176,10 +177,12 @@ export async function startProgramSession(dayId: string, db: SportixDB = default
   // Le test « y a-t-il déjà une séance en cours ? » est **dans** la transaction d'écriture : sinon,
   // deux appuis rapprochés sur « Démarrer la séance » (les lectures ci-dessus prennent un instant)
   // répondraient tous les deux « non » et créeraient deux séances, dont une invisible à jamais.
-  return db.transaction('rw', db.sessions, db.sets, async () => {
+  return db.transaction('rw', db.sessions, db.sets, db.blocks, async () => {
     const existing = await getActiveSession(db)
     if (existing) return existing.id
-    await db.sessions.add({ id, startedAt: Date.now(), programDayId: dayId, title: day.name })
+    const startedAt = Date.now()
+    const blockId = blockIdFor(await db.blocks.toArray(), startedAt)
+    await db.sessions.add({ id, startedAt, programDayId: dayId, title: day.name, blockId })
     await db.sets.bulkAdd(planned.map((p) => ({ ...p, id: crypto.randomUUID(), sessionId: id, done: false })))
     return id
   })

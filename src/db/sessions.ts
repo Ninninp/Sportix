@@ -1,5 +1,6 @@
 // Accès aux séances et aux séries. Chaque geste de l'utilisateur écrit immédiatement :
 // en salle, l'app peut être fermée ou tuée par le système à tout moment.
+import { blockIdFor } from '../lib/blocks.ts'
 import type { Variant } from '../lib/exercises.ts'
 import { lastPerformance, prefillSets } from '../lib/progression.ts'
 import { extendRest, startRest } from '../lib/rest.ts'
@@ -26,10 +27,11 @@ export async function startSession(db: SportixDB = defaultDb): Promise<string> {
   const id = crypto.randomUUID()
   // Vérification et création dans la même transaction : deux appuis rapprochés sur « Démarrer »
   // ne peuvent pas créer deux séances (la seconde transaction voit la première).
-  return db.transaction('rw', db.sessions, async () => {
+  return db.transaction('rw', db.sessions, db.blocks, async () => {
     const existing = await getActiveSession(db)
     if (existing) return existing.id // on ne démarre jamais deux séances à la fois
-    await db.sessions.add({ id, startedAt: Date.now() })
+    const startedAt = Date.now()
+    await db.sessions.add({ id, startedAt, blockId: blockIdFor(await db.blocks.toArray(), startedAt) })
     return id
   })
 }
