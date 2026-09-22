@@ -38,7 +38,7 @@ import {
   type Block,
   type BlockDraft,
 } from '../../lib/blocks.ts'
-import { IconCoche } from '../../components/icons.tsx'
+import { IconCalendrier, IconCoche } from '../../components/icons.tsx'
 import NameSheet from '../programs/NameSheet.tsx'
 import { colorVar } from './blockColors.ts'
 import { usePrograms } from '../programs/usePrograms.ts'
@@ -175,16 +175,26 @@ function BlockFormPage() {
         </div>
       </fieldset>
 
+      {/* Premier jour : la case affiche la date en toutes lettres ; le vrai champ date d'iOS est posé
+          dessus, transparent, et enfermé dans la case (overflow-hidden). Toucher la case ouvre la roue
+          de dates d'iOS, mais le champ ne peut plus faire glisser la page : affiché tel quel, Safari
+          lui donnait une largeur à lui qui dépassait de l'écran (retour du 22/09/2026). */}
       <label className="flex flex-col gap-1.5">
         <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">Premier jour (un lundi)</span>
-        <input
-          type="date"
-          value={toInput(start)}
-          onChange={(e) => e.target.value && set({ startsOn: fromInput(e.target.value) })}
-          // Safari iOS donne au champ date une largeur minimale à lui, qui dépassait de l'écran :
-          // appearance-none + min-w-0 le gardent dans sa colonne (texte aligné à gauche, voir index.css).
-          className="block h-[52px] w-full min-w-0 appearance-none rounded-md border-[1.5px] border-border-strong bg-surface px-3.5 text-left text-body-strong font-semibold text-text"
-        />
+        <span className="relative flex h-[52px] items-center gap-2 overflow-hidden rounded-md border-[1.5px] border-border-strong bg-surface px-3.5">
+          <span aria-hidden="true" className="min-w-0 flex-1 truncate text-body-strong font-semibold text-text">
+            {new Date(start).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+          <span aria-hidden="true" className="flex shrink-0 text-muted">
+            <IconCalendrier size={20} />
+          </span>
+          <input
+            type="date"
+            value={toInput(start)}
+            onChange={(e) => e.target.value && set({ startsOn: fromInput(e.target.value) })}
+            className="absolute inset-0 h-full w-full max-w-full min-w-0 appearance-none opacity-0"
+          />
+        </span>
       </label>
 
       <Card className="flex shrink-0 flex-col px-3.5 py-0.5">

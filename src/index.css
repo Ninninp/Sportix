@@ -151,8 +151,3 @@
     transition-duration: 0ms !important;
   }
 }
-
-/* Champ date de Safari iOS : sans appearance, sa valeur se centre ; on la garde à gauche. */
-input[type='date']::-webkit-date-and-time-value {
-  text-align: left;
-}
