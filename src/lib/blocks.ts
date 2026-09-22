@@ -98,16 +98,28 @@ export function overlapping(block: Block, others: Block[]): Block[] {
     .sort((a, b) => a.startsOn - b.startsOn)
 }
 
-/** Ajoute une semaine de deload après `after` : le bloc s'allonge et les deloads suivants décalent. */
-export function withDeloadWeek(block: Block, after: number): BlockDraft & { id: string; createdAt: number } {
-  // Déjà à la durée maximale : pas de place pour une semaine de plus.
-  if (block.weeks >= MAX_WEEKS) return block
-  const week = after + 1
-  return {
-    ...block,
-    weeks: block.weeks + 1,
-    deloadWeeks: [...block.deloadWeeks.map((n) => (n >= week ? n + 1 : n)), week].sort((a, b) => a - b),
-  }
+/** Nombre de semaines entières d'un lundi à un autre (en jours de calendrier). */
+export function weeksBetween(from: number, to: number): number {
+  let n = 0
+  while (addWeeks(from, n) < to) n++
+  return n
+}
+
+/**
+ * Décalage des blocs suivants quand un bloc s'allonge (ou avance) et mord sur eux : le premier bloc
+ * touché repart juste après celui-ci, et tous ceux qui venaient après lui reculent d'autant, pour
+ * garder l'enchaînement prévu. Seuls les blocs qui commencent APRÈS celui-ci sont déplacés.
+ * Renvoie les nouvelles dates de début (vide s'il n'y a rien à décaler).
+ */
+export function shiftNextBlocks(block: Block, others: Block[]): { id: string; startsOn: number }[] {
+  const end = blockEnd(block)
+  const hit = others.filter((o) => o.id !== block.id && o.startsOn > block.startsOn && o.startsOn < end)
+  if (hit.length === 0) return []
+  const first = Math.min(...hit.map((o) => o.startsOn))
+  const weeks = weeksBetween(first, end)
+  return others
+    .filter((o) => o.id !== block.id && o.startsOn >= first)
+    .map((o) => ({ id: o.id, startsOn: addWeeks(o.startsOn, weeks) }))
 }
 
 /** Lundi de la semaine d'une date choisie dans un formulaire (un bloc commence toujours un lundi). */

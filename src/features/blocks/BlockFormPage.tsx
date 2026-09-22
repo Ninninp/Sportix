@@ -2,8 +2,10 @@
 // Même page pour les deux : avec un identifiant dans l'adresse, elle charge le bloc à modifier.
 // - Premier jour : n'importe quelle date peut être choisie, le bloc part du lundi de sa semaine
 //   (règle du J6) ; les dates calculées se lisent au-dessus du bouton.
-// - Deload facultatif : « − » descend jusqu'à « Aucun ».
-// - Si le bloc croise un autre bloc, on prévient avant d'enregistrer (sans l'interdire).
+// - Deload facultatif : « − » descend jusqu'à « Aucun ». C'est le seul endroit où l'on ajoute un
+//   deload ou change sa semaine (le détail du bloc n'a plus de « + Semaine de deload »).
+// - Si le bloc croise un autre bloc, on prévient avant d'enregistrer (sans l'interdire) ; s'il mord
+//   sur un bloc qui vient après lui, on propose de décaler ce bloc (maquette « Chevauchement »).
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import Button from '../../components/Button.tsx'
@@ -86,24 +88,24 @@ function BlockFormPage() {
   const form = draft ?? initial
   const set = (changes: Partial<BlockDraft>) => setDraft({ ...form, ...changes })
 
-  // Le réglage « Deload » agit sur la dernière semaine de deload (un bloc peut en avoir plusieurs,
-  // ajoutées depuis son détail) ; 0 = « Aucun ».
-  const lastDeload = Math.max(0, ...form.deloadWeeks)
-  const setDeload = (week: number) => {
-    const others = form.deloadWeeks.filter((n) => n !== lastDeload && n !== week)
-    set({ deloadWeeks: week > 0 ? [...others, week].sort((a, b) => a - b) : others })
-  }
+  // Une seule semaine de deload par bloc (0 = « Aucun »).
+  const deload = form.deloadWeeks[0] ?? 0
+  const setDeload = (week: number) => set({ deloadWeeks: week > 0 ? [week] : [] })
   const setWeeks = (weeks: number) => set({ weeks, deloadWeeks: form.deloadWeeks.filter((n) => n <= weeks) })
 
   const start = normalizeStart(form.startsOn)
   const preview: Block = { ...form, startsOn: start, id: id ?? 'nouveau', createdAt: 0 }
   const ready = form.name.trim() !== ''
 
-  async function save() {
-    if (id) await updateBlock(id, form)
-    else await createBlock(form)
+  async function save(shiftNext = false) {
+    if (id) await updateBlock(id, form, shiftNext)
+    else await createBlock(form, shiftNext)
     navigate(id ? `/calendrier/${id}` : '/calendrier', { replace: true })
   }
+
+  // Blocs que « Décaler » ferait reculer : ceux qui commencent après celui-ci (même règle que shiftNextBlocks).
+  const later = conflicts.filter((b) => b.startsOn > start)
+  const formatLongDay = (t: number) => new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
 
   function trySave() {
     if (!ready) return
@@ -155,12 +157,12 @@ function BlockFormPage() {
         <div className="h-px bg-border" />
         <MiniStepper
           label="Deload"
-          value={lastDeload > 0 ? `semaine ${lastDeload}` : 'Aucun'}
+          value={deload > 0 ? `sem. ${deload}` : 'Aucun'}
           ariaLabel="Semaine de deload"
-          canDecrement={lastDeload > 0}
-          canIncrement={lastDeload < form.weeks}
-          onDecrement={() => setDeload(lastDeload - 1)}
-          onIncrement={() => setDeload(lastDeload + 1)}
+          canDecrement={deload > 0}
+          canIncrement={deload < form.weeks}
+          onDecrement={() => setDeload(deload - 1)}
+          onIncrement={() => setDeload(deload + 1)}
         />
       </Card>
 
@@ -207,15 +209,24 @@ function BlockFormPage() {
 
       <Sheet open={conflicts.length > 0} onClose={() => setConflicts([])} label="Chevauchement">
         <div>
-          <h2 className="text-title font-bold">Deux blocs en même temps</h2>
+          <h2 className="text-title font-bold">
+            {later.length > 0 ? `Le bloc irait jusqu’au ${formatLongDay(blockLastDay(preview))}` : 'Deux blocs en même temps'}
+          </h2>
           <p className="mt-1.5 text-body text-muted">
-            Ce bloc croise {conflicts.map((b) => `« ${b.name} »`).join(' et ')}. Pendant les semaines communes, les séances
-            iront au bloc qui a commencé le plus tard.
+            {conflicts.map((b) => `« ${b.name} » ${b.startsOn > start ? 'commence' : 'a commencé'} le ${formatLongDay(b.startsOn)}`).join(', ')} :
+            les blocs se chevaucheraient. Pendant les semaines communes, les séances iraient au bloc qui a commencé le plus tard.
           </p>
         </div>
         <div className="flex flex-col gap-2">
-          <Button onClick={() => void save()}>Enregistrer quand même</Button>
-          <Button variant="secondary" onClick={() => setConflicts([])}>
+          {later.length > 0 && (
+            <Button onClick={() => void save(true)}>
+              {later.length === 1 ? `Décaler « ${later[0].name} »` : 'Décaler les blocs suivants'}
+            </Button>
+          )}
+          <Button variant={later.length > 0 ? 'secondary' : 'primary'} onClick={() => void save()}>
+            Laisser le chevauchement
+          </Button>
+          <Button variant="link" className="text-text" onClick={() => setConflicts([])}>
             Changer les dates
           </Button>
         </div>

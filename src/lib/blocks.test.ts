@@ -23,7 +23,8 @@ import {
   suggestStart,
   weekIndexAt,
   weekSegments,
-  withDeloadWeek,
+  shiftNextBlocks,
+  weeksBetween,
   type Block,
 } from './blocks.ts'
 
@@ -117,17 +118,23 @@ describe('overlapping', () => {
   })
 })
 
-describe('withDeloadWeek', () => {
-  it('insère une semaine allégée et décale les deloads suivants', () => {
-    const b = withDeloadWeek(block(), 2)
-    expect(b.weeks).toBe(6)
-    expect(b.deloadWeeks).toEqual([3, 6])
+describe('shiftNextBlocks', () => {
+  const force = block({ weeks: 7 }) // allongé de 2 semaines : finit le 1er novembre
+  const hyper = block({ id: 'hyper', startsOn: day(2026, 9, 19), weeks: 4 })
+  const seche = block({ id: 'seche', startsOn: day(2026, 10, 16), weeks: 4 })
+
+  it('repousse le premier bloc touché juste après, et les suivants d’autant', () => {
+    expect(weeksBetween(day(2026, 9, 19), day(2026, 10, 2))).toBe(2)
+    expect(shiftNextBlocks(force, [force, hyper, seche])).toEqual([
+      { id: 'hyper', startsOn: day(2026, 10, 2) },
+      { id: 'seche', startsOn: day(2026, 10, 30) },
+    ])
   })
 
-  it('ne dépasse pas la durée maximale', () => {
-    const b = withDeloadWeek(block({ weeks: 24, deloadWeeks: [] }), 24)
-    expect(b.weeks).toBe(24)
-    expect(b.deloadWeeks).toEqual([])
+  it('ne déplace ni un bloc qui commence avant, ni rien sans chevauchement', () => {
+    const avant = block({ id: 'avant', startsOn: day(2026, 7, 31), weeks: 3 })
+    expect(shiftNextBlocks(force, [avant])).toEqual([])
+    expect(shiftNextBlocks(block(), [hyper, seche])).toEqual([])
   })
 })
 

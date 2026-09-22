@@ -5,7 +5,7 @@
 // les séances** à chaque création, modification ou suppression d'un bloc : une séance faite avant
 // de créer le bloc, ou pendant une semaine de deload ajoutée après coup, rejoint ainsi son bloc.
 // Le recalcul se fait dans la même transaction que le changement de bloc (jamais d'état bancal).
-import { addWeeks, blockEnd, blockIdFor, normalizeStart, withDeloadWeek, type Block, type BlockDraft, type BlockGoal } from '../lib/blocks.ts'
+import { blockIdFor, normalizeStart, shiftNextBlocks, type Block, type BlockDraft, type BlockGoal } from '../lib/blocks.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 
 /** Blocs, du plus ancien au plus récent. */
@@ -48,54 +48,38 @@ async function reattachSessions(db: SportixDB): Promise<void> {
   })
 }
 
-export async function createBlock(draft: BlockDraft, db: SportixDB = defaultDb): Promise<string> {
-  const id = crypto.randomUUID()
+/**
+ * Enregistre un bloc (nouveau si `id` est null). Avec `shiftNext`, les blocs suivants sur lesquels
+ * il mord reculent d'autant de semaines que nécessaire (`shiftNextBlocks`), dans la même transaction.
+ */
+async function saveBlock(id: string | null, draft: BlockDraft, shiftNext: boolean, db: SportixDB): Promise<string> {
+  const blockId = id ?? crypto.randomUUID()
   await db.transaction('rw', db.blocks, db.sessions, async () => {
-    await db.blocks.add({ ...clean(draft), id, createdAt: Date.now() })
+    const existing = id ? await db.blocks.get(id) : undefined
+    const block: Block = { ...clean(draft), id: blockId, createdAt: existing?.createdAt ?? Date.now() }
+    if (shiftNext) {
+      for (const { id: other, startsOn } of shiftNextBlocks(block, await db.blocks.toArray())) {
+        await db.blocks.update(other, { startsOn })
+      }
+    }
+    await db.blocks.put(block)
     await reattachSessions(db)
   })
-  return id
+  return blockId
 }
 
-export async function updateBlock(id: string, draft: BlockDraft, db: SportixDB = defaultDb): Promise<void> {
-  await db.transaction('rw', db.blocks, db.sessions, async () => {
-    await db.blocks.update(id, clean(draft))
-    await reattachSessions(db)
-  })
+export function createBlock(draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<string> {
+  return saveBlock(null, draft, shiftNext, db)
+}
+
+export async function updateBlock(id: string, draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<void> {
+  await saveBlock(id, draft, shiftNext, db)
 }
 
 /** Supprime un bloc. Ses séances restent (elles rejoignent un autre bloc qui couvre leur date, s'il y en a un). */
 export async function deleteBlock(id: string, db: SportixDB = defaultDb): Promise<void> {
   await db.transaction('rw', db.blocks, db.sessions, async () => {
     await db.blocks.delete(id)
-    await reattachSessions(db)
-  })
-}
-
-/**
- * Ajoute une semaine de deload après la semaine `after` : le bloc s'allonge d'une semaine.
- * Avec `shiftNext`, les blocs qui commençaient après lui (à partir de son ancienne fin) reculent
- * tous d'une semaine, pour garder l'enchaînement prévu sans chevauchement.
- */
-export async function addDeloadWeek(
-  id: string,
-  after: number,
-  shiftNext: boolean,
-  db: SportixDB = defaultDb,
-): Promise<void> {
-  await db.transaction('rw', db.blocks, db.sessions, async () => {
-    const block = await db.blocks.get(id)
-    if (!block) return
-    const longer = withDeloadWeek(block, after)
-    if (longer.weeks === block.weeks) return // déjà à la durée maximale
-    if (shiftNext) {
-      const oldEnd = blockEnd(block)
-      const next = await db.blocks.where('startsOn').aboveOrEqual(oldEnd).toArray()
-      for (const b of next) {
-        if (b.id !== id) await db.blocks.update(b.id, { startsOn: addWeeks(b.startsOn, 1) })
-      }
-    }
-    await db.blocks.put(longer)
     await reattachSessions(db)
   })
 }

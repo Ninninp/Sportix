@@ -195,7 +195,8 @@ function FeaturedBlock({ block, sessions, programs, now }: { block: Block; sessi
             {program && ` · ${program.program.name}`}
           </div>
           <div className="num mt-0.5 text-small text-on-inverse-muted">
-            {planned !== null ? `${done}/${planned} séances` : `${done} séance${done > 1 ? 's' : ''}`}
+            {/* Faites = séances terminées rattachées au bloc ; prévues = jours du programme × semaines du bloc. */}
+            {planned !== null ? `${done} faite${done > 1 ? 's' : ''} sur ${planned} prévues` : `${done} séance${done > 1 ? 's' : ''} faite${done > 1 ? 's' : ''}`}
           </div>
         </div>
         <Link

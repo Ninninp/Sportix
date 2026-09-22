@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { BlockDraft } from '../lib/blocks.ts'
-import { addDeloadWeek, createBlock, createGoal, deleteBlock, getBlock, listBlocks, listGoals, updateBlock } from './blocks.ts'
+import { createBlock, createGoal, deleteBlock, getBlock, listBlocks, listGoals, updateBlock } from './blocks.ts'
 import { createProgram, listDays, startProgramSession } from './programs.ts'
 import { SportixDB } from './schema.ts'
 import { endSession, startSession } from './sessions.ts'
@@ -74,15 +74,15 @@ describe('objectifs', () => {
 describe('enregistrement d’un bloc', () => {
   it('ramène le début au lundi et garde les deloads dans la durée', async () => {
     freshDb()
-    const id = await createBlock(draft({ name: ' Force ', startsOn: day(8, 17, 15), deloadWeeks: [6, 4, 4] }), db)
+    const id = await createBlock(draft({ name: ' Force ', startsOn: day(8, 17, 15), deloadWeeks: [6, 4, 4] }), false, db)
     const block = await getBlock(id, db)
     expect(block).toMatchObject({ name: 'Force', startsOn: day(8, 14), deloadWeeks: [4] })
   })
 
   it('liste les blocs par date de début', async () => {
     freshDb()
-    await createBlock(draft({ name: 'B', startsOn: day(9, 19) }), db)
-    await createBlock(draft({ name: 'A' }), db)
+    await createBlock(draft({ name: 'B', startsOn: day(9, 19) }), false, db)
+    await createBlock(draft({ name: 'A' }), false, db)
     expect((await listBlocks(db)).map((b) => b.name)).toEqual(['A', 'B'])
   })
 })
@@ -90,7 +90,7 @@ describe('enregistrement d’un bloc', () => {
 describe('rattachement des séances', () => {
   it('rattache une séance au bloc en cours à son démarrage', async () => {
     freshDb()
-    const blockId = await createBlock(draft(), db)
+    const blockId = await createBlock(draft(), false, db)
     const inside = await sessionAt(day(8, 22, 18))
     const outside = await sessionAt(day(10, 2, 18))
     expect((await db.sessions.get(inside))?.blockId).toBe(blockId)
@@ -99,7 +99,7 @@ describe('rattachement des séances', () => {
 
   it('rattache aussi une séance de programme', async () => {
     freshDb()
-    const blockId = await createBlock(draft(), db)
+    const blockId = await createBlock(draft(), false, db)
     const programId = await createProgram('Force A/B', 'A', db)
     const [dayA] = await listDays(programId, db)
     vi.useFakeTimers({ toFake: ['Date'] })
@@ -111,10 +111,10 @@ describe('rattachement des séances', () => {
   it('rattrape les séances passées quand on crée, modifie ou supprime un bloc', async () => {
     freshDb()
     const before = await sessionAt(day(8, 10, 18)) // la semaine avant le bloc
-    const blockId = await createBlock(draft(), db)
+    const blockId = await createBlock(draft(), false, db)
     expect((await db.sessions.get(before))?.blockId).toBeUndefined()
 
-    await updateBlock(blockId, draft({ startsOn: day(8, 7) }), db) // le bloc commence une semaine plus tôt
+    await updateBlock(blockId, draft({ startsOn: day(8, 7) }), false, db) // le bloc commence une semaine plus tôt
     expect((await db.sessions.get(before))?.blockId).toBe(blockId)
 
     await deleteBlock(blockId, db)
@@ -122,31 +122,31 @@ describe('rattachement des séances', () => {
   })
 })
 
-describe('addDeloadWeek', () => {
-  it('allonge le bloc et rattache la semaine ajoutée', async () => {
+describe('allonger un bloc (deload ajouté dans « Modifier »)', () => {
+  it('rattache la semaine ajoutée', async () => {
     freshDb()
-    const id = await createBlock(draft(), db) // 14 sept. → 18 oct.
+    const id = await createBlock(draft(), false, db) // 14 sept. → 18 oct.
     const late = await sessionAt(day(9, 20, 18)) // mardi 20 octobre : juste après
-    await addDeloadWeek(id, 2, false, db)
-    expect(await getBlock(id, db)).toMatchObject({ weeks: 6, deloadWeeks: [3, 5] })
+    await updateBlock(id, draft({ weeks: 6, deloadWeeks: [6] }), false, db)
+    expect(await getBlock(id, db)).toMatchObject({ weeks: 6, deloadWeeks: [6] })
     expect((await db.sessions.get(late))?.blockId).toBe(id)
   })
 
-  it('décale les blocs suivants d’une semaine si on le demande', async () => {
+  it('décale les blocs suivants si on le demande', async () => {
     freshDb()
-    const force = await createBlock(draft(), db)
-    const hyper = await createBlock(draft({ name: 'Hypertrophie', startsOn: day(9, 19), weeks: 4 }), db)
-    const apres = await createBlock(draft({ name: 'Sèche', startsOn: day(10, 16), weeks: 4 }), db)
-    await addDeloadWeek(force, 5, true, db)
+    const force = await createBlock(draft(), false, db)
+    const hyper = await createBlock(draft({ name: 'Hypertrophie', startsOn: day(9, 19), weeks: 4 }), false, db)
+    const apres = await createBlock(draft({ name: 'Sèche', startsOn: day(10, 16), weeks: 4 }), false, db)
+    await updateBlock(force, draft({ weeks: 6 }), true, db)
     expect((await getBlock(hyper, db))?.startsOn).toBe(day(9, 26))
     expect((await getBlock(apres, db))?.startsOn).toBe(day(10, 23))
   })
 
   it('laisse le chevauchement sinon', async () => {
     freshDb()
-    const force = await createBlock(draft(), db)
-    const hyper = await createBlock(draft({ name: 'Hypertrophie', startsOn: day(9, 19), weeks: 4 }), db)
-    await addDeloadWeek(force, 5, false, db)
+    const force = await createBlock(draft(), false, db)
+    const hyper = await createBlock(draft({ name: 'Hypertrophie', startsOn: day(9, 19), weeks: 4 }), false, db)
+    await updateBlock(force, draft({ weeks: 6 }), false, db)
     expect((await getBlock(hyper, db))?.startsOn).toBe(day(9, 19))
   })
 })
