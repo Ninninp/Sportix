@@ -3,7 +3,7 @@
   "attachments": {},
   "createdOnFiles": {
     "v": 1,
-    "at": "2026-09-21T18:00:00Z"
+    "at": "2026-09-23T08:00:00Z"
   },
   "title": "Sportix — Maquettes J6",
   "launch": {
@@ -35,26 +35,53 @@
       "page": "j6",
       "is_interactive": true
     },
-    "S-Bloc-nouveau.dc.html": {
+    "S-Calendrier-chevauchement.dc.html": {
       "x": 940,
       "y": 0,
       "w": 390,
-      "h": 940,
+      "h": 844,
+      "title": "Calendrier · deux blocs — sombre",
+      "page": "j6",
+      "is_interactive": true
+    },
+    "S-Bloc-nouveau.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
       "title": "Nouveau bloc — sombre",
       "page": "j6",
       "is_interactive": true
     },
-    "S-Objectif-nouveau.dc.html": {
-      "x": 1410,
+    "S-Bloc-couleur.dc.html": {
+      "x": 1880,
       "y": 0,
       "w": 390,
-      "h": 940,
+      "h": 844,
+      "title": "Couleur du bloc (panneau) — sombre",
+      "page": "j6",
+      "is_interactive": true
+    },
+    "S-Objectif-nouveau.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
       "title": "Nouvel objectif (panneau) — sombre",
       "page": "j6",
       "is_interactive": true
     },
+    "S-Bloc-chevauchement.dc.html": {
+      "x": 2820,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Deux blocs qui se chevauchent — sombre",
+      "page": "j6",
+      "is_interactive": true
+    },
     "S-Bloc-detail.dc.html": {
-      "x": 1880,
+      "x": 3290,
       "y": 0,
       "w": 390,
       "h": 940,
@@ -62,17 +89,8 @@
       "page": "j6",
       "is_interactive": true
     },
-    "S-Bloc-chevauchement.dc.html": {
-      "x": 2350,
-      "y": 0,
-      "w": 390,
-      "h": 940,
-      "title": "Deux blocs qui se chevauchent — sombre",
-      "page": "j6",
-      "is_interactive": true
-    },
     "S-Accueil-J6.dc.html": {
-      "x": 2820,
+      "x": 3760,
       "y": 0,
       "w": 390,
       "h": 844,
@@ -98,26 +116,53 @@
       "page": "j6",
       "is_interactive": true
     },
-    "C-Bloc-nouveau.dc.html": {
+    "C-Calendrier-chevauchement.dc.html": {
       "x": 940,
       "y": 1360,
       "w": 390,
-      "h": 940,
+      "h": 844,
+      "title": "Calendrier · deux blocs — clair",
+      "page": "j6",
+      "is_interactive": true
+    },
+    "C-Bloc-nouveau.dc.html": {
+      "x": 1410,
+      "y": 1360,
+      "w": 390,
+      "h": 844,
       "title": "Nouveau bloc — clair",
       "page": "j6",
       "is_interactive": true
     },
-    "C-Objectif-nouveau.dc.html": {
-      "x": 1410,
+    "C-Bloc-couleur.dc.html": {
+      "x": 1880,
       "y": 1360,
       "w": 390,
-      "h": 940,
+      "h": 844,
+      "title": "Couleur du bloc (panneau) — clair",
+      "page": "j6",
+      "is_interactive": true
+    },
+    "C-Objectif-nouveau.dc.html": {
+      "x": 2350,
+      "y": 1360,
+      "w": 390,
+      "h": 844,
       "title": "Nouvel objectif (panneau) — clair",
       "page": "j6",
       "is_interactive": true
     },
+    "C-Bloc-chevauchement.dc.html": {
+      "x": 2820,
+      "y": 1360,
+      "w": 390,
+      "h": 844,
+      "title": "Deux blocs qui se chevauchent — clair",
+      "page": "j6",
+      "is_interactive": true
+    },
     "C-Bloc-detail.dc.html": {
-      "x": 1880,
+      "x": 3290,
       "y": 1360,
       "w": 390,
       "h": 940,
@@ -125,17 +170,8 @@
       "page": "j6",
       "is_interactive": true
     },
-    "C-Bloc-chevauchement.dc.html": {
-      "x": 2350,
-      "y": 1360,
-      "w": 390,
-      "h": 940,
-      "title": "Deux blocs qui se chevauchent — clair",
-      "page": "j6",
-      "is_interactive": true
-    },
     "C-Accueil-J6.dc.html": {
-      "x": 2820,
+      "x": 3760,
       "y": 1360,
       "w": 390,
       "h": 844,
@@ -147,17 +183,21 @@
   "order": [
     "S-Calendrier-vide.dc.html",
     "Main.dc.html",
+    "S-Calendrier-chevauchement.dc.html",
     "S-Bloc-nouveau.dc.html",
+    "S-Bloc-couleur.dc.html",
     "S-Objectif-nouveau.dc.html",
-    "S-Bloc-detail.dc.html",
     "S-Bloc-chevauchement.dc.html",
+    "S-Bloc-detail.dc.html",
     "S-Accueil-J6.dc.html",
     "C-Calendrier-vide.dc.html",
     "C-Calendrier-mois.dc.html",
+    "C-Calendrier-chevauchement.dc.html",
     "C-Bloc-nouveau.dc.html",
+    "C-Bloc-couleur.dc.html",
     "C-Objectif-nouveau.dc.html",
-    "C-Bloc-detail.dc.html",
     "C-Bloc-chevauchement.dc.html",
+    "C-Bloc-detail.dc.html",
     "C-Accueil-J6.dc.html"
   ],
   "notes": {
@@ -167,7 +207,7 @@
       "text": "J6 · Calendrier des blocs — thème sombre",
       "kind": "title1",
       "page": "j6",
-      "maxW": 3210
+      "maxW": 4150
     },
     "j6-C": {
       "x": 0,
@@ -175,10 +215,10 @@
       "text": "J6 · Calendrier des blocs — thème clair",
       "kind": "title1",
       "page": "j6",
-      "maxW": 3210
+      "maxW": 4150
     },
     "j6-choix": {
-      "x": 3290,
+      "x": 4230,
       "y": 0,
       "w": 400,
       "page": "j6",
@@ -187,7 +227,7 @@
       "text": "Écran principal retenu le 21/09/2026 : la vue mensuelle. Un vrai calendrier, la colonne S1/S2/… à gauche pour les semaines du bloc, la case du jour cerclée, un point sous les jours où une séance a été faite, et les jours du bloc sur fond plein. La variante « frise des blocs » (les blocs les uns sous les autres) a été écartée : on retrouve les autres blocs en changeant de mois, et le bloc en cours est rappelé en bas de l’écran."
     },
     "j6-semaine": {
-      "x": 3290,
+      "x": 4230,
       "y": 520,
       "w": 400,
       "page": "j6",
@@ -196,28 +236,45 @@
       "text": "Retenu le 21/09/2026 : un bloc commence un lundi et dure un nombre entier de semaines : la semaine du bloc et la semaine du calendrier sont alors la même chose (S2 = du 21 au 27 septembre). C’est ce qui permet la barre S1…S5 partout, et la comparaison d’un bloc à l’autre au J7."
     },
     "j6-deload": {
-      "x": 3290,
+      "x": 4230,
       "y": 1040,
       "w": 400,
       "page": "j6",
       "size": "s",
-      "text": "Deload : une semaine du bloc marquée « D » (pointillés). « + Semaine de deload » l’insère et allonge le bloc d’une semaine ; si le bloc suivant est touché, on propose de le décaler (planche 7). Le deload reste visible dans les Stats du J7, grisé."
+      "text": "Deload (repris le 22/09/2026) : une semaine du bloc marquée « D » (pointillés), réglée UNIQUEMENT dans le formulaire du bloc — le bouton « + Semaine de deload » du détail a été retiré. Allonger un bloc peut mordre sur le suivant : on propose alors de le décaler. Une séance faite pendant un deload ne déclenche jamais de hausse de charge, et après le deload l’app reprend les charges d’avant."
     },
     "j6-rattachement": {
-      "x": 3290,
+      "x": 4230,
       "y": 1560,
       "w": 400,
       "page": "j6",
       "size": "s",
-      "text": "Chaque séance enregistrée pendant un bloc en garde l’identifiant (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Les séances déjà faites avant la création du bloc ne sont pas rattachées."
+      "text": "Chaque séance faite pendant un bloc lui est rattachée (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Le rattachement suit les dates : créer un bloc, changer son début ou ajouter un deload rattache aussi les séances déjà faites."
+    },
+    "j6-couleurs": {
+      "x": 4230,
+      "y": 2600,
+      "w": 400,
+      "page": "j6",
+      "size": "s",
+      "color": "teal",
+      "text": "Couleurs (22/09/2026) : chaque bloc a la sienne, choisie par le carré à droite du nom, et proposée différente du bloc précédent. Elles servent à lire d’un coup d’œil où finit un bloc et où commence le suivant, et à voir deux blocs qui se chevauchent : le jour commun est coupé en diagonale (planche « Calendrier · deux blocs »). En sombre, teintes moyennes et claires avec texte foncé."
+    },
+    "j6-formulaire": {
+      "x": 4230,
+      "y": 3120,
+      "w": 400,
+      "page": "j6",
+      "size": "s",
+      "text": "Formulaire (22/09/2026) : sans onglets et sans défilement sur un iPhone 14. Les pastilles tiennent sur une ligne qui défile à l’horizontale ; le premier jour s’écrit en toutes lettres (le champ date d’iOS, posé dessus en transparent, débordait de l’écran) ; « Par semaine » sert au « 4/15 séances » du calendrier."
     },
     "j6-accueil": {
-      "x": 3290,
+      "x": 4230,
       "y": 2080,
       "w": 400,
       "page": "j6",
       "size": "s",
-      "text": "Accueil (dernière planche) : la ligne fine du bloc passe au-dessus des chiffres de la semaine. Elle mène au détail du bloc. Sans bloc en cours, la ligne disparaît et l’accueil est celui du J5."
+      "text": "Accueil (dernière planche) : la ligne fine du bloc se pose SOUS les chiffres de la semaine, juste avant la grande carte, et mène au détail du bloc. Sans bloc en cours, elle disparaît et l’accueil est celui du J5. Chiffres de la semaine centrés (retouche du 22/09/2026)."
     }
   },
   "designSystems": []

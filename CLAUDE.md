@@ -22,9 +22,9 @@ Retours de l'utilisateur du 22/09/2026, traités : bouton « + Semaine de deload
 
 **Semaines de deload (fait le 23/09/2026, parcours § 2.1 et § 3.6)** : une séance commencée dans une semaine de deload porte `session.deload`, recopié sur ses séries (`set.deload`) ; comme `blockId`, l'étiquette est recalculée pour toutes les séances à chaque changement de bloc (`reattachSessions`, `isDeloadAt`). Conséquences : `lastPerformance` **saute** les séries de deload (après un deload on reprend les charges d'avant, avec la hausse gagnée avant), et pendant un deload aucune hausse n'est proposée (`prefillSets(..., deload)`, `planDaySets(..., deload)`, `increaseSuggested(pe, history, deload)`, badge ↑ masqué sur l'accueil, la séance et le récap). Les **records** voient toujours tout : c'est `lastPerformance` qui filtre, pas `getHistorySets`.
 
-**Reprendre ici** :
-1. Reporter dans le canvas J6 ce qui a changé depuis sa publication (bouton de deload retiré, réglage « Par semaine », couleurs des blocs, carte du bas, formulaire sans onglets, champ date en toutes lettres, chiffres des réglages − / +).
-2. Puis J7 (stats et progression).
+**Canvas J6 remis à jour le 23/09/2026** (version 44) : 9 écrans × 2 thèmes, avec les planches « Calendrier · deux blocs » (chevauchement en diagonale) et « Couleur du bloc ». Le générateur (`design/maquettes-d5/generer.mjs`) connaît maintenant les couleurs de bloc (`t.blocs`, `t.onBloc`) et les chiffres de la semaine centrés (`weekStats(t, true)`).
+
+**Reprendre ici** : **J7 (stats et progression)** — voir `docs/PLAN.md`. Penser à `useAllSets` / `blockSessions` pour comparer deux blocs, et à griser les séances de deload (`set.deload`) dans les graphiques.
 
 Reste aussi du J4 : **le test du son** sur l'iPhone (dernier point avant de pouvoir cocher le J4).
 
