@@ -6,7 +6,7 @@ import type { BlockDraft } from '../lib/blocks.ts'
 import { createBlock, createGoal, saveBlock, deleteBlock, getBlock, listBlocks, listGoals, updateBlock } from './blocks.ts'
 import { createProgram, listDays, startProgramSession } from './programs.ts'
 import { SportixDB } from './schema.ts'
-import { endSession, startSession } from './sessions.ts'
+import { addExerciseToSession, endSession, getSessionSets, startSession } from './sessions.ts'
 
 let db: SportixDB
 let n = 0
@@ -125,6 +125,41 @@ describe('rattachement des séances', () => {
 
     await deleteBlock(blockId, db)
     expect((await db.sessions.get(before))?.blockId).toBeUndefined()
+  })
+})
+
+describe('semaines de deload', () => {
+  it('étiquette la séance et ses séries, et suit les changements de bloc', async () => {
+    freshDb()
+    // Bloc de 5 semaines à partir du 14 septembre, sans deload pour l'instant.
+    const id = await createBlock(draft({ deloadWeeks: [] }), false, db)
+    const exerciseId = (await db.exercises.toArray())[0].id
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(day(8, 22, 18)) // mardi de la semaine 2
+    const session = await startSession(db)
+    await addExerciseToSession(session, exerciseId, 'barre', db)
+    vi.useRealTimers()
+    expect(await db.sessions.get(session)).not.toHaveProperty('deload')
+
+    // La semaine 2 devient une semaine de deload : la séance et ses séries suivent.
+    await updateBlock(id, draft({ deloadWeeks: [2] }), false, db)
+    expect((await db.sessions.get(session))?.deload).toBe(true)
+    expect((await getSessionSets(session, db)).every((s) => s.deload)).toBe(true)
+
+    // Le deload est retiré : les étiquettes disparaissent.
+    await updateBlock(id, draft({ deloadWeeks: [] }), false, db)
+    expect(await db.sessions.get(session)).not.toHaveProperty('deload')
+    expect((await getSessionSets(session, db)).every((s) => s.deload === undefined)).toBe(true)
+  })
+
+  it('une séance commencée en deload naît étiquetée', async () => {
+    freshDb()
+    await createBlock(draft({ deloadWeeks: [2] }), false, db)
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(day(8, 23, 18)) // mercredi de la semaine 2 (deload)
+    const session = await startSession(db)
+    vi.useRealTimers()
+    expect((await db.sessions.get(session))?.deload).toBe(true)
   })
 })
 

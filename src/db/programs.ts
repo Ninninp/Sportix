@@ -1,6 +1,6 @@
 // Accès aux programmes (J5) : programmes, jours, exercices de chaque jour, et démarrage d'une
 // séance à partir d'un jour. Chaque modification est enregistrée aussitôt (pas de bouton « Enregistrer »).
-import { blockIdFor } from '../lib/blocks.ts'
+import { blockIdFor, isDeloadAt } from '../lib/blocks.ts'
 import type { Variant } from '../lib/exercises.ts'
 import {
   DEFAULT_PROGRAM_EXERCISE,
@@ -165,24 +165,33 @@ export async function countExerciseInPrograms(exerciseId: string, db: SportixDB 
  * S'il y a déjà une séance en cours, on la reprend (jamais deux séances à la fois).
  */
 export async function startProgramSession(dayId: string, db: SportixDB = defaultDb): Promise<string> {
-  const [day, exercises, history, settings] = await Promise.all([
+  const [day, exercises, history, settings, blocks] = await Promise.all([
     db.programDays.get(dayId),
     listDayExercises(dayId, db),
     getHistorySets(undefined, db),
     getSettings(db),
+    db.blocks.toArray(),
   ])
   if (!day) throw new Error('Jour de programme introuvable')
   const id = crypto.randomUUID()
-  const planned = planDaySets(exercises, history, settings.weightSteps)
+  const startedAt = Date.now()
+  // Semaine de deload : charges de la dernière séance normale, sans hausse (parcours.md § 2.1).
+  const deload = isDeloadAt(blocks, startedAt)
+  const planned = planDaySets(exercises, history, settings.weightSteps, deload)
   // Le test « y a-t-il déjà une séance en cours ? » est **dans** la transaction d'écriture : sinon,
   // deux appuis rapprochés sur « Démarrer la séance » (les lectures ci-dessus prennent un instant)
   // répondraient tous les deux « non » et créeraient deux séances, dont une invisible à jamais.
   return db.transaction('rw', db.sessions, db.sets, db.blocks, async () => {
     const existing = await getActiveSession(db)
     if (existing) return existing.id
-    const startedAt = Date.now()
-    const blockId = blockIdFor(await db.blocks.toArray(), startedAt)
-    await db.sessions.add({ id, startedAt, programDayId: dayId, title: day.name, blockId })
+    await db.sessions.add({
+      id,
+      startedAt,
+      programDayId: dayId,
+      title: day.name,
+      blockId: blockIdFor(blocks, startedAt),
+      ...(deload ? { deload: true } : {}),
+    })
     await db.sets.bulkAdd(planned.map((p) => ({ ...p, id: crypto.randomUUID(), sessionId: id, done: false })))
     return id
   })

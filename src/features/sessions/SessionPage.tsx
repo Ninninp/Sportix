@@ -87,7 +87,8 @@ function SessionPage() {
   const exercise = block ? exercises.get(block.exerciseId) : undefined
   const progress = sessionProgress(sets)
   const steps = settings.weightSteps
-  const badge = block
+  // Séance de deload : jamais de proposition de hausse (parcours.md § 2.1).
+  const badge = block && !session.deload
     ? increaseBadge(lastPerformance(history, block.exerciseId, block.variant), block.variant, steps)
     : null
   const step = block ? weightStep(block.variant, steps) : 2.5

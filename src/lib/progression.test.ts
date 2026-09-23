@@ -55,6 +55,32 @@ describe('lastPerformance', () => {
   })
 })
 
+describe('semaines de deload (parcours.md § 2.1)', () => {
+  // La semaine passée : 3 × 12 à 80 kg (objectif atteint). Puis une semaine de deload, allégée.
+  const normale = pastSets([12, 12, 12])
+  const deload = pastSets([12, 12, 12], { sessionId: 'deload', weight: 60, deload: true, doneAt: 5000 })
+
+  it('ne retient pas une séance de deload comme « la dernière fois »', () => {
+    const last = lastPerformance([...normale, ...deload], 'developpe', 'barre')
+    expect(last?.sessionId).toBe('seance-1') // et non la séance de deload, pourtant plus récente
+    expect(last?.sets[0].weight).toBe(80) // on reprend les charges d'avant le deload
+  })
+
+  it('propose quand même la hausse gagnée avant le deload', () => {
+    const last = lastPerformance([...normale, ...deload], 'developpe', 'barre')
+    expect(prefillSets(last, 'barre')[0]).toMatchObject({ weight: 82.5, reps: 8 })
+  })
+
+  it('ne propose jamais de hausse pendant une séance de deload', () => {
+    const last = lastPerformance(normale, 'developpe', 'barre')
+    expect(prefillSets(last, 'barre', undefined, true)).toEqual([
+      { weight: 80, reps: 12, targetRepsMin: 8, targetRepsMax: 12 },
+      { weight: 80, reps: 12, targetRepsMin: 8, targetRepsMax: 12 },
+      { weight: 80, reps: 12, targetRepsMin: 8, targetRepsMax: 12 },
+    ])
+  })
+})
+
 describe('double progression', () => {
   it('12, 11, 10 : on garde la charge et les reps à battre', () => {
     const last = lastPerformance(pastSets([12, 11, 10]), 'developpe', 'barre')

@@ -49,13 +49,17 @@ export type LastPerformance = {
   sets: SessionSet[]
 }
 
-/** Retrouve la dernière séance où cet exercice (et cette variante) a été travaillé. */
+/**
+ * Retrouve la dernière séance où cet exercice (et cette variante) a été travaillé.
+ * Les séances de deload sont sautées (parcours.md § 2.1 et § 3.6) : elles ne déclenchent pas de
+ * hausse de charge, et après un deload on reprend les charges d'avant, pas les charges allégées.
+ */
 export function lastPerformance(
   history: SessionSet[],
   exerciseId: string,
   variant: Variant | null,
 ): LastPerformance | null {
-  const done = history.filter((s) => s.exerciseId === exerciseId && s.variant === variant && s.done)
+  const done = history.filter((s) => s.exerciseId === exerciseId && s.variant === variant && s.done && !s.deload)
   if (done.length === 0) return null
   // La série faite le plus récemment désigne la séance à reprendre.
   const latest = done.reduce((a, b) => ((b.doneAt ?? 0) > (a.doneAt ?? 0) ? b : a))
@@ -89,11 +93,13 @@ export function prefillSets(
   last: LastPerformance | null,
   variant: Variant | null,
   steps: WeightSteps = WEIGHT_STEPS,
+  /** Séance de deload : jamais de hausse de charge (les charges se baissent à la main). */
+  deload = false,
 ): PrefilledSet[] {
   const min = minWeight(variant)
   if (!last || last.sets.length === 0) return [{ weight: min, reps: 0 }]
 
-  const increase = suggestsWeightIncrease(last)
+  const increase = !deload && suggestsWeightIncrease(last)
   const step = increase ? weightStep(variant, steps) : 0
 
   return last.sets.map((s) => ({

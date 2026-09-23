@@ -5,7 +5,7 @@
 // les séances** à chaque création, modification ou suppression d'un bloc : une séance faite avant
 // de créer le bloc, ou pendant une semaine de deload ajoutée après coup, rejoint ainsi son bloc.
 // Le recalcul se fait dans la même transaction que le changement de bloc (jamais d'état bancal).
-import { blockIdFor, normalizeStart, shiftNextBlocks, type Block, type BlockDraft, type BlockGoal } from '../lib/blocks.ts'
+import { blockIdFor, isDeloadAt, normalizeStart, shiftNextBlocks, type Block, type BlockDraft, type BlockGoal } from '../lib/blocks.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 
 /** Blocs, du plus ancien au plus récent. */
@@ -38,13 +38,26 @@ function clean(draft: BlockDraft): BlockDraft {
   }
 }
 
-/** Rattache chaque séance au bloc en cours à son démarrage (ou à aucun). À appeler dans une transaction. */
+/**
+ * Rattache chaque séance au bloc en cours à son démarrage (ou à aucun), et recalcule si elle tombe
+ * dans une semaine de deload — étiquette recopiée sur ses séries, que la double progression saute.
+ * À appeler dans une transaction qui couvre `blocks`, `sessions` et `sets`.
+ */
 async function reattachSessions(db: SportixDB): Promise<void> {
   const blocks = await db.blocks.toArray()
+  const deloadSessions = new Set<string>()
   await db.sessions.toCollection().modify((session) => {
     const blockId = blockIdFor(blocks, session.startedAt)
     if (blockId) session.blockId = blockId
     else delete session.blockId
+    if (isDeloadAt(blocks, session.startedAt)) {
+      session.deload = true
+      deloadSessions.add(session.id)
+    } else delete session.deload
+  })
+  await db.sets.toCollection().modify((set) => {
+    if (deloadSessions.has(set.sessionId)) set.deload = true
+    else delete set.deload
   })
 }
 
@@ -60,8 +73,8 @@ async function reattachSessions(db: SportixDB): Promise<void> {
  */
 export async function saveBlock(id: string, draft: BlockDraft, shiftNext = false, db: SportixDB = defaultDb): Promise<string> {
   const blockId = id
-  await db.transaction('rw', db.blocks, db.sessions, async () => {
-    const existing = id ? await db.blocks.get(id) : undefined
+  await db.transaction('rw', db.blocks, db.sessions, db.sets, async () => {
+    const existing = await db.blocks.get(id)
     const block: Block = { ...clean(draft), id: blockId, createdAt: existing?.createdAt ?? Date.now() }
     if (shiftNext) {
       for (const { id: other, startsOn } of shiftNextBlocks(block, await db.blocks.toArray())) {
@@ -84,7 +97,7 @@ export async function updateBlock(id: string, draft: BlockDraft, shiftNext = fal
 
 /** Supprime un bloc. Ses séances restent (elles rejoignent un autre bloc qui couvre leur date, s'il y en a un). */
 export async function deleteBlock(id: string, db: SportixDB = defaultDb): Promise<void> {
-  await db.transaction('rw', db.blocks, db.sessions, async () => {
+  await db.transaction('rw', db.blocks, db.sessions, db.sets, async () => {
     await db.blocks.delete(id)
     await reattachSessions(db)
   })

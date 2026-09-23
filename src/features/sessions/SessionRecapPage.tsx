@@ -45,8 +45,9 @@ function SessionRecapPage() {
   const summary = sessionSummary(session, sets)
   const records = findRecords(sets, history)
   const blocks = groupSetsByExercise(sets)
-  // Ce que la double progression proposera la prochaine fois, exercice par exercice
-  const nextTime = blocks
+  // Ce que la double progression proposera la prochaine fois, exercice par exercice. Rien après une
+  // séance de deload : elle ne déclenche pas de hausse (parcours.md § 2.1).
+  const nextTime = (session.deload ? [] : blocks)
     .map((b) => ({ block: b, badge: increaseBadge({ sessionId, sets: b.sets }, b.variant, settings.weightSteps) }))
     .filter((x) => x.badge !== null)
 

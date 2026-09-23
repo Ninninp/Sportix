@@ -16,6 +16,7 @@ import {
   formatSpan,
   formatTonnage,
   formatWeekDates,
+  isDeloadAt,
   monthGrid,
   normalizeStart,
   overlapping,
@@ -213,6 +214,16 @@ describe('monthGrid', () => {
   it('passe d’un mois à l’autre', () => {
     expect(addMonths(day(2026, 11, 15), 1)).toBe(day(2027, 0, 1))
     expect(addMonths(day(2026, 0, 31), -1)).toBe(day(2025, 11, 1))
+  })
+})
+
+describe('isDeloadAt', () => {
+  const b = block({ deloadWeeks: [2] }) // 14 sept. → 18 oct., deload du 21 au 27 septembre
+
+  it('dit si une date tombe dans une semaine de deload', () => {
+    expect(isDeloadAt([b], day(2026, 8, 22, 18))).toBe(true)
+    expect(isDeloadAt([b], day(2026, 8, 15, 18))).toBe(false)
+    expect(isDeloadAt([b], day(2026, 10, 2, 18))).toBe(false) // hors bloc
   })
 })
 

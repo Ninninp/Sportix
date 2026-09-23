@@ -13,7 +13,7 @@ import Sheet from '../../components/Sheet.tsx'
 import { BadgeIncrease } from '../../components/Badge.tsx'
 import { IconChevronDroite, IconFleche, IconFlecheBas, IconPartager } from '../../components/icons.tsx'
 import { startProgramSession } from '../../db/programs.ts'
-import { activeBlock, describeWeeks, weekSegments } from '../../lib/blocks.ts'
+import { activeBlock, describeWeeks, isDeloadAt, weekSegments } from '../../lib/blocks.ts'
 import { startSession } from '../../db/sessions.ts'
 import { increaseBadge, lastPerformance } from '../../lib/progression.ts'
 import { increaseSuggested, nextDay } from '../../lib/programs.ts'
@@ -112,6 +112,8 @@ function HomePage() {
 
   const all = active ? [...sessions, active] : sessions
   const block = activeBlock(blocks, now)
+  // Semaine de deload : pas de badge ↑ sur la grande carte (aucune hausse ne sera proposée).
+  const deloadNow = isDeloadAt(blocks, now)
   const stats = weekStats(all, sets, now)
   const days = weekDays(all, now)
   const history: SessionSet[] = sets.filter((s) => s.done)
@@ -131,7 +133,7 @@ function HomePage() {
       return {
         exerciseId,
         value: latest.weight > 0 ? `${formatNumber(latest.weight)} kg` : `× ${latest.reps}`,
-        increase: latest.progression !== false && increaseBadge(lastPerformance(history, exerciseId, latest.variant), latest.variant) !== null,
+        increase: !deloadNow && latest.progression !== false && increaseBadge(lastPerformance(history, exerciseId, latest.variant), latest.variant) !== null,
       }
     })
 
@@ -156,7 +158,7 @@ function HomePage() {
       title: planned.day.name,
       sub: `${choice ? 'Séance choisie' : 'Prochaine séance'} · ${program.program.name} · ${plural(planned.exercises.length, 'exercice')}`,
       rows: heroRows(
-        planned.exercises.map((pe) => ({ key: pe.id, name: nameOf(pe.exerciseId), increase: increaseSuggested(pe, history) })),
+        planned.exercises.map((pe) => ({ key: pe.id, name: nameOf(pe.exerciseId), increase: increaseSuggested(pe, history, deloadNow) })),
       ),
       cta: 'Démarrer la séance',
       onStart: async () => void (await startProgramSession(planned.day.id)),

@@ -60,7 +60,8 @@ export function nextDay(days: ProgramDay[], sessions: Session[]): ProgramDay | u
  * progression est activée et que toutes les séries de la dernière fois (même variante) ont atteint
  * le haut de la fourchette du programme. Sert au pré-remplissage et au badge ↑ de l'accueil.
  */
-export function increaseSuggested(pe: ProgramExercise, history: SessionSet[]): boolean {
+export function increaseSuggested(pe: ProgramExercise, history: SessionSet[], deload = false): boolean {
+  if (deload) return false // semaine de deload : jamais de hausse (parcours.md § 2.1)
   const last = lastPerformance(history, pe.exerciseId, pe.variant)
   return pe.doubleProgression && last !== null && last.sets.length > 0 && last.sets.every((s) => s.reps >= pe.repsMax)
 }
@@ -68,7 +69,7 @@ export function increaseSuggested(pe: ProgramExercise, history: SessionSet[]): b
 /** Une série à créer au démarrage d'une séance de programme. */
 export type PlannedSet = Pick<
   SessionSet,
-  'exerciseId' | 'variant' | 'exerciseOrder' | 'order' | 'weight' | 'reps' | 'targetRepsMin' | 'targetRepsMax' | 'restSeconds' | 'progression'
+  'exerciseId' | 'variant' | 'exerciseOrder' | 'order' | 'weight' | 'reps' | 'targetRepsMin' | 'targetRepsMax' | 'restSeconds' | 'progression' | 'deload'
 >
 
 /**
@@ -85,12 +86,14 @@ export function planDaySets(
   exercises: ProgramExercise[],
   history: SessionSet[],
   steps: WeightSteps = WEIGHT_STEPS,
+  /** Séance de deload : charges de la dernière séance normale, sans hausse. */
+  deload = false,
 ): PlannedSet[] {
   return [...exercises]
     .sort((a, b) => a.order - b.order)
     .flatMap((pe, index) => {
       const last = lastPerformance(history, pe.exerciseId, pe.variant)
-      const increase = increaseSuggested(pe, history)
+      const increase = increaseSuggested(pe, history, deload)
       const step = increase ? weightStep(pe.variant, steps) : 0
       const min = minWeight(pe.variant)
       return Array.from({ length: pe.sets }, (_, i) => {
@@ -106,6 +109,7 @@ export function planDaySets(
           targetRepsMax: pe.repsMax,
           restSeconds: pe.restSeconds,
           progression: pe.doubleProgression,
+          ...(deload ? { deload: true } : {}),
         }
       })
     })

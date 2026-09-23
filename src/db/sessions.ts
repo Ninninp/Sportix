@@ -1,6 +1,6 @@
 // Accès aux séances et aux séries. Chaque geste de l'utilisateur écrit immédiatement :
 // en salle, l'app peut être fermée ou tuée par le système à tout moment.
-import { blockIdFor } from '../lib/blocks.ts'
+import { blockIdFor, isDeloadAt } from '../lib/blocks.ts'
 import type { Variant } from '../lib/exercises.ts'
 import { lastPerformance, prefillSets } from '../lib/progression.ts'
 import { extendRest, startRest } from '../lib/rest.ts'
@@ -31,7 +31,13 @@ export async function startSession(db: SportixDB = defaultDb): Promise<string> {
     const existing = await getActiveSession(db)
     if (existing) return existing.id // on ne démarre jamais deux séances à la fois
     const startedAt = Date.now()
-    await db.sessions.add({ id, startedAt, blockId: blockIdFor(await db.blocks.toArray(), startedAt) })
+    const blocks = await db.blocks.toArray()
+    await db.sessions.add({
+      id,
+      startedAt,
+      blockId: blockIdFor(blocks, startedAt),
+      ...(isDeloadAt(blocks, startedAt) ? { deload: true } : {}),
+    })
     return id
   })
 }
@@ -56,13 +62,15 @@ export async function addExerciseToSession(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [current, history, settings] = await Promise.all([
+  const [current, history, settings, session] = await Promise.all([
     getSessionSets(sessionId, db),
     getHistorySets(sessionId, db),
     getSettings(db),
+    db.sessions.get(sessionId),
   ])
   const exerciseOrder = nextExerciseOrder(current)
-  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps)
+  const deload = session?.deload === true
+  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps, deload)
 
   await db.sets.bulkAdd(
     prefilled.map((p, i) => ({
@@ -77,6 +85,7 @@ export async function addExerciseToSession(
       targetRepsMin: p.targetRepsMin,
       targetRepsMax: p.targetRepsMax,
       done: false,
+      ...(deload ? { deload: true } : {}),
     })),
   )
 }
@@ -173,14 +182,15 @@ export async function changeVariant(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [sets, history, settings] = await Promise.all([
+  const [sets, history, settings, session] = await Promise.all([
     getSessionSets(sessionId, db),
     getHistorySets(sessionId, db),
     getSettings(db),
+    db.sessions.get(sessionId),
   ])
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
-  const prefilled = prefillSets(lastPerformance(history, block.exerciseId, variant), variant, settings.weightSteps)
+  const prefilled = prefillSets(lastPerformance(history, block.exerciseId, variant), variant, settings.weightSteps, session?.deload === true)
 
   await Promise.all(
     block.sets.map((s, i) =>
@@ -208,17 +218,18 @@ export async function replaceExercise(
   variant: Variant | null,
   db: SportixDB = defaultDb,
 ): Promise<void> {
-  const [sets, history, settings] = await Promise.all([
+  const [sets, history, settings, session] = await Promise.all([
     getSessionSets(sessionId, db),
     getHistorySets(sessionId, db),
     getSettings(db),
+    db.sessions.get(sessionId),
   ])
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
 
   const remaining = block.sets.filter((s) => !s.done)
   if (remaining.length === 0) return
-  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps)
+  const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps, session?.deload === true)
   const doneCount = block.sets.length - remaining.length
   // Le nouvel exercice prend la place suivante s'il reste des séries faites à l'ancien.
   const newOrder = doneCount > 0 ? nextExerciseOrder(sets) : exerciseOrder

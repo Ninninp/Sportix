@@ -17,6 +17,8 @@ export type Session = {
   title?: string
   /** Bloc en cours au démarrage (J6), recalculé si les dates des blocs changent ; absent hors bloc. */
   blockId?: string
+  /** Séance commencée pendant une semaine de deload (J6), recalculée comme `blockId`. */
+  deload?: boolean
 }
 
 export type SessionSet = {
@@ -41,6 +43,11 @@ export type SessionSet = {
   restSeconds?: number
   /** false : double progression désactivée pour cet exercice (jamais de proposition de charge). */
   progression?: boolean
+  /**
+   * Série d'une séance de deload (même valeur que `session.deload`, recopiée ici pour que
+   * `lastPerformance` puisse l'écarter sans relire les séances).
+   */
+  deload?: boolean
 }
 
 export type ExerciseBlock = {

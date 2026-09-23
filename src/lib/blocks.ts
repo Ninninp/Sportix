@@ -119,6 +119,13 @@ export function blockIdFor(blocks: Block[], time: number): string | undefined {
   return activeBlock(blocks, time)?.id
 }
 
+/** Une séance commencée à cet instant tombe-t-elle dans une semaine de deload (du bloc en cours) ? */
+export function isDeloadAt(blocks: Block[], time: number): boolean {
+  const block = activeBlock(blocks, time)
+  const week = block ? weekIndexAt(block, time) : null
+  return block !== undefined && week !== null && isDeload(block, week)
+}
+
 export type BlockWeek = { index: number; start: number; end: number; deload: boolean }
 
 /** Les semaines du bloc, du lundi au dimanche (`end` = dernier jour, inclus). */

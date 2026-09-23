@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { nextDay, planDaySets, type ProgramDay, type ProgramExercise } from './programs.ts'
+import { increaseSuggested, nextDay, planDaySets, type ProgramDay, type ProgramExercise } from './programs.ts'
 import type { Session, SessionSet } from './sessions.ts'
 
 const days: ProgramDay[] = [
@@ -33,6 +33,22 @@ const past = (reps: number[], weight = 100): SessionSet[] =>
     id: `x${i}`, sessionId: 'old', exerciseId: 'squat', variant: 'barre', exerciseOrder: 1, order: i + 1,
     weight, reps: r, done: true, doneAt: 10 + i,
   }))
+
+describe('planDaySets pendant un deload', () => {
+  it('garde la charge de la dernière séance normale, sans hausse ni objectif rehaussé', () => {
+    const atteint = past([6, 6, 6]) // objectif atteint : +2,5 kg hors deload
+    expect(planDaySets([squat], atteint)[0]).toMatchObject({ weight: 102.5, reps: 4 })
+    const enDeload = planDaySets([squat], atteint, undefined, true)
+    expect(enDeload[0]).toMatchObject({ weight: 100, reps: 6, deload: true })
+  })
+
+  it('ignore une séance de deload pour la prochaine séance normale', () => {
+    const history = [...past([6, 6, 6]), ...past([6, 6, 6], 70).map((s) => ({ ...s, sessionId: 'deload', deload: true, doneAt: 99 }))]
+    expect(planDaySets([squat], history)[0]).toMatchObject({ weight: 102.5 })
+    expect(increaseSuggested(squat, history)).toBe(true)
+    expect(increaseSuggested(squat, history, true)).toBe(false) // pendant le deload
+  })
+})
 
 describe('planDaySets', () => {
   it('première fois : le nombre de séries du programme, barre à vide, 0 rep (les séries suivront la première)', () => {
