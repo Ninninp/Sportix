@@ -21,7 +21,7 @@ import { REST_MIN, WEIGHT_STEP_CHOICES, stepRest } from '../../lib/settings.ts'
 import { useActiveExercises } from '../exercises/useExercises.ts'
 import GoalsSheet from '../stats/GoalsSheet.tsx'
 import { useBodyWeights } from '../stats/useStats.ts'
-import { withMovingAverage } from '../../lib/bodyWeight.ts'
+import { currentAverage } from '../../lib/bodyWeight.ts'
 import { isStandalone } from '../../lib/standalone.ts'
 import { useSettings } from './useSettings.ts'
 
@@ -152,7 +152,7 @@ function SettingsPage() {
         <p className="num">Version {__APP_VERSION__}</p>
       </footer>
 
-      <GoalsSheet open={editing === 'goals'} onClose={close} currentWeight={weights && weights.length > 0 ? withMovingAverage(weights).at(-1)!.average : undefined} />
+      <GoalsSheet open={editing === 'goals'} onClose={close} currentWeight={weights ? currentAverage(weights) : undefined} />
 
       <Sheet open={editing === 'rest'} onClose={close} label="Repos par défaut">
         <div>

@@ -34,8 +34,9 @@ describe('objectifs des Stats', () => {
     expect(stepGoalSessions(14, 1)).toBe(14)
   })
 
-  it('poids cible : le premier appui part du poids actuel au demi-kilo, puis 0,5 kg par appui', () => {
-    expect(stepGoalWeight(undefined, 1, 78.4)).toBe(78.5)
+  it('poids cible : le premier appui part du poids actuel, arrondi dans le sens du bouton, puis 0,5 kg par appui', () => {
+    expect(stepGoalWeight(undefined, 1, 78.3)).toBe(78.5)
+    expect(stepGoalWeight(undefined, -1, 78.3)).toBe(78)
     expect(stepGoalWeight(76, -1, 78.4)).toBe(75.5)
   })
 })

@@ -65,10 +65,12 @@ type TimeChartProps = {
   record?: ChartPoint
   tips?: ChartTip[]
   format?: (v: number) => string
+  /** Écart minimal entre deux graduations (la précision affichée : 1 pour des reps ou des kg ronds). */
+  minStep?: number
 }
 
 /** Courbe dans le temps (poids corporel, progression d'un exercice). Toucher un point ouvre sa bulle. */
-export function TimeChart({ label, height, from, to, line = [], dots = [], target, bands = [], hatched = [], record, tips = [], format = (v) => formatNumber(v) }: TimeChartProps) {
+export function TimeChart({ label, height, from, to, line = [], dots = [], target, bands = [], hatched = [], record, tips = [], format = (v) => formatNumber(v), minStep = 0 }: TimeChartProps) {
   const [ref, width] = useWidth<HTMLDivElement>()
   const [selected, setSelected] = useState<number | null>(null)
   const pattern = useId()
@@ -77,7 +79,7 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
   const top = bands.length > 0 ? 30 : 8
   const bottom = height - 20
   const values = [...line, ...dots].map((p) => p.value).concat(target !== undefined ? [target] : [])
-  const scale = niceScale(values)
+  const scale = niceScale(values, 3, minStep)
   const x = (t: number) => ((t - from) / Math.max(1, to - from)) * pw
   const y = (v: number) => bottom - ((v - scale.min) / (scale.max - scale.min || 1)) * (bottom - top)
   const clampX = (t: number) => Math.max(0, Math.min(pw, x(t)))
@@ -196,7 +198,7 @@ export function WeekColumns({ label, weeks, target, height = 120 }: { label: str
   const pw = width - AXIS
   const top = 8
   const bottom = height - 20
-  const scale = niceScale([0, ...weeks.map((w) => w.count), ...(target !== undefined ? [target] : []), 2])
+  const scale = niceScale([0, ...weeks.map((w) => w.count), ...(target !== undefined ? [target] : []), 2], 3, 1)
   const y = (v: number) => bottom - (v / (scale.max || 1)) * (bottom - top)
   const slot = pw / Math.max(1, weeks.length)
   const bw = Math.max(3, Math.min(14, slot - 4))

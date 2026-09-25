@@ -12,11 +12,12 @@ import { IconChevronBas, IconCoche } from '../../components/icons.tsx'
 import { blockColor, blockLastDay, formatSpan, formatTonnage, weekIndexAt, type Block } from '../../lib/blocks.ts'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import { formatNumber } from '../../lib/sessions.ts'
-import { blockFigures, blockGains, defaultComparison, formatKgChange } from '../../lib/stats.ts'
+import { blockFigures, blockGains, defaultComparison, formatKgChange, startedBlocks } from '../../lib/stats.ts'
 import { colorVar } from '../blocks/blockColors.ts'
 import { useBlocks } from '../blocks/useBlocks.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
+import { usePeriod, withPeriod } from './useStats.ts'
 
 const sectionTitle = 'text-caption font-semibold tracking-[0.06em] text-muted uppercase'
 const COLS = 'grid grid-cols-[minmax(0,1fr)_96px_96px] items-center gap-x-2'
@@ -62,10 +63,10 @@ function Bar({ name, value, strong, max }: { name: string; value: number; strong
   )
 }
 
-function BlockCompareFallback() {
+function BlockCompareFallback({ back }: { back: string }) {
   return (
     <main className="flex flex-1 flex-col gap-3 px-4 pt-2 pb-4">
-      <ScreenHeader title="Comparer" backTo="/stats" backLabel="Retour aux stats" />
+      <ScreenHeader title="Comparer" backTo={back} backLabel="Retour aux stats" />
       <p className="text-body text-muted">Il faut au moins deux blocs commencés pour les comparer.</p>
     </main>
   )
@@ -73,6 +74,8 @@ function BlockCompareFallback() {
 
 function BlockComparePage() {
   const [params, setParams] = useSearchParams()
+  const [period] = usePeriod()
+  const back = withPeriod('/stats', period)
   const blocks = useBlocks()
   const sessions = useFinishedSessions()
   const sets = useAllSets()
@@ -82,9 +85,9 @@ function BlockComparePage() {
   const [picking, setPicking] = useState<0 | 1 | null>(null)
   if (!blocks || !sessions || !sets || !exercises) return null
 
-  const started = blocks.filter((b) => b.startsOn <= now).sort((a, b) => a.startsOn - b.startsOn)
+  const started = startedBlocks(blocks, now)
   const fallback = defaultComparison(blocks, now)
-  if (!fallback) return <BlockCompareFallback />
+  if (!fallback) return <BlockCompareFallback back={back} />
   const find = (id: string | null) => started.find((b) => b.id === id)
   const chosen: [Block, Block] = [find(params.get('a')) ?? fallback[0], find(params.get('b')) ?? fallback[1]]
   // Le plus ancien à gauche, quel que soit l'ordre du choix
@@ -98,13 +101,13 @@ function BlockComparePage() {
     if (picking === null) return
     const next: [Block, Block] = [a, b]
     next[picking] = block
-    setParams({ a: next[0].id, b: next[1].id }, { replace: true })
+    setParams({ a: next[0].id, b: next[1].id, periode: period }, { replace: true })
     setPicking(null)
   }
 
   return (
     <main className="flex flex-1 flex-col gap-3 px-4 pt-2 pb-4">
-      <ScreenHeader title="Comparer" backTo="/stats" backLabel="Retour aux stats" />
+      <ScreenHeader title="Comparer" backTo={back} backLabel="Retour aux stats" />
       <div className="grid shrink-0 grid-cols-2 gap-2">
         <Picker block={a} side="Premier" now={now} onClick={() => setPicking(0)} />
         <Picker block={b} side="Second" now={now} onClick={() => setPicking(1)} />

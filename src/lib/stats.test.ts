@@ -4,6 +4,10 @@ import type { Exercise } from './exercises.ts'
 import type { Session, SessionSet } from './sessions.ts'
 import {
   averagePerWeek,
+  countExercises,
+  defaultVariant,
+  formatMetricChange,
+  variantChoices,
   blockFigures,
   blockGains,
   defaultComparison,
@@ -264,9 +268,17 @@ describe('séances par semaine', () => {
   })
 
   it('la première semaine, commencée avant la période, est marquée et sort de la moyenne', () => {
-    const weeks = sessionsByWeek(sessions, blocks, periodStart('3m', NOW), NOW)
+    const early = [session('tot', at(5, 26)), ...sessions] // vendredi 26 juin, dans la 1re semaine des 3 mois
+    const weeks = sessionsByWeek(early, blocks, periodStart('3m', NOW), NOW)
     expect(weeks[0].partial).toBe(true)
     expect(weeks.slice(1).every((w) => !w.partial)).toBe(true)
+  })
+
+  it('les semaines d’avant la toute première séance ne comptent pas (l’app n’était pas utilisée)', () => {
+    // 3 semaines d'utilisation, 4 séances par semaine, vues sur un an
+    const recent = [7, 8, 9, 10, 14, 15, 16, 17, 21, 22, 23, 24].slice(0, 12).map((d, i) => session(`r${i}`, at(8, d, 8)))
+    const weeks = sessionsByWeek(recent, [], periodStart('1a', NOW), NOW)
+    expect(averagePerWeek(weeks)).toBe(4)
   })
 })
 
@@ -276,8 +288,8 @@ describe('setsPerMuscle', () => {
       ['squat', exercise('squat')],
       ['couche', exercise('couche', { muscleGroup: 'pectoraux' })],
     ])
-    // Première séance le lundi 14 septembre : 10 jours et 18 h jusqu'au jeudi 24 à 18 h
-    const sessions = [session('a', at(8, 14)), session('b', at(8, 21)), session('d', at(8, 17), { deload: true })]
+    // Première séance le lundi 7 septembre ; la semaine du 14 est un deload (sortie du diviseur)
+    const sessions = [session('a', at(8, 7)), session('b', at(8, 21)), session('d', at(8, 17), { deload: true })]
     const sets = [
       ...Array.from({ length: 6 }, () => set('a', 100, 5)),
       ...Array.from({ length: 4 }, () => set('b', 100, 5)),
@@ -285,7 +297,7 @@ describe('setsPerMuscle', () => {
       set('d', 100, 5),
     ]
     const result = setsPerMuscle(exercises, sessions, sets, periodStart('3m', NOW), NOW)
-    const weeks = (NOW - new Date(2026, 8, 14).getTime()) / (7 * 86_400_000)
+    const weeks = (NOW - new Date(2026, 8, 7).getTime()) / (7 * 86_400_000) - 1
     expect(result.map((r) => r.group)).toEqual(['jambes', 'pectoraux'])
     expect(result[0].perWeek).toBeCloseTo(10 / weeks)
   })
@@ -355,5 +367,35 @@ describe('formats', () => {
     expect(formatMetric('volume', 2160)).toBe('2 160 kg')
     expect(formatSet({ weight: 0, reps: 12 })).toBe('× 12')
     expect(formatShortDate(at(6, 27))).toBe('lun. 27 juil.')
+  })
+})
+
+describe('corrections de la relecture du J7', () => {
+  it('« 3 mois » le 31 mai part du 28 février, pas du 3 mars', () => {
+    expect(periodStart('3m', new Date(2026, 4, 31, 12).getTime())).toBe(new Date(2026, 1, 28).getTime())
+    expect(periodStart('1a', new Date(2028, 1, 29, 12).getTime())).toBe(new Date(2027, 1, 28).getTime())
+  })
+
+  it('pas de graduation plus fine que la précision affichée', () => {
+    expect(niceScale([10, 11], 3, 1).ticks).toEqual([10, 11])
+  })
+
+  it('variantes proposées : déclarées et déjà utilisées, « sans variante » si elle a servi', () => {
+    const used = [set('a', 60, 8, { variant: null }), set('a', 80, 5, { variant: 'smith' })]
+    expect(variantChoices({ id: 'squat', variants: ['barre'] }, used)).toEqual(['barre', 'smith', null])
+    expect(variantChoices({ id: 'squat', variants: [] }, [set('a', 80, 5)])).toEqual(['barre'])
+    expect(variantChoices({ id: 'squat', variants: [] }, [])).toEqual([null])
+    expect(defaultVariant(['barre', 'smith', null], 'squat', [...used, set('b', 90, 5, { variant: 'smith' })])).toBe('smith')
+  })
+
+  it('compte les exercices de la période sans tout recalculer', () => {
+    const sessions = [session('a', at(8, 7)), session('vieux', at(1, 1))]
+    const sets = [set('a', 90, 5), set('a', 50, 8, { exerciseId: 'couche' }), set('vieux', 0, 5, { exerciseId: 'ancien' })]
+    expect(countExercises(sessions, sets, periodStart('3m', NOW))).toBe(2)
+  })
+
+  it('écart d’une mesure, avec son unité', () => {
+    expect(formatMetricChange('oneRepMax', -5.2)).toBe('5 kg')
+    expect(formatMetricChange('maxReps', 2)).toBe('2 reps')
   })
 })

@@ -21,7 +21,7 @@ import {
   PERIODS,
   averagePerWeek,
   defaultComparison,
-  exerciseSummaries,
+  countExercises,
   formatSet,
   formatShortDate,
   periodStart,
@@ -117,7 +117,7 @@ function StatsPage() {
   const average = averagePerWeek(weeks)
   const muscles = setsPerMuscle(exercises, sessions, sets, from, now)
   const records = recentRecords(sessions, sets, from)
-  const followed = exerciseSummaries(exercises, sessions, sets, from).length
+  const followed = countExercises(sessions, sets, from)
   const comparison = defaultComparison(blocks, now)
   const goalWeight = settings.goalBodyWeight
   const goalSessions = settings.goalWeeklySessions
@@ -231,7 +231,7 @@ function StatsPage() {
 
       <Card className="shrink-0 divide-y divide-border overflow-hidden">
         <ListRow to={withPeriod('/stats/exercices', period)} title="Tous les exercices" subtitle={`${followed} exercice${followed > 1 ? 's' : ''} suivi${followed > 1 ? 's' : ''} ${span}`} />
-        {comparison && <ListRow to="/stats/blocs" title="Comparer deux blocs" subtitle={`${comparison[0].name} · ${comparison[1].name}`} />}
+        {comparison && <ListRow to={withPeriod('/stats/blocs', period)} title="Comparer deux blocs" subtitle={`${comparison[0].name} · ${comparison[1].name}`} />}
       </Card>
 
       {weighIn}

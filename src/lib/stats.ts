@@ -8,7 +8,7 @@
 //   des moyennes et des comparaisons : une semaine allégée n'est pas une baisse de niveau.
 // - Les records, eux, voient tout l'historique (même règle qu'en séance, src/lib/records.ts).
 import { activeBlock, addWeeks, blockEnd, isDeloadAt, type Block } from './blocks.ts'
-import { MUSCLE_GROUPS, type Exercise, type MuscleGroup, type Variant } from './exercises.ts'
+import { MUSCLE_GROUPS, VARIANTS, type Exercise, type MuscleGroup, type Variant } from './exercises.ts'
 import { formatNumber, type Session, type SessionSet } from './sessions.ts'
 import { mondayOf } from './week.ts'
 
@@ -26,15 +26,15 @@ export function parsePeriod(value: string | null): Period {
 
 /**
  * Premier jour (0 h) de la période qui finit maintenant. « 4 sem. » = cette semaine et les trois
- * d'avant, du lundi ; « 3 mois » et « 1 an » = le même jour, 3 mois ou 1 an plus tôt.
+ * d'avant, du lundi ; « 3 mois » et « 1 an » = le même jour, 3 mois ou 1 an plus tôt — ou le dernier
+ * jour de ce mois-là s'il est plus court (le 31 mai → le 28 février, et non le 3 mars).
  */
 export function periodStart(period: Period, now = Date.now()): number {
   if (period === '4s') return addWeeks(mondayOf(now), -3)
   const d = new Date(now)
-  d.setHours(0, 0, 0, 0)
-  if (period === '3m') d.setMonth(d.getMonth() - 3)
-  else d.setFullYear(d.getFullYear() - 1)
-  return d.getTime()
+  const months = period === '3m' ? 3 : 12
+  const lastDay = new Date(d.getFullYear(), d.getMonth() - months + 1, 0).getDate()
+  return new Date(d.getFullYear(), d.getMonth() - months, Math.min(d.getDate(), lastDay)).getTime()
 }
 
 // ---------- 1RM estimé ----------
@@ -55,8 +55,9 @@ export type Scale = { min: number; max: number; ticks: number[] }
 /**
  * Graduations « rondes » (1, 2, 2,5 ou 5 × 10ⁿ) qui encadrent les valeurs, environ `count` traits.
  * Une seule valeur (ou toutes égales) : on ouvre un peu autour pour que la courbe ne colle pas au bord.
+ * `minStep` : jamais d'écart plus fin que la précision affichée (sinon « 10, 11, 11 » pour des reps).
  */
-export function niceScale(values: number[], count = 3): Scale {
+export function niceScale(values: number[], count = 3, minStep = 0): Scale {
   let lo = Math.min(...values)
   let hi = Math.max(...values)
   if (!Number.isFinite(lo)) return { min: 0, max: 1, ticks: [0, 1] }
@@ -67,7 +68,7 @@ export function niceScale(values: number[], count = 3): Scale {
   }
   const raw = (hi - lo) / count
   const power = 10 ** Math.floor(Math.log10(raw))
-  const step = ([1, 2, 2.5, 5, 10].map((m) => m * power).find((s) => s >= raw) ?? 10 * power)
+  const step = Math.max(minStep, [1, 2, 2.5, 5, 10].map((m) => m * power).find((s) => s >= raw) ?? 10 * power)
   const min = Math.floor(lo / step) * step
   const max = Math.ceil(hi / step) * step
   const ticks: number[] = []
@@ -134,6 +135,12 @@ export type Point = {
 
 const counts = (s: SessionSet) => s.done && s.reps >= 1
 
+/** Nombre d'exercices travaillés depuis `from` (« 4 exercices suivis »), sans rien calculer d'autre. */
+export function countExercises(sessions: Session[], sets: SessionSet[], from: number): number {
+  const ids = new Set(sessions.filter((s) => s.endedAt !== undefined && s.startedAt >= from).map((s) => s.id))
+  return new Set(sets.filter((s) => counts(s) && ids.has(s.sessionId)).map((s) => s.exerciseId)).size
+}
+
 /** Séries faites de cet exercice (et de cette variante, sauf « toutes »). */
 export function exerciseSets(exerciseId: string, variant: VariantFilter, sets: SessionSet[]): SessionSet[] {
   return sets.filter((s) => counts(s) && s.exerciseId === exerciseId && (variant === 'all' || s.variant === variant))
@@ -180,6 +187,33 @@ export function exercisePoints(
     points.push({ sessionId: session.id, time: session.startedAt, value, deload: session.deload === true || best.deload === true, best })
   }
   return points.sort((a, b) => a.time - b.time)
+}
+
+/**
+ * Variantes proposées pour un exercice : celles qu'il déclare et celles déjà utilisées dans les
+ * séries (un exercice a pu être modifié depuis : ses anciennes séries restent consultables).
+ * `null` (sans variante) n'apparaît que s'il a servi, ou si l'exercice n'a aucune variante.
+ */
+export function variantChoices(exercise: Pick<Exercise, 'id' | 'variants'>, sets: SessionSet[]): (Variant | null)[] {
+  const used = new Set(exerciseSets(exercise.id, 'all', sets).map((s) => s.variant))
+  const declared = VARIANTS.filter((v) => exercise.variants.includes(v) || used.has(v))
+  return used.has(null) || declared.length === 0 ? [...declared, null] : declared
+}
+
+/** Variante affichée par défaut : la plus utilisée (la première proposée si rien n'est encore fait). */
+export function defaultVariant(choices: (Variant | null)[], exerciseId: string, sets: SessionSet[]): Variant | null {
+  const count = (v: Variant | null) => exerciseSets(exerciseId, v, sets).length
+  return choices.reduce((best, v) => (count(v) > count(best) ? v : best), choices[0])
+}
+
+/** Le meilleur point (le record de la mesure), ou undefined. */
+export function bestPoint(points: Point[]): Point | undefined {
+  return points.reduce<Point | undefined>((a, p) => (!a || p.value > a.value ? p : a), undefined)
+}
+
+/** Semaines de deload des blocs, en intervalles [début, fin[ (hachurées sur les graphiques). */
+export function deloadRanges(blocks: Block[]): { from: number; to: number }[] {
+  return blocks.flatMap((b) => b.deloadWeeks.map((w) => ({ from: addWeeks(b.startsOn, w - 1), to: addWeeks(b.startsOn, w) })))
 }
 
 export type Progress = {
@@ -301,13 +335,18 @@ export type WeekCount = {
   count: number
   deload: boolean
   current: boolean
-  /** Première semaine commencée avant le début de la période : on n'en voit qu'une partie. */
+  /**
+   * Semaine incomplète pour la moyenne : la première si elle commence avant la période (on n'en
+   * voit qu'une partie), et celles d'avant la toute première séance (l'app n'était pas encore utilisée).
+   */
   partial: boolean
 }
 
 /** Séances terminées de chaque semaine (du lundi) depuis `from` jusqu'à la semaine en cours. */
 export function sessionsByWeek(sessions: Session[], blocks: Block[], from: number, now = Date.now()): WeekCount[] {
   const thisWeek = mondayOf(now)
+  const finished = sessions.filter((s) => s.endedAt !== undefined)
+  const firstWeek = finished.length > 0 ? mondayOf(Math.min(...finished.map((s) => s.startedAt))) : thisWeek
   const weeks: WeekCount[] = []
   for (let start = mondayOf(from); start <= thisWeek; start = addWeeks(start, 1)) {
     const end = addWeeks(start, 1)
@@ -316,16 +355,16 @@ export function sessionsByWeek(sessions: Session[], blocks: Block[], from: numbe
       count: sessions.filter((s) => s.endedAt !== undefined && s.startedAt >= start && s.startedAt < end).length,
       deload: isDeloadAt(blocks, start),
       current: start === thisWeek,
-      partial: start < from,
+      partial: start < from || start < firstWeek,
     })
   }
   return weeks
 }
 
 /**
- * Moyenne de séances par semaine, sans les semaines incomplètes (celle en cours, pas finie, et la
- * première si la période commence en milieu de semaine : elles tireraient la moyenne vers le bas)
- * ni les semaines de deload. null s'il ne reste aucune semaine.
+ * Moyenne de séances par semaine, sans les semaines incomplètes (celle en cours, pas finie, la
+ * première si la période commence en milieu de semaine, et celles d'avant la toute première séance :
+ * elles tireraient la moyenne vers le bas) ni les semaines de deload. null s'il ne reste aucune semaine.
  */
 export function averagePerWeek(weeks: WeekCount[]): number | null {
   const kept = weeks.filter((w) => !w.current && !w.partial && !w.deload)
@@ -335,7 +374,8 @@ export function averagePerWeek(weeks: WeekCount[]): number | null {
 /**
  * Séries faites par semaine et par groupe musculaire, en moyenne sur la période (hors deload).
  * On divise par le nombre de semaines réellement couvertes : depuis `from`, ou depuis la première
- * séance si l'historique est plus court que la période (sinon tout paraîtrait trop bas).
+ * séance si l'historique est plus court que la période (sinon tout paraîtrait trop bas), moins les
+ * semaines de deload (leurs séries sont écartées : les garder au diviseur ferait baisser la moyenne).
  */
 export function setsPerMuscle(
   exercises: Map<string, Exercise>,
@@ -354,7 +394,10 @@ export function setsPerMuscle(
     totals.set(group, (totals.get(group) ?? 0) + 1)
   }
   const first = Math.max(from, mondayOf(Math.min(...kept.map((s) => s.startedAt))))
-  const weeks = Math.max(1, (now - first) / (7 * 86_400_000))
+  const deloadWeeks = new Set(
+    sessions.filter((s) => s.endedAt !== undefined && s.deload && s.startedAt >= first).map((s) => mondayOf(s.startedAt)),
+  ).size
+  const weeks = Math.max(1, (now - first) / (7 * 86_400_000) - deloadWeeks)
   return MUSCLE_GROUPS.filter((g) => totals.has(g))
     .map((group) => ({ group, perWeek: totals.get(group)! / weeks }))
     .sort((a, b) => b.perWeek - a.perWeek)
@@ -392,9 +435,14 @@ export function recentRecords(sessions: Session[], sets: SessionSet[], from: num
 
 // ---------- Comparer deux blocs ----------
 
+/** Blocs déjà commencés, du plus ancien au plus récent (ceux qu'on peut comparer). */
+export function startedBlocks(blocks: Block[], now = Date.now()): Block[] {
+  return blocks.filter((b) => b.startsOn <= now).sort((a, b) => a.startsOn - b.startsOn)
+}
+
 /** Les deux blocs comparés par défaut : le dernier commencé et celui d'avant. */
 export function defaultComparison(blocks: Block[], now = Date.now()): [Block, Block] | null {
-  const started = blocks.filter((b) => b.startsOn <= now).sort((a, b) => a.startsOn - b.startsOn)
+  const started = startedBlocks(blocks, now)
   return started.length >= 2 ? [started[started.length - 2], started[started.length - 1]] : null
 }
 
@@ -489,6 +537,13 @@ export function formatMetric(metric: Metric, value: number): string {
   if (metric === 'maxReps') return `× ${Math.round(value)}`
   const { number, unit } = metricParts(metric, value)
   return `${number} ${unit}`
+}
+
+/** Écart d'une mesure, sans signe (la flèche le donne) : « 5 kg », « 2 reps », « 1 200 kg ». */
+export function formatMetricChange(metric: Metric, change: number): string {
+  const abs = Math.abs(change)
+  if (metric === 'maxReps' || metric === 'totalReps') return `${Math.round(abs)} rep${Math.round(abs) > 1 ? 's' : ''}`
+  return formatMetric(metric, abs)
 }
 
 /** Une série : « 90 × 5 », ou « × 12 » sans charge. */

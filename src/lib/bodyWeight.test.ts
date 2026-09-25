@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  currentAverage,
   formatBodyWeight,
   formatWeightChange,
   parseBodyWeight,
@@ -35,6 +36,11 @@ describe('moyenne sur 7 jours', () => {
   it('moyenne des pesées des 7 jours qui finissent ce jour-là', () => {
     const points = withMovingAverage([w(day(8, 10), 80), w(day(8, 1), 82), w(day(8, 14), 79), w(day(8, 16), 78)])
     expect(points.map((p) => p.average)).toEqual([82, 80, 79.5, 79])
+  })
+
+  it('moyenne actuelle seule (pour les Réglages)', () => {
+    expect(currentAverage([w(day(8, 10), 80), w(day(8, 1), 82), w(day(8, 14), 79), w(day(8, 16), 78)])).toBe(79)
+    expect(currentAverage([])).toBeUndefined()
   })
 
   it('résumé de la période : moyenne actuelle et évolution depuis le début de la période', () => {

@@ -55,11 +55,24 @@ function daysBefore(date: number, n: number): number {
 /** Pesées triées par date, chacune avec la moyenne des pesées des 7 jours qui finissent ce jour-là. */
 export function withMovingAverage(weights: BodyWeight[]): WeightPoint[] {
   const sorted = [...weights].sort((a, b) => a.date - b.date)
-  return sorted.map((w) => {
+  // Fenêtre qui glisse : on ajoute la pesée du jour et on retire celles de plus de 7 jours
+  // (une seule passe, même avec des années de pesées).
+  let start = 0
+  let sum = 0
+  return sorted.map((w, i) => {
+    sum += w.kg
     const from = daysBefore(w.date, 6)
-    const window = sorted.filter((o) => o.date >= from && o.date <= w.date)
-    return { date: w.date, kg: w.kg, average: window.reduce((sum, o) => sum + o.kg, 0) / window.length }
+    while (sorted[start].date < from) sum -= sorted[start++].kg
+    return { date: w.date, kg: w.kg, average: sum / (i - start + 1) }
   })
+}
+
+/** Moyenne sur 7 jours à la dernière pesée (les réglages n'ont besoin que d'elle), ou undefined. */
+export function currentAverage(weights: BodyWeight[]): number | undefined {
+  if (weights.length === 0) return undefined
+  const last = Math.max(...weights.map((w) => w.date))
+  const window = weights.filter((w) => w.date >= daysBefore(last, 6))
+  return window.reduce((sum, w) => sum + w.kg, 0) / window.length
 }
 
 export type WeightSummary = {

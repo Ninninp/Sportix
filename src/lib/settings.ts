@@ -1,5 +1,6 @@
 // Réglages de l'app (onglet Réglages, J4) : valeurs par défaut et règles de saisie.
 // Enregistrés en base (table `settings`, voir src/db/settings.ts) ; ce fichier ne fait que calculer.
+import { BODY_WEIGHT_MAX, BODY_WEIGHT_MIN } from './bodyWeight.ts'
 import { WEIGHT_STEPS, type WeightSteps } from './progression.ts'
 
 export type Settings = {
@@ -60,8 +61,14 @@ export function stepGoalSessions(current: number | undefined, direction: 1 | -1)
   return next < GOAL_SESSIONS_MIN ? undefined : Math.min(GOAL_SESSIONS_MAX, next)
 }
 
-/** Objectif de poids après − / + : le premier appui part de `start` (le poids actuel, arrondi). */
+/**
+ * Objectif de poids après − / + : le premier appui part de `start` (le poids actuel), arrondi au
+ * demi-kilo dans le sens du bouton (78,3 kg : « − » donne 78, « + » donne 78,5).
+ */
 export function stepGoalWeight(current: number | undefined, direction: 1 | -1, start: number): number {
-  if (current === undefined) return Math.round(start / GOAL_WEIGHT_STEP) * GOAL_WEIGHT_STEP
-  return Math.min(250, Math.max(30, current + direction * GOAL_WEIGHT_STEP))
+  const next =
+    current === undefined
+      ? (direction === 1 ? Math.ceil(start / GOAL_WEIGHT_STEP) : Math.floor(start / GOAL_WEIGHT_STEP)) * GOAL_WEIGHT_STEP
+      : current + direction * GOAL_WEIGHT_STEP
+  return Math.min(BODY_WEIGHT_MAX, Math.max(BODY_WEIGHT_MIN, next))
 }

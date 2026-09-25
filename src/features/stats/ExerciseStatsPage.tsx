@@ -12,8 +12,8 @@ import ChipGroup from '../../components/ChipGroup.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import SegmentedControl from '../../components/SegmentedControl.tsx'
 import { IconFleche, IconFlecheBas } from '../../components/icons.tsx'
-import { addWeeks, blockColor, blockEnd } from '../../lib/blocks.ts'
-import { VARIANT_LABELS, type Variant } from '../../lib/exercises.ts'
+import { blockColor, blockEnd } from '../../lib/blocks.ts'
+import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import {
   LOADED_METRICS,
   METRIC_LABELS,
@@ -21,17 +21,20 @@ import {
   UNLOADED_METRICS,
   exercisePoints,
   exerciseRecords,
-  exerciseSets,
+  bestPoint,
+  defaultVariant,
+  deloadRanges,
   formatKg,
   formatMetric,
+  formatMetricChange,
   formatSet,
   formatShortDate,
   isLoaded,
   metricParts,
   periodStart,
   progressOf,
-  type Metric,
   type VariantFilter,
+  variantChoices,
 } from '../../lib/stats.ts'
 import { useBlocks } from '../blocks/useBlocks.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
@@ -42,14 +45,6 @@ import { usePeriod, withPeriod } from './useStats.ts'
 import { parseVariantParam, variantParam } from './variantParam.ts'
 
 const sectionTitle = 'text-caption font-semibold tracking-[0.06em] text-muted uppercase'
-
-/** Écart affiché sous le gros chiffre, avec l'unité de la mesure (« 5 kg », « 2 reps »). */
-function formatChange(metric: Metric, change: number): string {
-  const abs = Math.abs(change)
-  if (metric === 'maxReps' || metric === 'totalReps') return `${Math.round(abs)} rep${Math.round(abs) > 1 ? 's' : ''}`
-  if (metric === 'volume') return formatMetric('volume', abs)
-  return formatKg(abs)
-}
 
 function RecordRow({ label, date, value }: { label: string; date: number; value: string }) {
   return (
@@ -85,13 +80,8 @@ function ExerciseStatsPage() {
   }
 
   const loaded = isLoaded(exercise)
-  // Variantes proposées : celles de l'exercice et celles déjà utilisées (un exercice modifié depuis)
-  const used = new Set(exerciseSets(id, 'all', sets).map((s) => s.variant))
-  const variants: (Variant | null)[] = exercise.variants.length > 0 ? [...new Set<Variant>([...exercise.variants, ...[...used].filter((v): v is Variant => v !== null)])] : [null]
-  // Par défaut : la variante la plus utilisée
-  const counts = (v: Variant | null) => exerciseSets(id, v, sets).length
-  const fallback = [...variants].sort((a, b) => counts(b) - counts(a))[0]
-  const variant: VariantFilter = parseVariantParam(params.get('variante')) ?? fallback
+  const variants = variantChoices(exercise, sets)
+  const variant: VariantFilter = parseVariantParam(params.get('variante')) ?? defaultVariant(variants, id, sets)
   const metrics = loaded ? LOADED_METRICS : UNLOADED_METRICS
   const metric = metrics.find((m) => m === params.get('mesure')) ?? metrics[0]
   const setParam = (key: string, value: string) =>
@@ -110,7 +100,7 @@ function ExerciseStatsPage() {
   const kept = points.filter((p) => !p.deload)
   const latest = kept[kept.length - 1]
   const progress = progressOf(all, blocks, from, now)
-  const best = all.reduce<(typeof all)[number] | undefined>((a, p) => (!a || p.value > a.value ? p : a), undefined)
+  const best = bestPoint(all)
   const records = exerciseRecords(id, variant, loaded, sessions, sets)
   const shownBlocks = blocks.filter((b) => b.startsOn < now && blockEnd(b) > from)
   const variantName = variant === 'all' ? 'toutes variantes' : variant ? VARIANT_LABELS[variant].toLowerCase() : null
@@ -143,7 +133,7 @@ function ExerciseStatsPage() {
                   {progress.change > 0 ? <IconFleche size={13} strokeWidth={3} /> : <IconFlecheBas size={13} strokeWidth={3} />}
                   <span>
                     <span className="sr-only">{progress.change > 0 ? 'Hausse de ' : 'Baisse de '}</span>
-                    {formatChange(metric, progress.change)} {progress.blockName ? `depuis le début du bloc ${progress.blockName}` : `en ${PERIOD_LABELS[period]}`}
+                    {formatMetricChange(metric, progress.change)} {progress.blockName ? `depuis le début du bloc ${progress.blockName}` : `en ${PERIOD_LABELS[period]}`}
                   </span>
                 </div>
               )}
@@ -154,7 +144,8 @@ function ExerciseStatsPage() {
               from={from}
               to={now}
               bands={shownBlocks.map((b) => ({ from: b.startsOn, to: blockEnd(b), color: blockColor(b), label: b.name }))}
-              hatched={shownBlocks.flatMap((b) => b.deloadWeeks.map((w) => ({ from: addWeeks(b.startsOn, w - 1), to: addWeeks(b.startsOn, w) })))}
+              hatched={deloadRanges(shownBlocks)}
+              minStep={1}
               line={kept.map((p) => ({ time: p.time, value: p.value }))}
               dots={points.map((p) => ({ time: p.time, value: p.value, kind: p.deload ? ('hollow' as const) : ('ink' as const) }))}
               record={best && best.time >= from && best.value > 0 ? { time: best.time, value: best.value } : undefined}
