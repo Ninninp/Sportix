@@ -99,7 +99,7 @@ const progress = (t, done, total, fills, line = t.strong, fill = t.text, txt = t
     .join('')}</div></div>`;
 
 const nav = (t, active, links = {}) => {
-  const tabs = [['seance', 'Séance', 'dumbbell', links.seance ?? file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', links.prog ?? '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', links.stats ?? '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
+  const tabs = [['seance', 'Séance', 'dumbbell', links.seance ?? file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', links.prog ?? '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', links.stats ?? '#'], ['reglages', 'Réglages', 'gear', links.reglages ?? file(t, 'Reglages')]];
   return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 56px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
     .map(([k, l, i, h]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ''} style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: ${k === active ? 700 : 500}; color: ${k === active ? t.text : t.muted}; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: ${k === active ? t.text : 'transparent'};"></span>${ic(i)}<span>${l}</span></a>`)
     .join('')}</nav>`;
@@ -989,6 +989,86 @@ S['Objectifs'] = { title: 'Objectifs (panneau)', page: 'j7', render: (t) => fram
     goalGroup(t, 'Séances par semaine', [numRow(t, 'Cible', '4', '')]) +
     btn.link(t, 'Fermer', file(t, 'Stats'), t.text)) }) };
 
+// ===================================================================================
+// J8 — Sauvegarde et fiabilité
+// Tout reste sur le téléphone : le seul moyen de ne rien perdre (téléphone changé, cassé, app
+// supprimée) est un fichier de sauvegarde que l'utilisateur range lui-même (Fichiers, mail…).
+// - Réglages : section « Sauvegarde » (exporter, importer, dernière sauvegarde, stockage protégé) ;
+// - Exporter : le fichier est préparé à l'ouverture du panneau, « Partager le fichier » ouvre la
+//   feuille de partage d'iOS (elle doit s'ouvrir sur un appui : d'où le panneau) ;
+// - Importer : on choisit le fichier, puis on confirme ; l'import REMPLACE tout (pas de fusion) ;
+// - Rappel sur l'accueil quand la dernière sauvegarde date de plus de 30 jours.
+// Exemple : aujourd'hui vendredi 25 septembre 2026, dernière sauvegarde le 13 septembre.
+// ===================================================================================
+P.upload = '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"></path>';
+P.shield = '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path>';
+P.alert = '<circle cx="12" cy="12" r="10"></circle><path d="M12 8v4M12 16h.01"></path>';
+const J8NAV = (t) => ({ seance: file(t, 'Accueil-rappel'), reglages: file(t, 'Reglages-J8'), stats: '#' });
+
+// Ligne de réglage avec icône, titre et sous-titre (ouvre un panneau)
+const dataRow = (t, icon, name, sub, href, first = false) =>
+  `<a href="${href}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 12px 0 16px; color: ${t.text}; text-decoration: none; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="display: flex; color: ${t.muted};">${ic(icon, 20)}</span><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`;
+const valueRow = (t, name, value, first = false) =>
+  `<a href="#" style="display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 16px; color: ${t.text}; text-decoration: none; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="font-size: 17px;">${name}</span><span style="display: flex; align-items: center; gap: 4px; color: ${t.muted};"><span class="num" style="font-size: 17px;">${value}</span>${ic('chevR', 20)}</span></a>`;
+const section = (t, title, inner) => `<div style="display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;">${lbl(t, title)}${inner}</div>`;
+
+// Réglages tels qu'ils sont dans l'app au J7 (app installée : plus d'encart d'installation),
+// avec la section « Sauvegarde » en tête.
+const reglagesJ8 = (t) =>
+  `<h1 style="${H1} flex-shrink: 0;">Réglages</h1>` +
+  section(t, 'Sauvegarde', card(t,
+    dataRow(t, 'share', 'Exporter mes données', 'Dernière sauvegarde : il y a 12 jours', file(t, 'Export'), true) +
+    dataRow(t, 'upload', 'Importer une sauvegarde', 'Remplace les données de ce téléphone', file(t, 'Import-confirmation')), 'overflow: hidden;') +
+    `<div style="display: flex; align-items: center; gap: 6px; padding: 0 4px; font-size: 13px; line-height: 18px; color: ${t.muted};">${ic('shield', 16)}Stockage protégé : iOS ne l’effacera pas pour faire de la place.</div>`) +
+  section(t, 'Séance', card(t, valueRow(t, 'Repos par défaut', '2:00', true) +
+    `<label style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px; border-top: 1px solid ${t.border};"><span style="font-size: 17px;">Son de fin de repos</span><input class="sw" type="checkbox" role="switch" checked></label>`, 'overflow: hidden;')) +
+  section(t, 'Pas de charge (boutons − / +)', card(t, [['Barre', '2,5 kg'], ['Smith', '2,5 kg'], [`Haltères <span style="font-size: 13px; color: ${t.muted};">(par haltère)</span>`, '2 kg'], ['Machine', '5 kg'], ['Poulie', '2,5 kg']].map(([n, v], i) => valueRow(t, n, v, i === 0)).join(''), 'overflow: hidden;')) +
+  section(t, 'Stats', card(t, valueRow(t, 'Objectifs', '76 kg · 4 / sem.', true), 'overflow: hidden;')) +
+  section(t, 'Exercices', card(t, `<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px 0 16px; color: ${t.text}; text-decoration: none;"><span style="display: flex; color: ${t.muted};">${ic('book', 20)}</span><span style="flex-grow: 1; font-size: 17px;">Bibliothèque d'exercices</span><span class="num" style="font-size: 17px; color: ${t.muted};">32</span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`, 'overflow: hidden;')) +
+  `<p style="margin: 4px 0 0; font-size: 13px; line-height: 18px; color: ${t.muted}; text-align: center; flex-shrink: 0;">Tes données restent sur ce téléphone.<br><span class="num">Version 7338e7c · 25/09/2026</span></p>`;
+
+S['Reglages-J8'] = { title: 'Réglages · section Sauvegarde (la page défile)', page: 'j8', h: 1180, render: (t) => frame(t, { h: 1180, navActive: 'reglages', navLinks: J8NAV(t), gap: 16, main: reglagesJ8(t) }) };
+
+// Contenu d'une sauvegarde : une ligne par sorte de données
+const backupCounts = (t, rows) => card(t, rows.map(([n, v], i) => `<div style="display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 0 16px; ${i ? `border-top: 1px solid ${t.border};` : ''}"><span style="font-size: 15px; color: ${t.muted};">${n}</span><span class="num" style="font-size: 17px;">${v}</span></div>`).join(''), 'flex-shrink: 0; overflow: hidden;');
+
+S['Export'] = { title: 'Exporter (panneau)', page: 'j8', render: (t) => frame(t, { navActive: 'reglages', navLinks: J8NAV(t), gap: 16, main: reglagesJ8(t),
+  overlay: sheet(t, 'Exporter mes données',
+    `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Exporter mes données</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Un fichier avec tout ce que contient l’app. Range-le dans Fichiers ou envoie-le-toi : c’est ta copie de secours.</p></div>` +
+    backupCounts(t, [['Séances', '142'], ['Programmes', '3'], ['Blocs', '4'], ['Pesées', '38']]) +
+    `<div class="num" style="margin-top: -8px; font-size: 13px; color: ${t.muted}; text-align: center;">sportix-2026-09-25.json · 184 Ko</div>` +
+    `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, `${ic('share', 20)}Partager le fichier`, file(t, 'Reglages-J8'), 'width: 100%;')}${btn.link(t, 'Annuler', file(t, 'Reglages-J8'), t.text)}</div>`) }) };
+
+// Confirmation : la sauvegarde face à ce qu'il y a sur le téléphone, colonne par colonne
+const cmpCounts = (t, rows) => card(t,
+  `<div style="display: grid; grid-template-columns: minmax(0, 1fr) 104px 104px; column-gap: 8px; align-items: end; min-height: 44px; padding: 8px 16px 4px;"><span></span><span style="font-size: 12px; font-weight: 600; color: ${t.muted}; text-align: right;">Sauvegarde<br>du 13 sept.</span><span style="font-size: 12px; font-weight: 600; color: ${t.muted}; text-align: right;">Ce<br>téléphone</span></div>` +
+  rows.map(([n, a, b]) => `<div style="display: grid; grid-template-columns: minmax(0, 1fr) 104px 104px; column-gap: 8px; align-items: center; min-height: 40px; padding: 0 16px; border-top: 1px solid ${t.border};"><span style="font-size: 15px; color: ${t.muted};">${n}</span><span class="num" style="font-size: 17px; text-align: right;">${a}</span><span class="num" style="font-size: 17px; text-align: right; color: ${t.muted};">${b}</span></div>`).join(''),
+  'flex-shrink: 0; overflow: hidden;');
+
+S['Import-confirmation'] = { title: 'Importer · confirmation (panneau)', page: 'j8', render: (t) => frame(t, { navActive: 'reglages', navLinks: J8NAV(t), gap: 16, main: reglagesJ8(t),
+  overlay: sheet(t, 'Remplacer tes données',
+    `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Remplacer tes données ?</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Tout ce qui est sur ce téléphone sera remplacé par la sauvegarde.</p></div>` +
+    cmpCounts(t, [['Séances', '128', '142'], ['Programmes', '3', '3'], ['Blocs', '3', '4'], ['Pesées', '30', '38']]) +
+    `<p style="margin: 0; display: flex; gap: 8px; font-size: 15px; line-height: 20px; color: ${t.danger};">${ic('alert', 20)}<span>14 séances faites depuis le 13 septembre seront perdues.</span></p>` +
+    `<div style="display: flex; flex-direction: column; gap: 8px;">${btn.danger(t, 'Remplacer mes données', file(t, 'Import-fait'))}${btn.sec(t, 'Annuler', file(t, 'Reglages-J8'), 'width: 100%;')}${btn.link(t, 'Exporter d’abord ce téléphone', file(t, 'Export'), t.text)}</div>`) }) };
+
+S['Import-erreur'] = { title: 'Importer · fichier refusé (panneau)', page: 'j8', render: (t) => frame(t, { navActive: 'reglages', navLinks: J8NAV(t), gap: 16, main: reglagesJ8(t),
+  overlay: sheet(t, 'Fichier refusé',
+    `<div style="display: flex; flex-direction: column; gap: 6px;"><span style="display: flex; color: ${t.danger};">${ic('alert', 28)}</span><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Ce fichier n’est pas une sauvegarde Sportix</h2><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Choisis un fichier « sportix-….json » créé par « Exporter mes données ». Rien n’a été changé sur ce téléphone.</p></div>` +
+    `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.sec(t, 'Choisir un autre fichier', file(t, 'Import-confirmation'), 'width: 100%;')}${btn.link(t, 'Fermer', file(t, 'Reglages-J8'), t.text)}</div>`) }) };
+
+S['Import-fait'] = { title: 'Import terminé (panneau)', page: 'j8', render: (t) => frame(t, { navActive: 'reglages', navLinks: J8NAV(t), gap: 16, main: reglagesJ8(t),
+  overlay: sheet(t, 'Données importées',
+    `<div style="display: flex; flex-direction: column; gap: 6px;"><span style="width: 44px; height: 44px; border-radius: 22px; background: ${t.inverse}; color: ${t.onInverse}; display: flex; align-items: center; justify-content: center;">${ic('check', 24, 2.5)}</span><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Données importées</h2><p style="margin: 0; font-size: 15px; line-height: 20px; color: ${t.muted};">128 séances, 3 programmes, 3 blocs et 30 pesées sont sur ce téléphone.</p></div>` +
+    btn.pri(t, 'OK', file(t, 'Accueil-rappel'), 'width: 100%;')) }) };
+
+// Rappel : une ligne fine sur l'accueil, sous le bloc en cours, qui ouvre « Exporter ».
+S['Accueil-rappel'] = { title: 'Accueil · rappel de sauvegarde (plus de 30 jours)', page: 'j8', render: (t) => frame(t, { navActive: 'seance', navLinks: J8NAV(t),
+  main: homeJ5(t,
+    thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span><span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, '#', 'Bloc Force, semaine 2 sur 5, deload en semaine 4') +
+    thinRow(t, `<span style="display: flex; color: ${t.muted};">${ic('share', 18)}</span><span style="flex-grow: 1; font-size: 15px; font-weight: 700; white-space: nowrap;">Sauvegarder</span><span class="num" style="font-size: 15px; font-weight: 400; color: ${t.muted}; white-space: nowrap;">dernière il y a 34 j</span>`, file(t, 'Export'), 'Dernière sauvegarde il y a 34 jours, sauvegarder'), true) }) };
+
+
 // ---------- Écriture des fichiers ----------
 const page = (t, title, h, body) => `<!doctype html>
 <html lang="fr">
@@ -1104,4 +1184,17 @@ writeCanvas('../maquettes-j7/', { title: 'Sportix — Maquettes J7', at: '2026-0
     'j7-objectifs': noteJ7(1260, 'Objectifs : ils ne servent qu’à tracer les lignes en pointillés des graphiques (poids cible, séances par semaine). On les change en touchant le libellé en pointillés à droite du titre de la carte ; aussi dans les Réglages.'),
     'j7-regularite': noteJ7(1680, 'Proposition : pas de grille « Régularité » (façon GitHub) prévue dans parcours.md : elle redirait « Séances par semaine » et les points du calendrier. À confirmer.', 'red'),
     'j7-periode': noteJ7(2100, 'Période (4 sem. / 3 mois / 1 an) : un seul réglage en haut de la vue d’ensemble, qui vaut pour toutes les cartes ; « Séries par muscle » est donc une moyenne par semaine sur la période.'),
+  } });
+
+// ===== Canvas J8 (sauvegarde et fiabilité) : son propre dossier, son propre lien =====
+MAIN = 'Reglages-J8';
+const J8_ORDER = ['Reglages-J8', 'Export', 'Import-confirmation', 'Import-erreur', 'Import-fait', 'Accueil-rappel'];
+const noteJ8 = (y, text, color) => ({ x: (J8_ORDER.length + 1) * 470, y, w: 400, page: 'j8', ...(color ? { color } : {}), text });
+writeCanvas('../maquettes-j8/', { title: 'Sportix — Maquettes J8', at: '2026-09-25T14:00:00Z',
+  pages: [{ id: 'j8', name: 'J8 · Sauvegarde et fiabilité', order: J8_ORDER }], launch: { view: 'canvas', page: 'j8' }, notesCol: true, extraNotes: {
+    'j8-pourquoi': noteJ8(0, 'Pourquoi le J8 : tout reste sur le téléphone, sans compte ni serveur. Téléphone changé, cassé, ou app supprimée : sans fichier de sauvegarde, tout est perdu. Le fichier ne quitte le téléphone que si tu le partages toi-même (Fichiers / iCloud Drive, AirDrop, mail).', 'teal'),
+    'j8-fichier': noteJ8(420, 'Le fichier : « sportix-2026-09-25.json », tout ce que contient l’app (exercices, séances et séries, programmes, blocs et objectifs, pesées, réglages) et le numéro de version de la base. Pourquoi un panneau avant de partager : iOS n’ouvre la feuille de partage que sur un appui ; le fichier est préparé à l’ouverture du panneau, et « Partager le fichier » l’envoie aussitôt.'),
+    'j8-import': noteJ8(840, 'Importer REMPLACE tout, sans fusion : fusionner deux historiques créerait des doublons (la même séance deux fois) et des conflits (un programme modifié des deux côtés). Avant de confirmer, on voit la sauvegarde face au téléphone, et combien de séances seraient perdues. Un fichier d’une version plus récente de Sportix est refusé (« mets l’app à jour ») ; une sauvegarde plus ancienne passe par les mêmes migrations que la base.', 'orange'),
+    'j8-rappel': noteJ8(1260, 'Rappel (dernière planche) : une ligne fine sur l’accueil quand la dernière sauvegarde date de plus de 30 jours et qu’il y a eu des séances depuis (jamais sauvegardé : après 10 séances). Elle disparaît dès qu’on exporte. À confirmer : 30 jours ? Ou plutôt une pastille sur l’onglet Réglages, pour garder l’accueil épuré ?', 'red'),
+    'j8-stockage': noteJ8(1680, 'Stockage protégé : l’app demande au navigateur de ne jamais effacer ses données (déjà fait depuis le J2). La ligne sous la section dit si c’est accordé ; sinon : « Stockage non protégé : exporte régulièrement tes données ».'),
   } });

@@ -1,0 +1,200 @@
+{
+  "v": 3,
+  "attachments": {},
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-25T14:00:00Z"
+  },
+  "title": "Sportix — Maquettes J8",
+  "launch": {
+    "view": "canvas",
+    "page": "j8"
+  },
+  "pages": [
+    {
+      "id": "j8",
+      "name": "J8 · Sauvegarde et fiabilité"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1180,
+      "title": "Réglages · section Sauvegarde (la page défile) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "S-Export.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Exporter (panneau) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "S-Import-confirmation.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Importer · confirmation (panneau) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "S-Import-erreur.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Importer · fichier refusé (panneau) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "S-Import-fait.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Import terminé (panneau) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "S-Accueil-rappel.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · rappel de sauvegarde (plus de 30 jours) — sombre",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Reglages-J8.dc.html": {
+      "x": 0,
+      "y": 1600,
+      "w": 390,
+      "h": 1180,
+      "title": "Réglages · section Sauvegarde (la page défile) — clair",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Export.dc.html": {
+      "x": 470,
+      "y": 1600,
+      "w": 390,
+      "h": 844,
+      "title": "Exporter (panneau) — clair",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Import-confirmation.dc.html": {
+      "x": 940,
+      "y": 1600,
+      "w": 390,
+      "h": 844,
+      "title": "Importer · confirmation (panneau) — clair",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Import-erreur.dc.html": {
+      "x": 1410,
+      "y": 1600,
+      "w": 390,
+      "h": 844,
+      "title": "Importer · fichier refusé (panneau) — clair",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Import-fait.dc.html": {
+      "x": 1880,
+      "y": 1600,
+      "w": 390,
+      "h": 844,
+      "title": "Import terminé (panneau) — clair",
+      "page": "j8",
+      "is_interactive": true
+    },
+    "C-Accueil-rappel.dc.html": {
+      "x": 2350,
+      "y": 1600,
+      "w": 390,
+      "h": 844,
+      "title": "Accueil · rappel de sauvegarde (plus de 30 jours) — clair",
+      "page": "j8",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "S-Export.dc.html",
+    "S-Import-confirmation.dc.html",
+    "S-Import-erreur.dc.html",
+    "S-Import-fait.dc.html",
+    "S-Accueil-rappel.dc.html",
+    "C-Reglages-J8.dc.html",
+    "C-Export.dc.html",
+    "C-Import-confirmation.dc.html",
+    "C-Import-erreur.dc.html",
+    "C-Import-fait.dc.html",
+    "C-Accueil-rappel.dc.html"
+  ],
+  "notes": {
+    "j8-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J8 · Sauvegarde et fiabilité — thème sombre",
+      "kind": "title1",
+      "page": "j8",
+      "maxW": 3210
+    },
+    "j8-C": {
+      "x": 0,
+      "y": 1300,
+      "text": "J8 · Sauvegarde et fiabilité — thème clair",
+      "kind": "title1",
+      "page": "j8",
+      "maxW": 3210
+    },
+    "j8-pourquoi": {
+      "x": 3290,
+      "y": 0,
+      "w": 400,
+      "page": "j8",
+      "color": "teal",
+      "text": "Pourquoi le J8 : tout reste sur le téléphone, sans compte ni serveur. Téléphone changé, cassé, ou app supprimée : sans fichier de sauvegarde, tout est perdu. Le fichier ne quitte le téléphone que si tu le partages toi-même (Fichiers / iCloud Drive, AirDrop, mail)."
+    },
+    "j8-fichier": {
+      "x": 3290,
+      "y": 420,
+      "w": 400,
+      "page": "j8",
+      "text": "Le fichier : « sportix-2026-09-25.json », tout ce que contient l’app (exercices, séances et séries, programmes, blocs et objectifs, pesées, réglages) et le numéro de version de la base. Pourquoi un panneau avant de partager : iOS n’ouvre la feuille de partage que sur un appui ; le fichier est préparé à l’ouverture du panneau, et « Partager le fichier » l’envoie aussitôt."
+    },
+    "j8-import": {
+      "x": 3290,
+      "y": 840,
+      "w": 400,
+      "page": "j8",
+      "color": "orange",
+      "text": "Importer REMPLACE tout, sans fusion : fusionner deux historiques créerait des doublons (la même séance deux fois) et des conflits (un programme modifié des deux côtés). Avant de confirmer, on voit la sauvegarde face au téléphone, et combien de séances seraient perdues. Un fichier d’une version plus récente de Sportix est refusé (« mets l’app à jour ») ; une sauvegarde plus ancienne passe par les mêmes migrations que la base."
+    },
+    "j8-rappel": {
+      "x": 3290,
+      "y": 1260,
+      "w": 400,
+      "page": "j8",
+      "color": "red",
+      "text": "Rappel (dernière planche) : une ligne fine sur l’accueil quand la dernière sauvegarde date de plus de 30 jours et qu’il y a eu des séances depuis (jamais sauvegardé : après 10 séances). Elle disparaît dès qu’on exporte. À confirmer : 30 jours ? Ou plutôt une pastille sur l’onglet Réglages, pour garder l’accueil épuré ?"
+    },
+    "j8-stockage": {
+      "x": 3290,
+      "y": 1680,
+      "w": 400,
+      "page": "j8",
+      "text": "Stockage protégé : l’app demande au navigateur de ne jamais effacer ses données (déjà fait depuis le J2). La ligne sous la section dit si c’est accordé ; sinon : « Stockage non protégé : exporte régulièrement tes données »."
+    }
+  },
+  "designSystems": []
+}
