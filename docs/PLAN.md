@@ -47,7 +47,7 @@ Le design est traité comme une **phase dédiée (Phase D) avant le code**, puis
 - `sessions` : id, date, programDayId?, blockId?, durée, notes
 - `sets` : id, sessionId, exerciseId, variante, ordre, reps, charge, repsMin?, repsMax? (objectif en vigueur), RPE?, terminé
 - `bodyWeights` : id, date, poids
-- `settings` : unité (kg/lb), pas de charge par variante, repos par défaut, RPE affiché, objectifs perso (poids cible, séances/semaine, séries/muscle/semaine), version du schéma
+- `settings` : unité (kg/lb), pas de charge par variante, repos par défaut, RPE affiché, objectifs perso (poids cible, séances/semaine ; plus d'objectif de séries par muscle depuis le 25/09/2026), version du schéma
 
 ## Structure du projet
 ```

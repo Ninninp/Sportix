@@ -17,7 +17,7 @@
 
 | Écran | Onglet | Jalon | Rôle | Informations affichées | Action principale |
 |---|---|---|---|---|---|
-| **Accueil** | Séance | J3 → J5/J6/J7 | Point d'entrée : lancer une séance | Bloc actif (semaine X/Y, deload signalé) dès J6 ; séance du jour dès J5 ; raccourci pesée dès J7 ; sinon « Démarrer une séance » | Démarrer une séance |
+| **Accueil** | Séance | J3 → J5/J6 | Point d'entrée : lancer une séance | Bloc actif (semaine X/Y, deload signalé) dès J6 ; séance du jour dès J5 ; sinon « Démarrer une séance » | Démarrer une séance |
 | **Séance en cours** | Séance | J3 | Cœur de l'app, utilisé en salle | Exercices et leur variante ; séries pré-remplies ; fourchette de reps ; badge ↑ charge ; progression de la séance | Valider la série · `+ Série` · boutons +/− |
 | **Repos actif / terminé** | Séance | J4 | Minuteur entre deux séries | Décompte en gros chiffres, +15 s, passer ; à la fin, l'écran change franchement de couleur et un son est joué | Passer / reprendre |
 | **Choix d'exercice** | Séance | J3 | Ajouter **ou remplacer** un exercice | Recherche, filtre par groupe musculaire, choix de la variante, « Créer un exercice » | Sélectionner · créer à la volée |
@@ -31,7 +31,7 @@
 | **Détail programme** | Programmes | J5 | Construire un programme | Jours (ex. « Push ») ; pour chaque exercice : variante, séries, **fourchette de reps**, repos | Ajouter un jour / un exercice |
 | **Calendrier des blocs** | Calendrier | J6 | Vue mensuelle de la périodisation | Blocs, semaines de deload, bloc actif mis en évidence | Créer / ouvrir un bloc |
 | **Détail d'un bloc** | Calendrier | J6 | Suivre et ajuster un bloc | Objectif, dates, programme, semaines (dont deload), séances rattachées, progression | + Semaine de deload · modifier |
-| **Stats — vue d'ensemble** | Stats | J7 | Page d'accueil des graphiques | Poids corporel, séances/semaine, régularité, séries par muscle, PR récents, comparaison de blocs | Ouvrir un exercice · + Pesée |
+| **Stats — vue d'ensemble** | Stats | J7 | Page d'accueil des graphiques | Poids corporel, séances/semaine, séries par muscle, PR récents, comparaison de blocs | Ouvrir un exercice · + Pesée |
 | **Stats d'un exercice** | Stats | J7 | Progression d'un exercice | 1RM estimé, charge max, volume, PR ; filtre par variante ; blocs en fond, deload grisé | Changer de variante / de période |
 | **Pesée** (panneau) | — | J7 | Saisir le poids du jour | Poids (boutons +/− par 0,1 kg, pré-rempli avec la dernière pesée), date | Enregistrer |
 | **Réglages** | Réglages | J1 → J8 | Paramètres et maintenance | Unité, pas de charge par variante, repos par défaut, RPE, objectifs de bloc, objectifs perso, bibliothèque, installation iOS, export/import | Modifier un réglage |
@@ -162,8 +162,6 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Accueil] -->|Raccourci « Pesée »| W[Panneau pesée]
-    W --> A
     V[Stats — vue d'ensemble] -->|+ Pesée| W2[Panneau pesée]
     V -->|Tap sur une ligne d'objectif| G[Modifier l'objectif\npoids cible, séances/semaine]
     V -->|PR récent ou liste d'exercices| X[Stats d'un exercice]
@@ -241,7 +239,7 @@ Un tap sur le chiffre ouvre le pavé numérique pour les autres valeurs.
 - **J3** : bouton « Démarrer une séance » + accès à l'historique.
 - **J5** : ajoute « Séance du jour » quand un programme est actif.
 - **J6** : ajoute en haut le bandeau « Bloc Force — semaine 2/4 » (ou « semaine 3/5 · Deload »).
-- **J7** : ajoute un petit raccourci « Pesée » (dernier poids + bouton).
+- **J7** : rien. Le poids **n'est pas** sur l'accueil (décision du 25/09/2026) : la pesée se fait depuis les Stats (« + Pesée » sur la carte Poids corporel).
 
 ### Objectifs de bloc
 **C'est l'utilisateur qui les crée.** L'app n'en fournit qu'un, en exemple : « Force » (modifiable, supprimable). Ils sont enregistrés dans une liste réutilisable, pour que les blocs restent comparables au J7.
@@ -256,8 +254,8 @@ Un tap sur le chiffre ouvre le pavé numérique pour les autres valeurs.
 **Stats — vue d'ensemble**
 - **Poids corporel** : points des pesées + **moyenne sur 7 jours** (le poids varie beaucoup d'un jour à l'autre) + **ligne d'objectif** (poids cible).
 - **Séances par semaine** : barres + **ligne d'objectif** (ex. 4/semaine).
-- **Régularité** : grille des jours entraînés sur les dernières semaines, comme les contributions GitHub.
-- **Séries par groupe musculaire par semaine**, avec une **zone d'objectif** (ex. 10–20 séries/semaine).
+- ~~**Régularité** : grille des jours entraînés, façon GitHub.~~ **Écartée le 25/09/2026** : elle redisait « Séances par semaine » et les points du calendrier.
+- **Séries par groupe musculaire par semaine** (moyenne sur la période choisie), **sans objectif** : la zone 10–20 a été retirée le 25/09/2026, jugée inutile.
 - **PR récents** 🏆, et accès à la liste des exercices.
 - **Comparaison de 2 blocs** : 1RM estimé au début et à la fin, et volume, pour les exercices communs.
 
@@ -265,7 +263,7 @@ Un tap sur le chiffre ouvre le pavé numérique pour les autres valeurs.
 - 1RM estimé (Epley), charge max et volume par séance, historique des PR.
 - Les périodes des blocs apparaissent en fond coloré, et les semaines de deload sont grisées.
 
-Les objectifs perso (poids cible, séances/semaine, zone de séries) se modifient en touchant la ligne d'objectif sur le graphique, ou dans les Réglages.
+Les objectifs perso (poids cible, séances/semaine) ne servent qu'à tracer les lignes en pointillés des graphiques ; ils se modifient en touchant le libellé de la ligne d'objectif, ou dans les Réglages.
 
 *Pour plus tard (J9, si besoin)* : mensurations (tour de bras, de taille…) sur le même modèle que le poids.
 
@@ -281,7 +279,7 @@ Reporté dans [`docs/PLAN.md`](../PLAN.md) :
 - nouvelle table `blockGoals` (« Force » fournie en exemple) ; `blocks.objectif` devient `blocks.goalId`.
 - `blocks` : + `deloadWeeks`.
 - nouvelle table `bodyWeights` : id, date, poids.
-- `settings` : + pas de charge par variante, + RPE affiché, + objectifs perso (poids cible, séances/semaine, zone de séries/muscle/semaine).
+- `settings` : + pas de charge par variante, + RPE affiché, + objectifs perso (poids cible, séances/semaine).
 
 ## 7. Prochaine étape
 

@@ -1,0 +1,227 @@
+{
+  "v": 3,
+  "attachments": {},
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-23T12:00:00Z"
+  },
+  "title": "Sportix — Maquettes J7",
+  "launch": {
+    "view": "canvas",
+    "page": "j7"
+  },
+  "pages": [
+    {
+      "id": "j7",
+      "name": "J7 · Stats et progression"
+    }
+  ],
+  "boards": {
+    "S-Stats-vide.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Stats · premier lancement — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "Main.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 1540,
+      "title": "Stats · vue d’ensemble (la page défile) — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "S-Pesee.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Pesée (panneau) — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "S-Objectifs.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Objectifs (panneau) — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "S-Stats-exercices.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Stats · tous les exercices — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "S-Stats-exercice.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 940,
+      "title": "Stats d’un exercice · Squat — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "S-Stats-blocs.dc.html": {
+      "x": 2820,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Comparer deux blocs — sombre",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Stats-vide.dc.html": {
+      "x": 0,
+      "y": 1960,
+      "w": 390,
+      "h": 844,
+      "title": "Stats · premier lancement — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Stats.dc.html": {
+      "x": 470,
+      "y": 1960,
+      "w": 390,
+      "h": 1540,
+      "title": "Stats · vue d’ensemble (la page défile) — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Pesee.dc.html": {
+      "x": 940,
+      "y": 1960,
+      "w": 390,
+      "h": 844,
+      "title": "Pesée (panneau) — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Objectifs.dc.html": {
+      "x": 1410,
+      "y": 1960,
+      "w": 390,
+      "h": 844,
+      "title": "Objectifs (panneau) — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Stats-exercices.dc.html": {
+      "x": 1880,
+      "y": 1960,
+      "w": 390,
+      "h": 844,
+      "title": "Stats · tous les exercices — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Stats-exercice.dc.html": {
+      "x": 2350,
+      "y": 1960,
+      "w": 390,
+      "h": 940,
+      "title": "Stats d’un exercice · Squat — clair",
+      "page": "j7",
+      "is_interactive": true
+    },
+    "C-Stats-blocs.dc.html": {
+      "x": 2820,
+      "y": 1960,
+      "w": 390,
+      "h": 844,
+      "title": "Comparer deux blocs — clair",
+      "page": "j7",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "S-Stats-vide.dc.html",
+    "Main.dc.html",
+    "S-Pesee.dc.html",
+    "S-Objectifs.dc.html",
+    "S-Stats-exercices.dc.html",
+    "S-Stats-exercice.dc.html",
+    "S-Stats-blocs.dc.html",
+    "C-Stats-vide.dc.html",
+    "C-Stats.dc.html",
+    "C-Pesee.dc.html",
+    "C-Objectifs.dc.html",
+    "C-Stats-exercices.dc.html",
+    "C-Stats-exercice.dc.html",
+    "C-Stats-blocs.dc.html"
+  ],
+  "notes": {
+    "j7-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J7 · Stats et progression — thème sombre",
+      "kind": "title1",
+      "page": "j7",
+      "maxW": 3680
+    },
+    "j7-C": {
+      "x": 0,
+      "y": 1660,
+      "text": "J7 · Stats et progression — thème clair",
+      "kind": "title1",
+      "page": "j7",
+      "maxW": 3680
+    },
+    "j7-question": {
+      "x": 3760,
+      "y": 0,
+      "w": 400,
+      "page": "j7",
+      "color": "teal",
+      "text": "La question du J7 : « ai-je progressé au squat pendant mon bloc Force ? ». Réponse sur « Stats d’un exercice » : le gros chiffre (1RM estimé) et, dessous, « ↑ 5 kg depuis le début du bloc Force » ; le graphique montre les blocs en fond, de leur couleur."
+    },
+    "j7-graphiques": {
+      "x": 3760,
+      "y": 420,
+      "w": 400,
+      "page": "j7",
+      "text": "Règles des graphiques (skill dataviz) : une série en encre, le contexte en gris ; jamais deux échelles sur un graphique ; pas de valeur sur chaque point (seulement le record, l’objectif) ; toucher un point affiche une bulle (date, 1RM, série) avec un trait vertical. Couleurs vérifiées par le script de la skill : encre, gris et orange/jaune se distinguent, daltonisme compris, dans les deux thèmes."
+    },
+    "j7-deload": {
+      "x": 3760,
+      "y": 840,
+      "w": 400,
+      "page": "j7",
+      "color": "orange",
+      "text": "Deload : semaine hachurée « D », ses séances en points creux gris, hors de la courbe et exclues des comparaisons ; sur « Séances par semaine », la colonne du deload est grise."
+    },
+    "j7-objectifs": {
+      "x": 3760,
+      "y": 1260,
+      "w": 400,
+      "page": "j7",
+      "text": "Objectifs : ils ne servent qu’à tracer les lignes en pointillés des graphiques (poids cible, séances par semaine). On les change en touchant le libellé en pointillés à droite du titre de la carte ; aussi dans les Réglages."
+    },
+    "j7-regularite": {
+      "x": 3760,
+      "y": 1680,
+      "w": 400,
+      "page": "j7",
+      "color": "red",
+      "text": "Proposition : pas de grille « Régularité » (façon GitHub) prévue dans parcours.md : elle redirait « Séances par semaine » et les points du calendrier. À confirmer."
+    },
+    "j7-periode": {
+      "x": 3760,
+      "y": 2100,
+      "w": 400,
+      "page": "j7",
+      "text": "Période (4 sem. / 3 mois / 1 an) : un seul réglage en haut de la vue d’ensemble, qui vaut pour toutes les cartes ; « Séries par muscle » est donc une moyenne par semaine sur la période."
+    }
+  },
+  "designSystems": []
+}

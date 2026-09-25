@@ -99,7 +99,7 @@ const progress = (t, done, total, fills, line = t.strong, fill = t.text, txt = t
     .join('')}</div></div>`;
 
 const nav = (t, active, links = {}) => {
-  const tabs = [['seance', 'Séance', 'dumbbell', links.seance ?? file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', links.prog ?? '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
+  const tabs = [['seance', 'Séance', 'dumbbell', links.seance ?? file(t, 'Accueil-J3')], ['prog', 'Programmes', 'list', links.prog ?? '#'], ['cal', 'Calendrier', 'cal', '#'], ['stats', 'Stats', 'stats', links.stats ?? '#'], ['reglages', 'Réglages', 'gear', file(t, 'Reglages')]];
   return `<nav aria-label="Navigation principale" style="flex-shrink: 0; height: 56px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: ${t.surface}; border-top: 1px solid ${t.border};">${tabs
     .map(([k, l, i, h]) => `<a href="${h}"${k === active ? ' aria-current="page"' : ''} style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: ${k === active ? 700 : 500}; color: ${k === active ? t.text : t.muted}; text-decoration: none;"><span style="width: 24px; height: 3px; border-radius: 2px; background: ${k === active ? t.text : 'transparent'};"></span>${ic(i)}<span>${l}</span></a>`)
     .join('')}</nav>`;
@@ -746,6 +746,249 @@ S['Accueil-J6'] = { title: 'Accueil · avec le bloc en cours', page: 'j6', rende
   main: homeJ5(t, thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span>` +
     `<span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, file(t, 'Calendrier-mois'), 'Bloc Force, semaine 2 sur 5, deload en semaine 4'), true) }) };
 
+// ===================================================================================
+// J7 — Stats et progression
+// Graphiques d'après la skill dataviz : la série qui compte en encre, le contexte en gris ;
+// traits de 2 px, points de 8 px avec un anneau couleur de fond, grille en filets pleins,
+// ligne d'objectif en pointillés ; étiquettes choisies (le record, l'objectif), jamais une valeur
+// sur chaque point. Blocs en lavis de leur couleur, deload hachuré, ses points creux et gris
+// (exclus des comparaisons). Couleurs vérifiées avec validate_palette.js : encre, gris et accent
+// se distinguent (daltonisme compris) et ressortent à plus de 3:1 sur la carte, dans les deux thèmes.
+// Exemple commun : aujourd'hui jeudi 24 septembre 2026, période « 3 mois » (depuis le 25 juin) ;
+// bloc « Hypertrophie » (bleu) du 10 août au 13 septembre, deload en semaine 5 (7 → 13 sept.),
+// puis bloc « Force » (vert) depuis le 14 septembre, en semaine 2/5.
+// ===================================================================================
+const J7NAV = (t) => ({ seance: '#', stats: file(t, 'Stats') });
+const CW = 326;       // largeur d'un graphique dans une carte (390 − 2 × 16 − 2 × 16)
+const PW = CW - 30;   // zone tracée ; les graduations sont à droite
+const DAYS = 91;      // 25 juin (jour 0, un jeudi) → jeudi 24 septembre (jour 91)
+const MONTHS = [[6, 'juil.'], [37, 'août'], [68, 'sept.']];
+const rnd = (i) => { const s = Math.sin(i * 12.9898 + 4.1) * 43758.5453; return (s - Math.floor(s)) * 2 - 1; };
+const fr = (v, d = 1) => v.toFixed(d).replace('.', ',');
+// Lavis des blocs : la teinte pâle telle quelle en clair, adoucie en sombre (les teintes y sont vives)
+const wash = (t, c) => (t.key === 'S' ? `${t.blocs[c]}30` : t.blocs[c]);
+const txt = (t, x, y, s, anchor = 'start', weight = 600, color = t.muted) =>
+  `<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="11" font-weight="${weight}" fill="${color}" style="font-variant-numeric: tabular-nums;">${s}</text>`;
+const colPath = (x0, w, yTop, yBase, r = 4) =>
+  `M${x0} ${yBase} V${yTop + r} Q${x0} ${yTop} ${x0 + r} ${yTop} H${x0 + w - r} Q${x0 + w} ${yTop} ${x0 + w} ${yTop + r} V${yBase} Z`;
+const targetLine = (t, yv) => `<line x1="0" x2="${PW}" y1="${yv}" y2="${yv}" stroke="${t.muted}" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+
+// Cadre commun : graduations horizontales (filets pleins) et valeurs à droite, mois en bas.
+const plot = (t, { h, yMin, yMax, ticks, fmt = (v) => v, xMax = DAYS, xLabels = MONTHS, label, body }) => {
+  const top = 8, bot = h - 20;
+  const y = (v) => +(bot - ((v - yMin) / (yMax - yMin)) * (bot - top)).toFixed(1);
+  const x = (d) => +((d / xMax) * PW).toFixed(1);
+  const grid = ticks.map((v) => `<line x1="0" x2="${PW}" y1="${y(v)}" y2="${y(v)}" stroke="${t.border}" stroke-width="1"/>${txt(t, CW, y(v) + 4, fmt(v), 'end')}`).join('');
+  const xl = xLabels.map(([d, s]) => txt(t, x(d), h - 3, s)).join('');
+  return `<svg role="img" aria-label="${label}" width="${CW}" height="${h}" viewBox="0 0 ${CW} ${h}" style="display: block; flex-shrink: 0; overflow: visible;">${body({ x, y, top, bot, grid, xl })}</svg>`;
+};
+
+// Carte de graphique : titre, lien à droite (pesée, objectif), gros chiffre, graphique
+const statCard = (t, title, right, inner) =>
+  card(t, `<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px;"><h2 style="margin: 0; font-size: 17px; font-weight: 700;">${title}</h2>${right}</div>${inner}`,
+    'flex-shrink: 0; padding: 10px 16px 14px; display: flex; flex-direction: column; gap: 8px;');
+const bigNum = (t, value, unit, sub = '') =>
+  `<div><span class="num" style="font-size: 34px; line-height: 38px; letter-spacing: -0.02em;">${value}</span>${unit ? ` <span style="font-size: 15px; font-weight: 600; color: ${t.muted};">${unit}</span>` : ''}${sub ? `<div style="display: flex; align-items: center; gap: 4px; font-size: 13px; color: ${t.muted};">${sub}</div>` : ''}</div>`;
+const cardLink = (t, label, href, icon = '') =>
+  `<a href="${href}" style="min-height: 48px; margin: -8px -8px -8px 0; padding: 0 8px; display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: ${t.text}; text-decoration: none; white-space: nowrap;">${icon}${label}</a>`;
+// Objectif modifiable : on touche son libellé (la ligne en pointillés seule serait trop fine au doigt)
+const goalLink = (t, label) =>
+  `<a href="${file(t, 'Objectifs')}" aria-label="${label}, modifier" style="min-height: 48px; margin: -8px -8px -8px 0; padding: 0 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: ${t.muted}; text-decoration: none; white-space: nowrap;"><svg width="16" height="2" aria-hidden="true"><line x1="0" x2="16" y1="1" y2="1" stroke="${t.muted}" stroke-width="1.5" stroke-dasharray="4 4"/></svg>${label}</a>`;
+
+// ---------- Poids corporel : pesées (points gris) + moyenne sur 7 jours (trait) + objectif ----------
+const PESEES = Array.from({ length: DAYS + 1 }, (_, d) => d)
+  .filter((d) => [0, 2, 4, 5].includes(d % 7) || d === DAYS)
+  .map((d) => [d, d === DAYS ? 78.4 : 80.3 - 1.8 * (d / DAYS) + 0.45 * rnd(d)]);
+const MOY7 = PESEES.map(([d]) => { const w = PESEES.filter(([e]) => e > d - 7 && e <= d); return [d, w.reduce((s, [, v]) => s + v, 0) / w.length]; });
+const moyNow = MOY7.at(-1)[1], moyStart = MOY7[3][1];
+
+const poidsChart = (t) => plot(t, { h: 150, yMin: 75, yMax: 81.5, ticks: [76, 78, 80],
+  label: `Poids corporel sur 3 mois : moyenne sur 7 jours de ${fr(moyStart)} à ${fr(moyNow)} kg, objectif 76 kg`,
+  body: ({ x, y, grid, xl }) => {
+    const line = MOY7.map(([d, v], i) => `${i ? 'L' : 'M'}${x(d)} ${y(v)}`).join(' ');
+    const [ld, lv] = MOY7.at(-1);
+    return grid + xl + PESEES.map(([d, v]) => `<circle cx="${x(d)}" cy="${y(v)}" r="2.5" fill="${t.strong}"/>`).join('') +
+      targetLine(t, y(76)) +
+      `<path d="${line}" fill="none" stroke="${t.text}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
+      `<circle cx="${x(ld)}" cy="${y(lv)}" r="4" fill="${t.text}" stroke="${t.surface}" stroke-width="2"/>`;
+  } });
+
+const poidsCard = (t) => statCard(t, 'Poids corporel', cardLink(t, 'Pesée', file(t, 'Pesee'), ic('plus', 18, 2.5)),
+  `<div style="display: flex; align-items: flex-end; justify-content: space-between;">${bigNum(t, fr(moyNow), 'kg', `${ic('down', 13, 3)} ${fr(moyStart - moyNow)} kg en 3 mois`)}${goalLink(t, 'objectif 76')}</div>` +
+  poidsChart(t) +
+  `<div style="display: flex; gap: 16px; font-size: 12px; color: ${t.muted};"><span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 3px; background: ${t.strong};"></span>pesée</span><span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 16px; height: 2px; border-radius: 1px; background: ${t.text};"></span>moyenne 7 jours</span></div>`);
+
+// ---------- Séances par semaine : colonnes, deload en gris, semaine en cours en pointillés ----------
+// 13 semaines, du lundi 29 juin au lundi 21 septembre ; la 11ᵉ (7 → 13 sept.) est le deload.
+const SEM = [3, 2, 3, 4, 3, 3, 4, 4, 3, 4, 2, 3, 2];
+const seancesChart = (t) => plot(t, { h: 120, yMin: 0, yMax: 5, ticks: [0, 2, 4], xMax: 13, xLabels: [[0.3, 'juil.'], [5.3, 'août'], [9.3, 'sept.']],
+  label: 'Séances par semaine sur 13 semaines, 3,1 en moyenne, objectif 4 ; semaine de deload : 2 ; semaine en cours : 2',
+  body: ({ x, y, grid, xl }) => {
+    const slot = PW / 13, bw = 14;
+    return grid + xl + targetLine(t, y(4)) + SEM.map((v, i) => {
+      const x0 = +(x(i) + (slot - bw) / 2).toFixed(1);
+      if (i === 12) return `<path d="${colPath(x0 + 0.75, bw - 1.5, y(v) + 0.75, y(0))}" fill="none" stroke="${t.text}" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+      return `<path d="${colPath(x0, bw, y(v), y(0))}" fill="${i === 10 ? t.strong : t.text}"/>`;
+    }).join('');
+  } });
+
+const seancesCard = (t) => statCard(t, 'Séances par semaine', goalLink(t, 'objectif 4'),
+  bigNum(t, '3,1', '', 'en moyenne') + seancesChart(t) +
+  `<div style="display: flex; gap: 16px; font-size: 12px; color: ${t.muted};"><span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: ${t.strong};"></span>deload</span><span style="display: inline-flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="box-sizing: border-box; width: 12px; height: 12px; border-radius: 3px; border: 1.5px dashed ${t.text};"></span>semaine en cours</span></div>`);
+
+// ---------- Séries par muscle : barres horizontales, sans objectif (retiré le 25/09/2026) ----------
+const MUSCLES = [['Jambes', 16], ['Dos', 14], ['Pectoraux', 12], ['Épaules', 9], ['Bras', 8], ['Abdos', 4]];
+const musclesChart = (t) => {
+  const lw = 96, max = 24, row = 30, h = MUSCLES.length * row;
+  const x = (v) => +(lw + (v / max) * (CW - lw - 34)).toFixed(1);
+  return `<svg role="img" aria-label="Séries par semaine et par muscle : ${MUSCLES.map(([m, v]) => `${m} ${v}`).join(', ')}" width="${CW}" height="${h}" viewBox="0 0 ${CW} ${h}" style="display: block; flex-shrink: 0;">` +
+    MUSCLES.map(([m, v], i) => {
+      const cy = i * row + row / 2;
+      return `<text x="0" y="${cy + 5}" font-size="15" font-weight="600" fill="${t.text}">${m}</text>` +
+        `<path d="M${lw} ${cy - 7} H${x(v) - 4} Q${x(v)} ${cy - 7} ${x(v)} ${cy - 3} V${cy + 3} Q${x(v)} ${cy + 7} ${x(v) - 4} ${cy + 7} H${lw} Z" fill="${t.text}"/>` +
+        `<text x="${x(v) + 6}" y="${cy + 5}" font-size="15" font-weight="700" fill="${t.text}" style="font-variant-numeric: tabular-nums;">${v}</text>`;
+    }).join('') + `</svg>`;
+};
+const musclesCard = (t) => statCard(t, 'Séries par muscle', '',
+  `<div style="font-size: 13px; color: ${t.muted}; margin-top: -6px;">par semaine, en moyenne</div>` + musclesChart(t));
+
+// ---------- Records récents ----------
+const prRow = (t, name, date, val, first = false) =>
+  `<a href="${file(t, 'Stats-exercice')}" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 12px 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}">${badgePR(t)}<span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${date}</span></span><span class="num" style="font-size: 18px;">${val}</span></a>`;
+
+const statsHeader = (t) => `<header style="flex-shrink: 0;"><h1 style="${H1}">Stats</h1></header>`;
+const statsMain = (t) =>
+  statsHeader(t) + seg(t, ['4 sem.', '3 mois', '1 an'], 1, 'Période') +
+  poidsCard(t) + seancesCard(t) + musclesCard(t) +
+  `<div style="flex-shrink: 0; margin-top: 4px;">${lbl(t, 'Records récents')}</div>` +
+  card(t, prRow(t, 'Squat', 'Barre · lun. 21 sept.', '110 × 2', true) + prRow(t, 'Développé couché', 'Barre · mer. 16 sept.', '85 × 5') + prRow(t, 'Soulevé de terre', 'Barre · jeu. 27 août', '150 × 3'), 'flex-shrink: 0; overflow: hidden;') +
+  card(t, listRow(t, 'Tous les exercices', '18 exercices suivis', file(t, 'Stats-exercices'), ic('chevR', 20), true) + listRow(t, 'Comparer deux blocs', 'Hypertrophie · Force', file(t, 'Stats-blocs')), 'flex-shrink: 0; overflow: hidden;');
+
+S['Stats'] = { title: 'Stats · vue d’ensemble (la page défile)', page: 'j7', h: 1540, render: (t) => frame(t, { h: 1540, navActive: 'stats', navLinks: J7NAV(t), main: statsMain(t) }) };
+
+S['Stats-vide'] = { title: 'Stats · premier lancement', page: 'j7', render: (t) => frame(t, { navActive: 'stats', navLinks: J7NAV(t), main:
+  statsHeader(t) +
+  card(t, `<span style="font-size: 20px; font-weight: 800;">Pas encore de stats</span><span style="font-size: 15px; line-height: 20px; color: ${t.muted};">Elles se remplissent à chaque séance et à chaque pesée.</span>`,
+    'flex-shrink: 0; padding: 16px; display: flex; flex-direction: column; gap: 8px;') +
+  `<div style="flex-grow: 1;"></div>` +
+  btn.sec(t, `${ic('plus', 20)}Pesée`, file(t, 'Pesee'), 'width: 100%;') }) };
+
+// ---------- Stats d'un exercice : Squat · barre ----------
+// Séances de squat le lundi et le jeudi ; 1RM estimé (Epley) = charge × (1 + reps / 30).
+const HYP = [46, 81], DEL = [74, 81], FOR = [81, 92];
+const SQUAT = Array.from({ length: 89 }, (_, d) => d).filter((d) => d % 7 === 0 || d % 7 === 4).map((d) => {
+  const fixed = { 32: 105, 81: 112, 84: 114.5, 88: 117 };
+  let v = fixed[d];
+  if (v === undefined) v = d < 46 ? 104 + 3 * (d / 46) + 0.7 * rnd(d) : d < 74 ? 107 + 5 * ((d - 46) / 27) + 0.6 * rnd(d) : 100 + 0.5 * rnd(d);
+  return { d, v: Math.round(v * 2) / 2, deload: d >= DEL[0] && d < DEL[1] };
+});
+const squatChart = (t) => plot(t, { h: 190, yMin: 96, yMax: 126, ticks: [100, 110, 120],
+  label: '1RM estimé au squat sur 3 mois : de 104 à 117 kg ; bloc Hypertrophie de 107 à 112 kg, bloc Force de 112 à 117 kg ; séances de deload grisées',
+  body: ({ x, y, top, bot, grid, xl }) => {
+    const band = (d0, d1, fill) => `<rect x="${x(d0)}" y="${top - 8}" width="${x(d1) - x(d0)}" height="${bot - top + 8}" fill="${fill}"/>`;
+    const pts = SQUAT.filter((p) => !p.deload);
+    const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.d)} ${y(p.v)}`).join(' ');
+    const tip = SQUAT.find((p) => p.d === 32), last = pts.at(-1);
+    const tx = x(tip.d), bw = 92, bx = tx - bw / 2;
+    return `<defs><pattern id="hachures-${t.key}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="${t.strong}" stroke-width="1.5" stroke-opacity=".6"/></pattern></defs>` +
+      band(HYP[0], HYP[1], wash(t, 'bleu')) + band(FOR[0], FOR[1], wash(t, 'vert')) + band(DEL[0], DEL[1], `url(#hachures-${t.key})`) +
+      txt(t, x(HYP[0]) + 5, top + 6, 'Hypertrophie', 'start', 700, t.text) + txt(t, x(FOR[0]) + 5, top + 6, 'Force', 'start', 700, t.text) + txt(t, (x(DEL[0]) + x(DEL[1])) / 2, top + 6, 'D', 'middle', 700, t.text) +
+      grid + xl +
+      `<path d="${line}" fill="none" stroke="${t.text}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>` +
+      SQUAT.map((p) => p.deload
+        ? `<circle cx="${x(p.d)}" cy="${y(p.v)}" r="4" fill="${t.surface}" stroke="${t.strong}" stroke-width="2"/>`
+        : `<circle cx="${x(p.d)}" cy="${y(p.v)}" r="4" fill="${t.text}" stroke="${t.surface}" stroke-width="2"/>`).join('') +
+      // Record : badge au-dessus du dernier point
+      `<rect x="${x(last.d) - 12}" y="${y(last.v) - 28}" width="24" height="18" rx="9" fill="${t.accent2}"/>${txt(t, x(last.d), y(last.v) - 15, 'PR', 'middle', 800, t.onAccent2)}` +
+      // Point touché : trait vertical et bulle (comme à la souris, mais au doigt)
+      `<line x1="${tx}" x2="${tx}" y1="${y(tip.v) - 12}" y2="${bot}" stroke="${t.muted}" stroke-width="1"/>` +
+      `<circle cx="${tx}" cy="${y(tip.v)}" r="6" fill="${t.text}" stroke="${t.surface}" stroke-width="2"/>` +
+      `<rect x="${bx}" y="${y(tip.v) - 62}" width="${bw}" height="50" rx="8" fill="${t.inverse}"/>` +
+      `<text x="${tx}" y="${y(tip.v) - 46}" text-anchor="middle" font-size="11" font-weight="600" fill="${t.onInverseMuted}">lun. 27 juil.</text>` +
+      `<text x="${tx}" y="${y(tip.v) - 28}" text-anchor="middle" font-size="17" font-weight="800" fill="${t.onInverse}" style="font-variant-numeric: tabular-nums;">105 kg</text>` +
+      `<text x="${tx}" y="${y(tip.v) - 16}" text-anchor="middle" font-size="11" font-weight="600" fill="${t.onInverse}" style="font-variant-numeric: tabular-nums;">90 × 5</text>`;
+  } });
+
+const recRow = (t, label, date, val, first = false) =>
+  `<div style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 16px; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${label}</span><span style="font-size: 13px; color: ${t.muted};">${date}</span></span><span class="num" style="font-size: 18px;">${val}</span></div>`;
+
+const periodBtn = (t) => `<a href="#" aria-label="Période : 3 mois, changer" style="min-height: 48px; padding: 0 8px; display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; color: ${t.text}; text-decoration: none; white-space: nowrap;">3 mois${ic('chevD', 18, 2.5)}</a>`;
+
+S['Stats-exercice'] = { title: 'Stats d’un exercice · Squat', page: 'j7', h: 940, render: (t) => frame(t, { h: 940, navActive: 'stats', navLinks: J7NAV(t), gap: 12, main:
+  header(t, 'Squat', file(t, 'Stats-exercices'), 'Retour aux exercices', periodBtn(t)) +
+  chips(t, ['Barre', 'Smith', 'Toutes'], [0]) +
+  seg(t, ['1RM estimé', 'Charge max', 'Volume'], 0, 'Mesure') +
+  card(t, bigNum(t, '117', 'kg', `${ic('up', 13, 3)} 5 kg depuis le début du bloc Force`) + squatChart(t),
+    'flex-shrink: 0; padding: 14px 16px 14px; display: flex; flex-direction: column; gap: 12px;') +
+  `<div style="flex-shrink: 0; margin-top: 4px;">${lbl(t, 'Records · barre')}</div>` +
+  card(t, recRow(t, '1RM estimé', 'lun. 21 sept.', '117 kg', true) + recRow(t, 'Charge max', 'lun. 21 sept.', '110 kg × 2') + recRow(t, 'Volume d’une séance', 'jeu. 27 août', '2 160 kg'), 'flex-shrink: 0; overflow: hidden;') }) };
+
+// ---------- Tous les exercices : une courbe miniature par exercice ----------
+const spark = (t, vals) => {
+  const w = 56, h = 24, lo = Math.min(...vals), hi = Math.max(...vals);
+  const pts = vals.map((v, i) => `${i ? 'L' : 'M'}${((i / (vals.length - 1)) * (w - 4) + 2).toFixed(1)} ${(h - 3 - ((v - lo) / (hi - lo || 1)) * (h - 6)).toFixed(1)}`).join(' ');
+  return `<svg width="${w}" height="${h}" aria-hidden="true" style="flex-shrink: 0;"><path d="${pts}" fill="none" stroke="${t.muted}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+};
+const exStatRow = (t, name, sub, vals, value, first = false) =>
+  `<a href="${file(t, 'Stats-exercice')}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 0 12px 0 16px; text-decoration: none; color: ${t.text}; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${name}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span>${spark(t, vals)}<span class="num" style="width: 64px; text-align: right; font-size: 18px;">${value}</span></a>`;
+
+S['Stats-exercices'] = { title: 'Stats · tous les exercices', page: 'j7', render: (t) => frame(t, { navActive: 'stats', navLinks: J7NAV(t), main:
+  header(t, 'Exercices', file(t, 'Stats'), 'Retour aux stats', periodBtn(t)) + search(t) +
+  card(t, [
+    exStatRow(t, 'Squat', 'Barre · 1RM estimé', [104, 105, 105, 107, 108, 110, 112, 113, 117], '117 kg', true),
+    exStatRow(t, 'Développé couché', 'Barre · 1RM estimé', [90, 90, 92, 91, 93, 95, 96, 98, 99], '99 kg'),
+    exStatRow(t, 'Soulevé de terre', 'Barre · 1RM estimé', [160, 162, 165, 165, 168, 170, 172, 175, 175], '175 kg'),
+    exStatRow(t, 'Tractions', 'Poids du corps · reps max', [8, 8, 9, 9, 9, 10, 10, 11, 12], '× 12'),
+    exStatRow(t, 'Développé militaire', 'Haltères · 1RM estimé', [27, 27, 28, 28, 28, 29, 29, 30, 30], '30 kg'),
+    exStatRow(t, 'Presse à cuisses', 'Machine · 1RM estimé', [190, 195, 195, 200, 205, 205, 210, 212, 215], '215 kg'),
+  ].join(''), 'flex-shrink: 0; overflow: hidden;') }) };
+
+// ---------- Comparer deux blocs ----------
+// Le bloc le plus ancien en gris, le plus récent en encre (mise en avant) ; chaque barre porte
+// le nom de son bloc et sa valeur : la couleur n'est jamais le seul repère.
+const blocPick = (t, nom, couleur, sub, label) =>
+  `<a href="#" aria-label="${label}" style="box-sizing: border-box; min-width: 0; min-height: 64px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid ${t.strong}; background: ${t.surface}; color: ${t.text}; text-decoration: none; display: flex; flex-direction: column; gap: 2px;">` +
+  `<span style="display: flex; align-items: center; gap: 6px;"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 6px; flex-shrink: 0; background: ${t.blocs[couleur]};"></span><span style="flex-grow: 1; font-size: 17px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${nom}</span><span style="display: flex; color: ${t.muted};">${ic('chevD', 16, 2.5)}</span></span>` +
+  `<span style="font-size: 13px; color: ${t.muted}; white-space: nowrap;">${sub}</span></a>`;
+const CMP_COLS = 'display: grid; grid-template-columns: minmax(0, 1fr) 96px 96px; column-gap: 8px; align-items: center;';
+const cmpRow = (t, label, a, b, first = false) =>
+  `<div style="${CMP_COLS} min-height: 44px; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="font-size: 15px; color: ${t.muted};">${label}</span><span class="num" style="text-align: right; font-size: 18px; color: ${t.muted};">${a}</span><span class="num" style="text-align: right; font-size: 18px;">${b}</span></div>`;
+const gainBars = (t, name, a, b, first = false) => {
+  const max = 8, lw = 96, x = (v) => (v / max) * (CW - lw - 56);
+  const bar = (nom, v, fill, strong) =>
+    `<div style="display: flex; align-items: center; gap: 8px; height: 22px;"><span style="width: ${lw - 8}px; flex-shrink: 0; font-size: 13px; color: ${t.muted};">${nom}</span><span aria-hidden="true" style="width: ${x(v).toFixed(1)}px; height: 12px; border-radius: 0 4px 4px 0; background: ${fill};"></span><span class="num" style="font-size: 15px; ${strong ? '' : `color: ${t.muted};`}">+${fr(v, v % 1 ? 1 : 0)} kg</span></div>`;
+  return `<div style="padding: 10px 0; display: flex; flex-direction: column; gap: 4px; ${first ? '' : `border-top: 1px solid ${t.border};`}"><span style="font-size: 17px; font-weight: 600;">${name}</span>${bar('Hypertrophie', a, t.strong, false)}${bar('Force', b, t.text, true)}</div>`;
+};
+
+S['Stats-blocs'] = { title: 'Comparer deux blocs', page: 'j7', render: (t) => frame(t, { navActive: 'stats', navLinks: J7NAV(t), main:
+  header(t, 'Comparer', file(t, 'Stats'), 'Retour aux stats') +
+  `<div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">${blocPick(t, 'Hypertrophie', 'bleu', '10 août → 13 sept.', 'Premier bloc : Hypertrophie, changer')}${blocPick(t, 'Force', 'vert', 'en cours · S2/5', 'Second bloc : Force, en cours, changer')}</div>` +
+  card(t, cmpRow(t, 'Séances / sem.', '3,5', '2,5', true) + cmpRow(t, 'Volume / sem.', '12,8 t', '13,4 t'), 'flex-shrink: 0; padding: 0 16px;') +
+  `<div style="flex-shrink: 0; margin-top: 4px;">${lbl(t, '1RM estimé · gagné pendant le bloc')}</div>` +
+  card(t, gainBars(t, 'Squat', 5, 5, true) + gainBars(t, 'Développé couché', 3, 2.5) + gainBars(t, 'Soulevé de terre', 5, 7.5) + gainBars(t, 'Développé militaire', 2, 1),
+    'flex-shrink: 0; padding: 0 16px;') +
+  `<div style="flex-shrink: 0; font-size: 13px; color: ${t.muted}; text-align: center;">Semaines de deload exclues</div>` }) };
+
+// ---------- Panneaux : pesée, objectifs ----------
+S['Pesee'] = { title: 'Pesée (panneau)', page: 'j7', render: (t) => frame(t, { navActive: 'stats', navLinks: J7NAV(t), main: statsMain(t),
+  overlay: sheet(t, 'Pesée',
+    `<h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Pesée</h2>` +
+    stepper(t, 'Poids', '78,4', 'kg', 'Poids', 'Moins 0,1 kg', 'Plus 0,1 kg') +
+    card(t, `<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px 0 16px; text-decoration: none; color: ${t.text};"><span style="flex-grow: 1; font-size: 17px; font-weight: 600;">Aujourd’hui</span><span style="font-size: 15px; color: ${t.muted};">jeu. 24 sept.</span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`, 'overflow: hidden;') +
+    `<div style="display: flex; flex-direction: column; gap: 4px;">${btn.pri(t, 'Enregistrer', file(t, 'Stats'), 'width: 100%;')}${btn.link(t, 'Annuler', file(t, 'Stats'), t.text)}</div>`) }) };
+
+// Le panneau dit à quoi il sert (question du 25/09/2026 dans le canvas) : chaque réglage est rangé
+// sous le nom de la carte dont il trace la ligne en pointillés.
+const goalGroup = (t, card_, rows) =>
+  `<div style="display: flex; flex-direction: column; gap: 4px;">${lbl(t, card_)}` +
+  card(t, rows.join(`<div style="height: 1px; background: ${t.border};"></div>`), 'flex-shrink: 0; padding: 2px 14px; display: flex; flex-direction: column;') + `</div>`;
+S['Objectifs'] = { title: 'Objectifs (panneau)', page: 'j7', render: (t) => frame(t, { navActive: 'stats', navLinks: J7NAV(t), main: statsMain(t),
+  overlay: sheet(t, 'Objectifs',
+    `<div><h2 style="margin: 0; font-size: 22px; line-height: 26px; font-weight: 700;">Objectifs</h2><p style="margin: 6px 0 0; font-size: 15px; line-height: 20px; color: ${t.muted};">Les lignes en pointillés des graphiques, pour voir d’un coup d’œil si tu es dans les clous.</p></div>` +
+    goalGroup(t, 'Poids corporel', [numRow(t, 'Cible', '76', 'kg')]) +
+    goalGroup(t, 'Séances par semaine', [numRow(t, 'Cible', '4', '')]) +
+    btn.link(t, 'Fermer', file(t, 'Stats'), t.text)) }) };
+
 // ---------- Écriture des fichiers ----------
 const page = (t, title, h, body) => `<!doctype html>
 <html lang="fr">
@@ -788,7 +1031,7 @@ const PAGES = [
 ];
 
 // Écrit les planches d'un canvas (deux thèmes) et son index canvas.json dans `dir`
-const writeCanvas = (dir, { title, at, pages, launch, extraNotes = {} }) => {
+const writeCanvas = (dir, { title, at, pages, launch, extraNotes = {}, notesCol = false }) => {
   const out = new URL(dir, import.meta.url);
   mkdirSync(out, { recursive: true });
   const boards = {}, order = [], notes = {};
@@ -796,7 +1039,7 @@ const writeCanvas = (dir, { title, at, pages, launch, extraNotes = {} }) => {
     const rowH = Math.max(...pg.order.map((id) => S[id].h || 844));
     THEMES.forEach((t, row) => {
       const y = row * (rowH + 420);
-      notes[`${pg.id}-${t.key}`] = { x: 0, y: y - 300, text: `${pg.name} — thème ${t.name}`, kind: 'title1', page: pg.id, maxW: Math.max(1200, pg.order.length * 470 - 80) };
+      notes[`${pg.id}-${t.key}`] = { x: 0, y: y - 300, text: `${pg.name} — thème ${t.name}`, kind: 'title1', page: pg.id, maxW: Math.max(1200, (pg.order.length + (notesCol ? 1 : 0)) * 470 - 80) };
       pg.order.forEach((id, i) => {
         const s = S[id], h = s.h || 844, f = file(t, id);
         writeFileSync(new URL(f, out), page(t, s.title, h, s.render(t)));
@@ -845,5 +1088,20 @@ writeCanvas('../maquettes-j6/', { title: 'Sportix — Maquettes J6', at: '2026-0
     'j6-rattachement': noteJ6(1560, 'Chaque séance faite pendant un bloc lui est rattachée (`blockId`) : c’est ce lien qui permettra « ai-je progressé au squat pendant mon bloc force ? » au J7. Le rattachement suit les dates : créer un bloc, changer son début ou ajouter un deload rattache aussi les séances déjà faites.'),
     'j6-couleurs': noteJ6(2600, 'Couleurs (22/09/2026) : chaque bloc a la sienne, choisie par le carré à droite du nom, et proposée différente du bloc précédent. Elles servent à lire d’un coup d’œil où finit un bloc et où commence le suivant, et à voir deux blocs qui se chevauchent : le jour commun est coupé en diagonale (planche « Calendrier · deux blocs »). En sombre, teintes moyennes et claires avec texte foncé.', 'teal'),
     'j6-formulaire': noteJ6(3120, 'Formulaire (22/09/2026) : sans onglets et sans défilement sur un iPhone 14. Les pastilles tiennent sur une ligne qui défile à l’horizontale ; le premier jour s’écrit en toutes lettres (le champ date d’iOS, posé dessus en transparent, débordait de l’écran) ; « Par semaine » sert au « 4/15 séances » du calendrier.'),
-    'j6-accueil': noteJ6(2080, 'Accueil (dernière planche) : la ligne fine du bloc se pose SOUS les chiffres de la semaine, juste avant la grande carte, et mène au détail du bloc. Sans bloc en cours, elle disparaît et l’accueil est celui du J5. Chiffres de la semaine centrés (retouche du 22/09/2026).'),
+    'j6-accueil': noteJ6(2080,'Accueil (dernière planche) : la ligne fine du bloc se pose SOUS les chiffres de la semaine, juste avant la grande carte, et mène au détail du bloc. Sans bloc en cours, elle disparaît et l’accueil est celui du J5. Chiffres de la semaine centrés (retouche du 22/09/2026).'),
+  } });
+
+// ===== Canvas J7 (stats et progression) : son propre dossier, son propre lien =====
+MAIN = 'Stats';
+const J7_ORDER = ['Stats-vide', 'Stats', 'Pesee', 'Objectifs', 'Stats-exercices', 'Stats-exercice', 'Stats-blocs'];
+// Notes une colonne plus loin, en taille normale, et titres qui les couvrent (disposition refaite dans le canvas le 25/09/2026)
+const noteJ7 = (y, text, color) => ({ x: (J7_ORDER.length + 1) * 470, y, w: 400, page: 'j7', ...(color ? { color } : {}), text });
+writeCanvas('../maquettes-j7/', { title: 'Sportix — Maquettes J7', at: '2026-09-23T12:00:00Z',
+  pages: [{ id: 'j7', name: 'J7 · Stats et progression', order: J7_ORDER }], launch: { view: 'canvas', page: 'j7' }, notesCol: true, extraNotes: {
+    'j7-question': noteJ7(0, 'La question du J7 : « ai-je progressé au squat pendant mon bloc Force ? ». Réponse sur « Stats d’un exercice » : le gros chiffre (1RM estimé) et, dessous, « ↑ 5 kg depuis le début du bloc Force » ; le graphique montre les blocs en fond, de leur couleur.', 'teal'),
+    'j7-graphiques': noteJ7(420, 'Règles des graphiques (skill dataviz) : une série en encre, le contexte en gris ; jamais deux échelles sur un graphique ; pas de valeur sur chaque point (seulement le record, l’objectif) ; toucher un point affiche une bulle (date, 1RM, série) avec un trait vertical. Couleurs vérifiées par le script de la skill : encre, gris et orange/jaune se distinguent, daltonisme compris, dans les deux thèmes.'),
+    'j7-deload': noteJ7(840, 'Deload : semaine hachurée « D », ses séances en points creux gris, hors de la courbe et exclues des comparaisons ; sur « Séances par semaine », la colonne du deload est grise.', 'orange'),
+    'j7-objectifs': noteJ7(1260, 'Objectifs : ils ne servent qu’à tracer les lignes en pointillés des graphiques (poids cible, séances par semaine). On les change en touchant le libellé en pointillés à droite du titre de la carte ; aussi dans les Réglages.'),
+    'j7-regularite': noteJ7(1680, 'Proposition : pas de grille « Régularité » (façon GitHub) prévue dans parcours.md : elle redirait « Séances par semaine » et les points du calendrier. À confirmer.', 'red'),
+    'j7-periode': noteJ7(2100, 'Période (4 sem. / 3 mois / 1 an) : un seul réglage en haut de la vue d’ensemble, qui vaut pour toutes les cartes ; « Séries par muscle » est donc une moyenne par semaine sur la période.'),
   } });

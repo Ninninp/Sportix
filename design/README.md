@@ -12,8 +12,9 @@ Référence visuelle du projet (voir [`docs/PHASE-D.md`](../docs/PHASE-D.md)). L
 | D5 — Maquettes MVP | [Sportix — Maquettes D5](https://claude.ai/artifact/97yLtU5WwzEf6hWSRHqJRq) | Validé le 19/09/2026 — **référence visuelle des jalons J1 à J4** | [`maquettes-d5/`](maquettes-d5/) |
 | J5 — Programmes | [Sportix — Maquettes J5](https://claude.ai/artifact/YVb56UsegHkqsWQcj4eFQK) | Validé le 21/09/2026 — **référence du J5** (séance « en liste », accueil façon Lyfta) | [`maquettes-j5/`](maquettes-j5/) |
 | J6 — Calendrier des blocs | [Sportix — Maquettes J6](https://claude.ai/artifact/9KuXG1SEWTr4adp429qfNB) | Vue mensuelle ; J6 validé le 22/09/2026, **canvas remis à jour le 23/09/2026** (9 écrans × 2 thèmes) | [`maquettes-j6/`](maquettes-j6/) |
+| J7 — Stats et progression | [Sportix — Maquettes J7](https://claude.ai/artifact/NgjbPhtHbmkmYEuzew6DhP) | **Validé le 25/09/2026** — **référence du J7** (7 écrans × 2 thèmes) | [`maquettes-j7/`](maquettes-j7/) |
 
-Les planches D5, J5 et J6 sont produites par [`maquettes-d5/generer.mjs`](maquettes-d5/generer.mjs) (les J5 dans `maquettes-j5/`, les J6 dans `maquettes-j6/`, chacun avec son `canvas.json`) : chaque écran y est décrit une fois, puis généré dans les deux thèmes à partir des tokens (`node design/maquettes-d5/generer.mjs`). Les planches `S-…` sont en thème sombre, `C-…` en clair ; `Main.dc.html` est l'accueil sombre.
+Les planches D5, J5, J6 et J7 sont produites par [`maquettes-d5/generer.mjs`](maquettes-d5/generer.mjs) (les J5 dans `maquettes-j5/`, les J6 dans `maquettes-j6/`, les J7 dans `maquettes-j7/`, chacun avec son `canvas.json`) : chaque écran y est décrit une fois, puis généré dans les deux thèmes à partir des tokens (`node design/maquettes-d5/generer.mjs`). Les planches `S-…` sont en thème sombre, `C-…` en clair ; `Main.dc.html` est l'accueil sombre.
 
 Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont une **copie** des sources du canvas, faite au moment de la publication. En cas d'écart, le canvas en ligne fait foi : si tu le retouches directement dans la page, je relis le canvas avant de modifier quoi que ce soit.
 
@@ -51,6 +52,13 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
   - **Canvas remis à jour le 23/09/2026** avec tout cela : deux planches ajoutées (« Calendrier · deux blocs », qui montre un jour coupé en deux couleurs, et « Couleur du bloc »), « + Semaine de deload » retiré du détail, avertissement de chevauchement déplacé sur le formulaire, réglage « Par semaine », date en toutes lettres, chiffres des réglages − / +, chiffres de la semaine centrés sur l'accueil. L'image de barre d'état collée à la main sur « Calendrier · aucun bloc » (sombre) a disparu à la régénération.
   - **Retours du 22/09/2026** : le bouton « + Semaine de deload » du détail est **retiré** — le deload (l'ajouter, changer sa semaine) ne se règle que dans « Modifier », un seul par bloc ; l'avertissement de chevauchement s'ouvre donc depuis le formulaire. Retouches faites dans le canvas et reportées dans l'app : chiffres de la semaine centrés sur l'accueil (libellé et valeur) ; « 5 sem. » et « sem. 4 » dans le formulaire. Le canvas montre encore l'ancien bouton sur « Détail d'un bloc ».
   - Autres écrans : calendrier vide, nouveau bloc (nom, objectif, premier jour, durée, deload, programme), nouvel objectif (panneau), détail d'un bloc (semaines, séances par semaine, « + Semaine de deload »), avertissement de chevauchement, accueil avec la ligne du bloc.
+
+- **J7 (validé le 25/09/2026)** — 7 écrans × 2 thèmes. **Retours du 25/09/2026** (notes dans le canvas) :
+  - « On ne veut pas le poids sur la page d'accueil » : la planche « Accueil » du J7 est retirée ; la pesée se fait depuis les Stats (« Pesée » sur la carte Poids corporel), `docs/design/parcours.md` corrigé.
+  - « Il sert à quoi ce panneau ? » (Objectifs) : les objectifs ne servent qu'à tracer les lignes en pointillés des graphiques. Le panneau le dit en une phrase et range chaque réglage sous le nom de sa carte (Poids corporel · Cible, Séances par semaine · Cible).
+  - **Plus d'objectif sur « Séries par muscle »** (jugé inutile) : ni zone 10–20 sur le graphique, ni réglage dans le panneau ; les barres sont toutes en encre.
+  - **Pas de grille « Régularité »** façon GitHub (proposition du canvas acceptée) : elle redisait « Séances par semaine » et les points du calendrier.
+  - Notes du canvas déplacées d'une colonne vers la droite et en taille normale (disposition refaite à la main dans le canvas, reprise par le générateur).
 
 ## Notes pour plus tard
 

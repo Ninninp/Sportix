@@ -24,7 +24,7 @@ Retours de l'utilisateur du 22/09/2026, traités : bouton « + Semaine de deload
 
 **Canvas J6 remis à jour le 23/09/2026** (version 44) : 9 écrans × 2 thèmes, avec les planches « Calendrier · deux blocs » (chevauchement en diagonale) et « Couleur du bloc ». Le générateur (`design/maquettes-d5/generer.mjs`) connaît maintenant les couleurs de bloc (`t.blocs`, `t.onBloc`) et les chiffres de la semaine centrés (`weekStats(t, true)`).
 
-**Reprendre ici** : **J7 (stats et progression)** — voir `docs/PLAN.md`. Penser à `useAllSets` / `blockSessions` pour comparer deux blocs, et à griser les séances de deload (`set.deload`) dans les graphiques.
+**Reprendre ici** : **J7 (stats et progression)** — voir `docs/PLAN.md`. **Maquettes validées le 25/09/2026** (canvas « Sportix — Maquettes J7 », lien dans `design/README.md`, sources `design/maquettes-j7/`) : pas de poids sur l'accueil, pas de grille « Régularité », objectifs = poids cible et séances/semaine seulement (pas de zone de séries par muscle). Penser à `useAllSets` / `blockSessions` pour comparer deux blocs, et à griser les séances de deload (`set.deload`) dans les graphiques.
 
 Reste aussi du J4 : **le test du son** sur l'iPhone (dernier point avant de pouvoir cocher le J4).
 
