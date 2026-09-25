@@ -81,6 +81,9 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
   const x = (t: number) => ((t - from) / Math.max(1, to - from)) * pw
   const y = (v: number) => bottom - ((v - scale.min) / (scale.max - scale.min || 1)) * (bottom - top)
   const clampX = (t: number) => Math.max(0, Math.min(pw, x(t)))
+  // Seules les semaines de deload visibles : une semaine à venir (après aujourd'hui) ou d'avant la
+  // période serait réduite à un trait sur le bord, et son « D » flotterait seul dans le coin.
+  const deloads = hatched.filter((h) => clampX(h.to) - clampX(h.from) >= 1)
 
   // Le point le plus proche du doigt, sur l'axe du temps
   const pick = (clientX: number, rect: DOMRect) => {
@@ -140,7 +143,7 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
             <rect x={clampX(b.from)} y={top - 24} width={clampX(b.to) - clampX(b.from)} height={bottom - top + 24} className="dark:opacity-20" style={{ fill: colorVar(b.color) }} />
           </g>
         ))}
-        {hatched.map((h, i) => (
+        {deloads.map((h, i) => (
           <rect key={`h${i}`} x={clampX(h.from)} y={top - 24} width={clampX(h.to) - clampX(h.from)} height={bottom - top + 24} fill={`url(#${pattern})`} />
         ))}
         {bands.map((b, i) =>
@@ -148,7 +151,7 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
             <Label key={`bl${i}`} x={clampX(b.from) + 5} y={top - 10} weight={700} color={C.text}>{b.label}</Label>
           ) : null,
         )}
-        {hatched.map((h, i) => (
+        {deloads.map((h, i) => (
           <Label key={`hl${i}`} x={(clampX(h.from) + clampX(h.to)) / 2} y={top - 10} anchor="middle" weight={700} color={C.text}>D</Label>
         ))}
         {scale.ticks.map((v) => (
