@@ -41,6 +41,11 @@ describe('parseBackup', () => {
     expect(parseBackup(JSON.stringify(backup({ schemaVersion: 7 })), 6)).toEqual({ ok: false, reason: 'trop-recent' })
   })
 
+  it('refuse « tables » en tableau, ou sans bibliothèque d’exercices : l’importer effacerait tout', () => {
+    expect(parseBackup(JSON.stringify({ ...backup(), tables: [] }), 6)).toEqual({ ok: false, reason: 'pas-sportix' })
+    expect(parseBackup(JSON.stringify({ ...backup(), tables: {} }), 6)).toEqual({ ok: false, reason: 'pas-sportix' })
+  })
+
   it('refuse des lignes sans identifiant (fichier abîmé ou modifié à la main)', () => {
     const broken = { ...backup(), tables: { ...emptyTables(), sets: [{ weight: 100 }] } }
     expect(parseBackup(JSON.stringify(broken), 6)).toEqual({ ok: false, reason: 'pas-sportix' })
@@ -61,8 +66,8 @@ describe('contenu et comparaison', () => {
     expect(summarize(b.tables)).toEqual({ sessions: 2, programs: 1, blocks: 0, bodyWeights: 2 })
   })
 
-  it('séances du téléphone absentes de la sauvegarde = perdues', () => {
-    expect(lostSessions(b, [{ id: 'a', endedAt: 1 }, { id: 'c', endedAt: 3 }, { id: 'd' }])).toBe(1)
+  it('séances du téléphone absentes de la sauvegarde = perdues, séance en cours comprise', () => {
+    expect(lostSessions(b, [{ id: 'a' }, { id: 'c' }, { id: 'd' }])).toBe(2)
   })
 })
 
@@ -89,17 +94,15 @@ describe('phrases de l’import', () => {
 })
 
 describe('needsBackup (pastille de l’onglet Réglages)', () => {
-  const session = (startedAt: number, done = true) => ({ startedAt, ...(done && { endedAt: startedAt + 3_600_000 }) })
-
   it('jamais sauvegardé : à partir de 10 séances terminées', () => {
-    expect(needsBackup(undefined, Array.from({ length: 9 }, (_, i) => session(day(8, i + 1))), NOW)).toBe(false)
-    expect(needsBackup(undefined, Array.from({ length: 10 }, (_, i) => session(day(8, i + 1))), NOW)).toBe(true)
+    expect(needsBackup(undefined, 9, NOW)).toBe(false)
+    expect(needsBackup(undefined, 10, NOW)).toBe(true)
   })
 
   it('plus de 30 jours ET des séances depuis', () => {
     const last = day(7, 20) // 36 jours avant
-    expect(needsBackup(last, [session(day(8, 1))], NOW)).toBe(true)
-    expect(needsBackup(last, [session(day(7, 1))], NOW)).toBe(false) // rien de nouveau depuis
-    expect(needsBackup(day(8, 1), [session(day(8, 20))], NOW)).toBe(false) // 24 jours seulement
+    expect(needsBackup(last, 1, NOW)).toBe(true)
+    expect(needsBackup(last, 0, NOW)).toBe(false) // rien de nouveau depuis
+    expect(needsBackup(day(8, 1), 5, NOW)).toBe(false) // 24 jours seulement
   })
 })

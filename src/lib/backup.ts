@@ -3,6 +3,7 @@
 // est la seule copie de secours. Importer une sauvegarde REMPLACE toutes les données (pas de
 // fusion : elle créerait des doublons et des conflits — maquettes J8, validées le 25/09/2026).
 // Calculs purs ici ; lecture et écriture de la base dans src/db/backup.ts.
+import { dayStart } from './bodyWeight.ts'
 
 /** Les tables enregistrées dans une sauvegarde (toutes celles de la base). */
 export const BACKUP_TABLES = [
@@ -53,9 +54,12 @@ export function parseBackup(text: string, currentSchemaVersion: number): ParseRe
   }
   if (typeof data !== 'object' || data === null) return { ok: false, reason: 'pas-sportix' }
   const raw = data as Partial<Record<keyof Backup, unknown>>
-  if (raw.app !== 'sportix' || raw.format !== 1 || typeof raw.tables !== 'object' || raw.tables === null) {
+  if (raw.app !== 'sportix' || raw.format !== 1 || typeof raw.tables !== 'object' || raw.tables === null || Array.isArray(raw.tables)) {
     return { ok: false, reason: 'pas-sportix' }
   }
+  // La bibliothèque d'exercices existe depuis la toute première version : un fichier sans elle
+  // est abîmé ou modifié à la main, pas une vraie sauvegarde (et l'importer effacerait tout).
+  if (!Array.isArray((raw.tables as Record<string, unknown>).exercises)) return { ok: false, reason: 'pas-sportix' }
   if (typeof raw.schemaVersion !== 'number' || typeof raw.exportedAt !== 'number') return { ok: false, reason: 'pas-sportix' }
   if (raw.schemaVersion > currentSchemaVersion) return { ok: false, reason: 'trop-recent' }
 
@@ -81,10 +85,13 @@ export function summarize(tables: { sessions: object[]; programs: unknown[]; blo
   }
 }
 
-/** Séances terminées sur le téléphone qui ne sont pas dans la sauvegarde : elles seraient perdues. */
-export function lostSessions(backup: Backup, current: { id: string; endedAt?: number }[]): number {
+/**
+ * Séances du téléphone qui ne sont pas dans la sauvegarde : elles seraient perdues. La séance en
+ * cours compte aussi (relecture du J8 : un import pendant une séance l'effaçait sans prévenir).
+ */
+export function lostSessions(backup: Backup, current: { id: string }[]): number {
   const kept = new Set(backup.tables.sessions.map((s) => s.id))
-  return current.filter((s) => s.endedAt !== undefined && !kept.has(s.id)).length
+  return current.filter((s) => !kept.has(s.id)).length
 }
 
 /** « sportix-2026-09-25.json » */
@@ -102,9 +109,7 @@ export function formatFileSize(bytes: number): string {
 
 /** Jours de calendrier entre deux instants (aujourd'hui = 0, hier = 1), justes aux changements d'heure. */
 export function daysBetween(from: number, to: number): number {
-  const a = new Date(from).setHours(0, 0, 0, 0)
-  const b = new Date(to).setHours(0, 0, 0, 0)
-  return Math.round((b - a) / 86_400_000)
+  return Math.round((dayStart(to) - dayStart(from)) / 86_400_000)
 }
 
 /** « Dernière sauvegarde : il y a 12 jours » (ou « jamais »). */
@@ -125,10 +130,14 @@ export const BACKUP_REMINDER_SESSIONS = 10
  * sauvegarde date de plus de 30 jours et qu'il y a eu des séances depuis ; sans aucune
  * sauvegarde, à partir de 10 séances (inutile d'y penser le premier jour).
  */
-export function needsBackup(lastBackupAt: number | undefined, sessions: { startedAt: number; endedAt?: number }[], now = Date.now()): boolean {
-  const finished = sessions.filter((s) => s.endedAt !== undefined)
-  if (lastBackupAt === undefined) return finished.length >= BACKUP_REMINDER_SESSIONS
-  return daysBetween(lastBackupAt, now) > BACKUP_REMINDER_DAYS && finished.some((s) => s.startedAt > lastBackupAt)
+export function needsBackup(
+  lastBackupAt: number | undefined,
+  /** Séances terminées : toutes (sans sauvegarde), ou commencées après la dernière sauvegarde. */
+  finishedSessions: number,
+  now = Date.now(),
+): boolean {
+  if (lastBackupAt === undefined) return finishedSessions >= BACKUP_REMINDER_SESSIONS
+  return daysBetween(lastBackupAt, now) > BACKUP_REMINDER_DAYS && finishedSessions > 0
 }
 
 /**

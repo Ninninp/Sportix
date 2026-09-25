@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
 import { afterEach, describe, expect, it } from 'vitest'
 import { parseBackup } from '../lib/backup.ts'
-import { exportBackup, importBackup, markBackupDone } from './backup.ts'
+import { exportBackup, finishedSessionsSince, importBackup, markBackupDone } from './backup.ts'
 import { saveBodyWeight } from './bodyWeights.ts'
 import { SportixDB } from './schema.ts'
 import { endSession, startSession } from './sessions.ts'
@@ -32,7 +32,7 @@ describe('sauvegarde', () => {
     await saveBodyWeight('w', Date.now(), 78.4, phone)
     await updateSettings({ restSeconds: 180 }, phone)
     const backup = await exportBackup(phone, 1000)
-    expect(backup.schemaVersion).toBe(6)
+    expect(backup.schemaVersion).toBe(phone.verno)
 
     // Le nouveau téléphone a déjà ses propres données (exercices de base, une séance à lui)
     const other = freshDb()
@@ -56,12 +56,36 @@ describe('sauvegarde', () => {
     const db = freshDb()
     const id = await startSession(db)
     await endSession(id, db)
-    const backup = await exportBackup(db)
-    // Deux lignes avec le même identifiant dans une table… et une ligne invalide pour la clé
-    backup.tables.bodyWeights = [{ id: 'w', date: 1, kg: 80, createdAt: 1 }, { id: undefined as unknown as string }]
-    const before = await db.sessions.count()
-    await expect(importBackup(backup, db)).rejects.toThrow()
-    expect(await db.sessions.count()).toBe(before)
+    const exported = await exportBackup(db)
+    exported.tables.sessions = []
+    exported.tables.bodyWeights = [{ id: 'w', date: 1, kg: 80, createdAt: 1 }]
+    // Panne simulée au milieu de l'import (comme un stockage plein) : les séances sont déjà
+    // effacées quand l'écriture des pesées échoue.
+    db.bodyWeights.hook('creating', () => {
+      throw new Error('stockage plein')
+    })
+    await expect(importBackup(exported, db)).rejects.toThrow('stockage plein')
+    expect((await db.sessions.toArray()).map((s) => s.id)).toEqual([id])
+  })
+
+  it('une sauvegarde d’avant le J6 retrouve l’objectif d’exemple « Force », comme une mise à niveau', async () => {
+    const db = freshDb()
+    const old = await exportBackup(db)
+    old.schemaVersion = 4
+    old.tables.blockGoals = []
+    await importBackup(old, db)
+    expect((await db.blockGoals.toArray()).map((g) => g.name)).toEqual(['Force'])
+  })
+
+  it('compte les séances terminées depuis la dernière sauvegarde', async () => {
+    const db = freshDb()
+    await db.sessions.bulkPut([
+      { id: 'a', startedAt: 100, endedAt: 200 },
+      { id: 'b', startedAt: 500, endedAt: 600 },
+      { id: 'en-cours', startedAt: 700 },
+    ])
+    expect(await finishedSessionsSince(undefined, db)).toBe(2)
+    expect(await finishedSessionsSince(300, db)).toBe(1)
   })
 
   it('note la date de la dernière sauvegarde', async () => {

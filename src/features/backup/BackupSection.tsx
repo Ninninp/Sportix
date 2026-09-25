@@ -20,7 +20,7 @@ import { CompareRows } from './SummaryRows.tsx'
 
 type ImportState =
   | { step: 'confirm'; backup: Backup }
-  | { step: 'refused'; reason: 'illisible' | 'pas-sportix' | 'trop-recent' }
+  | { step: 'refused'; reason: 'illisible' | 'pas-sportix' | 'trop-recent' | 'echec' }
   | { step: 'done'; summary: BackupSummary }
   | null
 
@@ -40,20 +40,31 @@ function Row({ icon, title, subtitle, onClick }: { icon: ReactNode; title: strin
   )
 }
 
-function ConfirmSheet({ backup, onCancel, onExportFirst, onDone }: { backup: Backup; onCancel: () => void; onExportFirst: () => void; onDone: (s: BackupSummary) => void }) {
+type ConfirmProps = { backup: Backup; onCancel: () => void; onExportFirst: () => void; onDone: (s: BackupSummary) => void; onFailed: () => void }
+
+function ConfirmSheet({ backup, onCancel, onExportFirst, onDone, onFailed }: ConfirmProps) {
   const comparison = useLiveQuery(() => compareWithDevice(backup), [backup])
+  // Pendant l'import, le panneau ne se ferme plus (sinon on croirait avoir annulé un import
+  // qui se termine quand même) ; le verrou empêche aussi un second appui.
+  const [running, setRunning] = useState(false)
   const busy = useRef(false)
   const summary = summarize(backup.tables)
 
   const replace = async () => {
     if (busy.current) return
     busy.current = true
-    await importBackup(backup)
-    onDone(summary)
+    setRunning(true)
+    try {
+      await importBackup(backup)
+      onDone(summary)
+    } catch {
+      // La transaction est annulée : rien n'a changé sur le téléphone
+      onFailed()
+    }
   }
 
   return (
-    <Sheet open onClose={onCancel} label="Remplacer tes données">
+    <Sheet open onClose={running ? () => {} : onCancel} label="Remplacer tes données">
       <div>
         <h2 className="text-title font-bold">Remplacer tes données ?</h2>
         <p className="mt-1.5 text-body text-muted">Tout ce qui est sur ce téléphone sera remplacé par la sauvegarde.</p>
@@ -72,13 +83,13 @@ function ConfirmSheet({ backup, onCancel, onExportFirst, onDone }: { backup: Bac
         </>
       )}
       <div className="flex flex-col gap-2">
-        <Button variant="danger" disabled={!comparison} onClick={() => void replace()}>
-          Remplacer mes données
+        <Button variant="danger" disabled={!comparison || running} onClick={() => void replace()}>
+          {running ? 'Import en cours…' : 'Remplacer mes données'}
         </Button>
-        <Button variant="secondary" onClick={onCancel}>
+        <Button variant="secondary" disabled={running} onClick={onCancel}>
           Annuler
         </Button>
-        <Button variant="link" className="text-text" onClick={onExportFirst}>
+        <Button variant="link" className="text-text" disabled={running} onClick={onExportFirst}>
           Exporter d’abord ce téléphone
         </Button>
       </div>
@@ -93,6 +104,10 @@ const NOT_A_BACKUP = {
 const REFUSALS = {
   illisible: NOT_A_BACKUP,
   'pas-sportix': NOT_A_BACKUP,
+  echec: {
+    title: 'L’import n’a pas abouti',
+    text: 'Rien n’a été changé sur ce téléphone. Ferme l’app et rouvre-la, puis réessaie.',
+  },
   'trop-recent': {
     title: 'Sauvegarde d’une version plus récente',
     text: 'Elle vient d’une version de Sportix plus récente que celle-ci. Ferme l’app et rouvre-la pour la mettre à jour, puis réessaie. Rien n’a été changé sur ce téléphone.',
@@ -145,6 +160,7 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
           onCancel={() => setImporting(null)}
           onExportFirst={() => setExporting(true)}
           onDone={(summary) => setImporting({ step: 'done', summary })}
+          onFailed={() => setImporting({ step: 'refused', reason: 'echec' })}
         />
       )}
 

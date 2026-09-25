@@ -137,8 +137,8 @@ src/
 - Poids corporel (pesées, moyenne 7 jours) et séances/semaine, avec lignes d'objectif modifiables.
 - **Objectif** : répondre à « ai-je progressé au squat pendant mon bloc force ? ».
 
-### J8 — Sauvegarde & fiabilité (1–2 jours) — maquettes validées et codé le 25/09/2026, à tester sur l'iPhone
-> Maquettes : canvas « Sportix — Maquettes J8 ». Export d'un fichier JSON (toutes les tables + version de la base) par la feuille de partage d'iOS ; import qui **remplace** tout, dans une seule transaction, après une confirmation qui compare la sauvegarde et le téléphone ; fichier d'une version plus récente refusé. Rappel : pastille sur l'onglet Réglages (plus de 30 jours sans sauvegarde et des séances depuis), pas sur l'accueil. `navigator.storage.persist()` est demandé depuis le J2, sans affichage. Pas de migration Dexie nécessaire : les tables et champs ajoutés depuis le J2 sont facultatifs, une sauvegarde ancienne s'importe telle quelle.
+### J8 — Sauvegarde & fiabilité (1–2 jours) — ✅ validé le 25/09/2026 (maquettes, code, test iPhone, `/code-review`)
+> Maquettes : canvas « Sportix — Maquettes J8 ». Export d'un fichier JSON (toutes les tables + version de la base) par la feuille de partage d'iOS ; import qui **remplace** tout, dans une seule transaction, après une confirmation qui compare la sauvegarde et le téléphone ; fichier d'une version plus récente refusé. Rappel : pastille sur l'onglet Réglages (plus de 30 jours sans sauvegarde et des séances depuis), pas sur l'accueil. `navigator.storage.persist()` est demandé depuis le J2, sans affichage. Pas de migration Dexie nécessaire : les tables et champs ajoutés depuis le J2 sont facultatifs ; pour une sauvegarde ancienne, l'import refait ce que les mises à niveau auraient fait (v5 : l'objectif d'exemple « Force »).
 - Export/import JSON (Web Share API), `navigator.storage.persist()`, rappel de sauvegarde, migrations Dexie.
 - **Objectif** : changer de téléphone sans rien perdre.
 

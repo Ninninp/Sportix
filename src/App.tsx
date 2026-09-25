@@ -21,7 +21,7 @@ function App() {
   const active = useActiveSession()
   const settings = useSettings()
   useRestAlarm(active?.rest, settings?.restSound ?? true)
-  const remindBackup = useBackupReminder()
+  const remindBackup = useBackupReminder(settings)
 
   return (
     <div className="flex h-dvh flex-col bg-bg text-text">

@@ -26,6 +26,11 @@ export async function importBackup(backup: Backup, db: SportixDB = defaultDb): P
       await table.clear()
       await table.bulkPut(backup.tables[name])
     }
+    // Sauvegarde d'avant une version de la base : on refait ce que la mise à niveau aurait fait
+    // (voir src/db/schema.ts). Version 5 (J6) : l'objectif de bloc d'exemple « Force ».
+    if (backup.schemaVersion < 5 && (await db.blockGoals.count()) === 0) {
+      await db.blockGoals.add({ id: crypto.randomUUID(), name: 'Force', createdAt: Date.now() })
+    }
     const settings = (await db.settings.get('app')) ?? { id: 'app' as const }
     await db.settings.put({ ...settings, id: 'app', lastBackupAt: backup.exportedAt })
   })
@@ -37,6 +42,18 @@ export async function markBackupDone(time = Date.now(), db: SportixDB = defaultD
     const settings = (await db.settings.get('app')) ?? { id: 'app' as const }
     await db.settings.put({ ...settings, id: 'app', lastBackupAt: time })
   })
+}
+
+/**
+ * Séances terminées qui comptent pour le rappel : toutes (sans sauvegarde), ou celles commencées
+ * après la dernière sauvegarde. Un simple compte par index, pas la lecture de toute la table.
+ */
+export function finishedSessionsSince(lastBackupAt: number | undefined, db: SportixDB = defaultDb): Promise<number> {
+  return db.sessions
+    .where('startedAt')
+    .above(lastBackupAt ?? -Infinity)
+    .filter((s) => s.endedAt !== undefined)
+    .count()
 }
 
 /** Vérifie le texte d'un fichier choisi pour l'import, par rapport à la version de CETTE base. */
