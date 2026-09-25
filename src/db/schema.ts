@@ -9,6 +9,7 @@
 // Dexie applique alors les étapes manquantes au prochain lancement, sans rien perdre.
 import Dexie, { type EntityTable, type Transaction } from 'dexie'
 import type { Block, BlockGoal } from '../lib/blocks.ts'
+import type { BodyWeight } from '../lib/bodyWeight.ts'
 import type { Exercise } from '../lib/exercises.ts'
 import type { Program, ProgramDay, ProgramExercise } from '../lib/programs.ts'
 import type { Session, SessionSet } from '../lib/sessions.ts'
@@ -25,6 +26,7 @@ export class SportixDB extends Dexie {
   programExercises!: EntityTable<ProgramExercise, 'id'>
   blocks!: EntityTable<Block, 'id'>
   blockGoals!: EntityTable<BlockGoal, 'id'>
+  bodyWeights!: EntityTable<BodyWeight, 'id'>
 
   constructor(name = 'sportix') {
     super(name)
@@ -68,6 +70,12 @@ export class SportixDB extends Dexie {
         blockGoals: 'id',
       })
       .upgrade((tx) => addSeedGoal(tx))
+
+    // Version 6 (J7) : les pesées (poids corporel). Nouvelle table seulement ; les objectifs de la
+    // page Stats (poids cible, séances par semaine) sont de simples réglages, dans `settings`.
+    this.version(6).stores({
+      bodyWeights: 'id, date',
+    })
 
     // Au tout premier lancement seulement (base encore vide) : les exercices de base.
     // Le `return` est indispensable : Dexie attend cette promesse avant de clore la transaction.

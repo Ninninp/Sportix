@@ -3,6 +3,7 @@
 // J4 : repos par défaut, son de fin de repos, pas de charge des boutons − / + par variante.
 // Chaque changement est enregistré aussitôt (pas de bouton « Enregistrer »).
 // Unité (kg / lb) et RPE, présents sur la maquette, arriveront avec les jalons qui les utilisent.
+// J7 : les objectifs des Stats (poids cible, séances par semaine), le même panneau que dans les Stats.
 import { useState, type ReactNode } from 'react'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
@@ -18,6 +19,9 @@ import { formatRest } from '../../lib/rest.ts'
 import { formatNumber } from '../../lib/sessions.ts'
 import { REST_MIN, WEIGHT_STEP_CHOICES, stepRest } from '../../lib/settings.ts'
 import { useActiveExercises } from '../exercises/useExercises.ts'
+import GoalsSheet from '../stats/GoalsSheet.tsx'
+import { useBodyWeights } from '../stats/useStats.ts'
+import { withMovingAverage } from '../../lib/bodyWeight.ts'
 import { isStandalone } from '../../lib/standalone.ts'
 import { useSettings } from './useSettings.ts'
 
@@ -44,11 +48,16 @@ function SettingsPage() {
   const installed = isStandalone(window)
   const exercises = useActiveExercises()
   const settings = useSettings()
-  // Panneau ouvert : le repos, ou le pas de charge d'une variante
-  const [editing, setEditing] = useState<'rest' | Variant | null>(null)
+  const weights = useBodyWeights()
+  // Panneau ouvert : le repos, les objectifs, ou le pas de charge d'une variante
+  const [editing, setEditing] = useState<'rest' | 'goals' | Variant | null>(null)
   if (settings === undefined) return null
   const close = () => setEditing(null)
-  const variant = editing !== null && editing !== 'rest' ? editing : null
+  const variant = editing !== null && editing !== 'rest' && editing !== 'goals' ? editing : null
+  const goals = [
+    settings.goalBodyWeight !== undefined && `${formatNumber(settings.goalBodyWeight)} kg`,
+    settings.goalWeeklySessions !== undefined && `${settings.goalWeeklySessions} / sem.`,
+  ].filter(Boolean)
 
   return (
     <main className="flex flex-1 flex-col gap-4 px-4 pt-2 pb-4">
@@ -115,6 +124,13 @@ function SettingsPage() {
       </section>
 
       <section className="flex flex-col gap-2">
+        <h2 className={sectionTitle}>Stats</h2>
+        <Card className="overflow-hidden">
+          <SettingButton label="Objectifs" value={goals.length > 0 ? goals.join(' · ') : 'Aucun'} onClick={() => setEditing('goals')} />
+        </Card>
+      </section>
+
+      <section className="flex flex-col gap-2">
         <h2 className={sectionTitle}>Exercices</h2>
         <Card className="overflow-hidden">
           <ListRow
@@ -135,6 +151,8 @@ function SettingsPage() {
         {/* Permet de vérifier que l'iPhone a bien la dernière version déployée */}
         <p className="num">Version {__APP_VERSION__}</p>
       </footer>
+
+      <GoalsSheet open={editing === 'goals'} onClose={close} currentWeight={weights && weights.length > 0 ? withMovingAverage(weights).at(-1)!.average : undefined} />
 
       <Sheet open={editing === 'rest'} onClose={close} label="Repos par défaut">
         <div>

@@ -31,7 +31,7 @@ Le design est traité comme une **phase dédiée (Phase D) avant le code**, puis
 | Base de données locale | IndexedDB via **Dexie** + `dexie-react-hooks` (`useLiveQuery`) |
 | Navigation | React Router |
 | Style | Tailwind CSS, configuré avec les **tokens du design system** |
-| Graphiques | Recharts |
+| Graphiques | SVG maison (`src/features/stats/charts.tsx`) ; Recharts écarté le 25/09/2026 |
 | Dates / calendrier | `Date` natif (date-fns écarté le 21/09/2026) |
 | Tests | Vitest (logique métier) |
 
@@ -130,7 +130,8 @@ src/
 - Création/modification/suppression des blocs ; bloc actif sur l'accueil ; `blockId` sur les séances ; détection des chevauchements.
 - **Objectif** : planifier 3 mois et voir où on en est d'un coup d'œil.
 
-### J7 — Stats & progression (4–5 jours)
+### J7 — Stats & progression (4–5 jours) — maquettes validées et codé le 25/09/2026, à tester sur l'iPhone
+> Maquettes : canvas « Sportix — Maquettes J7 » (7 écrans × 2 thèmes). Dexie v6 (`bodyWeights`), objectifs dans `settings`. Calculs dans `src/lib/stats.ts` et `src/lib/bodyWeight.ts` (testés), écrans dans `src/features/stats/`. **Recharts n'est pas utilisé** (décidé le 25/09/2026) : les maquettes demandent des choses qu'il fait mal ou pas (blocs en fond de leur couleur, semaines de deload hachurées, points creux hors de la courbe, bulle au toucher, graduations à droite) ; quelques composants SVG suffisent, suivent les deux thèmes par les variables CSS, et évitent une grosse dépendance dans une PWA hors ligne. Deload affiché mais exclu des courbes, moyennes et comparaisons ; records sur tout l'historique.
 - **Design** : maquettes des graphiques (Claude Code suit sa skill `dataviz` pour des graphiques lisibles et cohérents).
 - 1RM estimé (Epley), volume, PR 🏆, séries hebdo par muscle, comparaison entre blocs ; tests Vitest.
 - Poids corporel (pesées, moyenne 7 jours) et séances/semaine, avec lignes d'objectif modifiables.

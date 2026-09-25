@@ -1,7 +1,5 @@
 import { createBrowserRouter } from 'react-router'
 import App from './App.tsx'
-import ComingSoon from './components/ComingSoon.tsx'
-import { IconStats } from './components/icons.tsx'
 import BlockDetailPage from './features/blocks/BlockDetailPage.tsx'
 import BlockFormPage from './features/blocks/BlockFormPage.tsx'
 import CalendarPage from './features/blocks/CalendarPage.tsx'
@@ -18,6 +16,10 @@ import SessionDetailPage from './features/sessions/SessionDetailPage.tsx'
 import SessionPage from './features/sessions/SessionPage.tsx'
 import SessionRecapPage from './features/sessions/SessionRecapPage.tsx'
 import SettingsPage from './features/settings/SettingsPage.tsx'
+import BlockComparePage from './features/stats/BlockComparePage.tsx'
+import ExerciseStatsListPage from './features/stats/ExerciseStatsListPage.tsx'
+import ExerciseStatsPage from './features/stats/ExerciseStatsPage.tsx'
+import StatsPage from './features/stats/StatsPage.tsx'
 
 // Associe chaque adresse (URL) à l'écran à afficher.
 // basename : l'app vit sous /Sportix/ (GitHub Pages), valeur fournie par Vite (option `base`).
@@ -44,13 +46,11 @@ export const router = createBrowserRouter(
         { path: 'calendrier/nouveau', element: <BlockFormPage /> },
         { path: 'calendrier/:id', element: <BlockDetailPage /> },
         { path: 'calendrier/:id/modifier', element: <BlockFormPage /> },
-        {
-          path: 'stats',
-          element: (
-            <ComingSoon title="Stats" milestone="J7" Icon={IconStats}
-              description="Ta progression : 1RM estimé, volume, records et poids du corps." />
-          ),
-        },
+        // Stats (J7) ; la période choisie voyage dans l'adresse (?periode=3m)
+        { path: 'stats', element: <StatsPage /> },
+        { path: 'stats/exercices', element: <ExerciseStatsListPage /> },
+        { path: 'stats/exercices/:id', element: <ExerciseStatsPage /> },
+        { path: 'stats/blocs', element: <BlockComparePage /> },
         { path: 'reglages', element: <SettingsPage /> },
         { path: 'reglages/exercices', element: <ExerciseLibraryPage /> },
         // Le formulaire sert à la création (« nouveau ») comme à la modification (identifiant)

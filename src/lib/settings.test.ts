@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SETTINGS, stepRest, withDefaults } from './settings.ts'
+import { DEFAULT_SETTINGS, stepGoalSessions, stepGoalWeight, stepRest, withDefaults } from './settings.ts'
 
 describe('withDefaults', () => {
   it('sans rien d’enregistré : les valeurs par défaut (repos 2:00, son, pas des maquettes)', () => {
@@ -23,5 +23,19 @@ describe('stepRest', () => {
     expect(stepRest(120, -1)).toBe(105)
     expect(stepRest(15, -1)).toBe(15)
     expect(stepRest(600, 1)).toBe(600)
+  })
+})
+
+describe('objectifs des Stats', () => {
+  it('séances par semaine : de « Aucun » à 1, et retour à « Aucun » sous 1', () => {
+    expect(stepGoalSessions(undefined, 1)).toBe(1)
+    expect(stepGoalSessions(undefined, -1)).toBeUndefined()
+    expect(stepGoalSessions(1, -1)).toBeUndefined()
+    expect(stepGoalSessions(14, 1)).toBe(14)
+  })
+
+  it('poids cible : le premier appui part du poids actuel au demi-kilo, puis 0,5 kg par appui', () => {
+    expect(stepGoalWeight(undefined, 1, 78.4)).toBe(78.5)
+    expect(stepGoalWeight(76, -1, 78.4)).toBe(75.5)
   })
 })

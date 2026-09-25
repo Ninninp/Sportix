@@ -11,6 +11,9 @@ export type Settings = {
   weightSteps: WeightSteps
   /** Programme actif (J5) : c'est sa prochaine séance que l'accueil propose. */
   activeProgramId?: string
+  /** Objectifs des Stats (J7) : ils ne servent qu'à tracer une ligne en pointillés sur un graphique. */
+  goalBodyWeight?: number
+  goalWeeklySessions?: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -42,4 +45,23 @@ export function withDefaults(stored?: Partial<Settings>): Settings {
 /** Repos après un appui sur − / + dans Réglages : 15 s de plus ou de moins, dans les bornes. */
 export function stepRest(seconds: number, direction: 1 | -1): number {
   return Math.min(REST_MAX, Math.max(REST_MIN, seconds + direction * REST_STEP))
+}
+
+/** Bornes de l'objectif « séances par semaine » (comme le réglage « Par semaine » d'un bloc). */
+export const GOAL_SESSIONS_MIN = 1
+export const GOAL_SESSIONS_MAX = 14
+/** Pas de l'objectif de poids : un demi-kilo. */
+export const GOAL_WEIGHT_STEP = 0.5
+
+/** Objectif de séances par semaine après − / + : sous 1, plus d'objectif (undefined). */
+export function stepGoalSessions(current: number | undefined, direction: 1 | -1): number | undefined {
+  if (current === undefined) return direction === 1 ? GOAL_SESSIONS_MIN : undefined
+  const next = current + direction
+  return next < GOAL_SESSIONS_MIN ? undefined : Math.min(GOAL_SESSIONS_MAX, next)
+}
+
+/** Objectif de poids après − / + : le premier appui part de `start` (le poids actuel, arrondi). */
+export function stepGoalWeight(current: number | undefined, direction: 1 | -1, start: number): number {
+  if (current === undefined) return Math.round(start / GOAL_WEIGHT_STEP) * GOAL_WEIGHT_STEP
+  return Math.min(250, Math.max(30, current + direction * GOAL_WEIGHT_STEP))
 }
