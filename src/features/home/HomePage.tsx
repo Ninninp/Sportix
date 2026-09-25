@@ -218,6 +218,7 @@ function HomePage() {
             <span className="text-body font-semibold text-muted">kg</span>
           </WeekFigure>
         </div>
+        <div aria-hidden="true" className="mt-1.5 h-px bg-border" />
         <div className="mt-1.5 flex justify-center gap-[25px]">
           {days.map((d, i) => (
             <div
