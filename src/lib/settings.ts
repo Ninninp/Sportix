@@ -15,6 +15,8 @@ export type Settings = {
   /** Objectifs des Stats (J7) : ils ne servent qu'à tracer une ligne en pointillés sur un graphique. */
   goalBodyWeight?: number
   goalWeeklySessions?: number
+  /** Date du dernier export réussi (J8), pour « Dernière sauvegarde » et la pastille de rappel. */
+  lastBackupAt?: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {

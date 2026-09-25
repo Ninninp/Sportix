@@ -67,7 +67,7 @@
       "y": 0,
       "w": 390,
       "h": 844,
-      "title": "Accueil · rappel de sauvegarde (plus de 30 jours) — sombre",
+      "title": "Rappel : pastille sur l’onglet Réglages (plus de 30 jours) — sombre",
       "page": "j8",
       "is_interactive": true
     },
@@ -121,7 +121,7 @@
       "y": 1600,
       "w": 390,
       "h": 844,
-      "title": "Accueil · rappel de sauvegarde (plus de 30 jours) — clair",
+      "title": "Rappel : pastille sur l’onglet Réglages (plus de 30 jours) — clair",
       "page": "j8",
       "is_interactive": true
     }
@@ -186,14 +186,14 @@
       "w": 400,
       "page": "j8",
       "color": "red",
-      "text": "Rappel (dernière planche) : une ligne fine sur l’accueil quand la dernière sauvegarde date de plus de 30 jours et qu’il y a eu des séances depuis (jamais sauvegardé : après 10 séances). Elle disparaît dès qu’on exporte. À confirmer : 30 jours ? Ou plutôt une pastille sur l’onglet Réglages, pour garder l’accueil épuré ?"
+      "text": "Rappel (dernière planche, retouche du 25/09/2026) : pas de ligne sur l’accueil. Une pastille sur l’onglet Réglages quand la dernière sauvegarde date de plus de 30 jours et qu’il y a eu des séances depuis (jamais sauvegardé : après 10 séances). Elle disparaît dès qu’on exporte."
     },
     "j8-stockage": {
       "x": 3290,
       "y": 1680,
       "w": 400,
       "page": "j8",
-      "text": "Stockage protégé : l’app demande au navigateur de ne jamais effacer ses données (déjà fait depuis le J2). La ligne sous la section dit si c’est accordé ; sinon : « Stockage non protégé : exporte régulièrement tes données »."
+      "text": "Stockage protégé : l’app demande au navigateur de ne jamais effacer ses données (déjà fait depuis le J2), sans rien afficher (ligne retirée dans le canvas le 25/09/2026)."
     }
   },
   "designSystems": []

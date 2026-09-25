@@ -2,6 +2,7 @@
 // Onglets de 56 px (cible tactile ≥ 48 px), posés un peu plus bas que la zone de sécurité
 // complète (8 px de moins) pour rapprocher la barre du bas de l'écran, comme les apps iOS
 // (retour du test sur iPhone, 19/09/2026).
+// J8 : une pastille rouge sur Réglages rappelle d'exporter les données (plus de 30 jours sans sauvegarde).
 import type { ComponentType } from 'react'
 import { NavLink } from 'react-router'
 import { IconCalendrier, IconProgrammes, IconReglages, IconSeance, IconStats } from './icons.tsx'
@@ -14,7 +15,8 @@ const tabs: { to: string; label: string; Icon: ComponentType<{ size?: number }> 
   { to: '/reglages', label: 'Réglages', Icon: IconReglages },
 ]
 
-function BottomNav() {
+/** `badge` : adresse de l'onglet qui porte une pastille (sauvegarde à faire, sur Réglages). */
+function BottomNav({ badge }: { badge?: string }) {
   return (
     <nav
       aria-label="Navigation principale"
@@ -37,8 +39,16 @@ function BottomNav() {
                     aria-hidden="true"
                     className={`h-[3px] w-6 rounded-sm ${isActive ? 'bg-text' : 'bg-transparent'}`}
                   />
-                  <Icon size={24} />
-                  <span>{label}</span>
+                  <span className="relative flex">
+                    <Icon size={24} />
+                    {badge === to && (
+                      <span aria-hidden="true" className="absolute -top-0.5 -right-1.5 size-2.5 rounded-full bg-danger ring-2 ring-surface" />
+                    )}
+                  </span>
+                  <span>
+                    {label}
+                    {badge === to && <span className="sr-only"> (sauvegarde à faire)</span>}
+                  </span>
                 </>
               )}
             </NavLink>

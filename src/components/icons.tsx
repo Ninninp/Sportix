@@ -76,3 +76,13 @@ export const IconCorbeille = (p: IconProps) => (
 export const IconLivre = (p: IconProps) => (
   <Icon {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></Icon>
 )
+// Importer : une flèche qui entre dans le bac (l'inverse de « Partager », qui en sort)
+export const IconImporter = (p: IconProps) => (
+  <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></Icon>
+)
+export const IconAlerte = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 8v4M12 16h.01" />
+  </Icon>
+)

@@ -4,6 +4,7 @@ import SessionBar from './features/sessions/SessionBar.tsx'
 import { useActiveSession } from './features/sessions/useSession.ts'
 import { useSettings } from './features/settings/useSettings.ts'
 import { useRestAlarm } from './features/timer/useRestAlarm.ts'
+import { useBackupReminder } from './features/backup/useBackupReminder.ts'
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,
 // la barre d'onglets reste en bas — sauf pendant une séance, où l'écran est plein
@@ -20,6 +21,7 @@ function App() {
   const active = useActiveSession()
   const settings = useSettings()
   useRestAlarm(active?.rest, settings?.restSound ?? true)
+  const remindBackup = useBackupReminder()
 
   return (
     <div className="flex h-dvh flex-col bg-bg text-text">
@@ -34,7 +36,7 @@ function App() {
       ) : (
         <>
           {active && <SessionBar session={active} />}
-          <BottomNav />
+          <BottomNav badge={remindBackup ? '/reglages' : undefined} />
         </>
       )}
     </div>

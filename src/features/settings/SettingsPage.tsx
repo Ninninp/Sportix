@@ -4,6 +4,7 @@
 // Chaque changement est enregistré aussitôt (pas de bouton « Enregistrer »).
 // Unité (kg / lb) et RPE, présents sur la maquette, arriveront avec les jalons qui les utilisent.
 // J7 : les objectifs des Stats (poids cible, séances par semaine), le même panneau que dans les Stats.
+// J8 : la section « Sauvegarde » en tête (exporter, importer), voir src/features/backup/.
 import { useState, type ReactNode } from 'react'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
@@ -19,6 +20,7 @@ import { formatRest } from '../../lib/rest.ts'
 import { formatNumber } from '../../lib/sessions.ts'
 import { REST_MIN, WEIGHT_STEP_CHOICES, stepRest } from '../../lib/settings.ts'
 import { useActiveExercises } from '../exercises/useExercises.ts'
+import BackupSection from '../backup/BackupSection.tsx'
 import GoalsSheet from '../stats/GoalsSheet.tsx'
 import { useBodyWeights } from '../stats/useStats.ts'
 import { currentAverage } from '../../lib/bodyWeight.ts'
@@ -84,6 +86,8 @@ function SettingsPage() {
           </div>
         </Card>
       )}
+
+      <BackupSection lastBackupAt={settings.lastBackupAt} />
 
       <section className="flex flex-col gap-2">
         <h2 className={sectionTitle}>Séance</h2>
