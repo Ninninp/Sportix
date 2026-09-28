@@ -61,6 +61,18 @@ function HeroRow({ first, name, increase, value }: { first: boolean; name: strin
   )
 }
 
+const FIRST_STEPS = ['Ajoute tes exercices au fil de la séance', 'Règle charge et reps avec − / +, puis valide la série', 'La fois suivante, tout est pré-rempli']
+
+/** Étape numérotée de la carte « Première séance ». */
+function StepRow({ first, n, text }: { first: boolean; n: number; text: string }) {
+  return (
+    <div className={`flex min-h-[38px] items-center gap-2 py-1.5 ${first ? '' : 'border-t border-on-inverse/15'}`}>
+      <span className="num flex size-7 shrink-0 items-center justify-center rounded-full border-[1.5px] border-on-inverse text-[14px]">{n}</span>
+      <span className="flex-1 text-body font-semibold">{text}</span>
+    </div>
+  )
+}
+
 type HeroRowData = { key: string; name: string; increase?: boolean; value?: string }
 
 /**
@@ -162,6 +174,15 @@ function HomePage() {
       ),
       cta: 'Démarrer la séance',
       onStart: async () => void (await startProgramSession(planned.day.id)),
+    }
+  } else if (sessions.length === 0) {
+    // Tout premier lancement (maquette D5 « Accueil · premier lancement ») : comment ça marche
+    hero = {
+      title: 'Première séance',
+      sub: 'Pas besoin de programme pour commencer.',
+      rows: FIRST_STEPS.map((step, i) => <StepRow key={i} first={i === 0} n={i + 1} text={step} />),
+      cta: 'Démarrer la séance',
+      onStart: async () => void (await startSession()),
     }
   } else {
     hero = {

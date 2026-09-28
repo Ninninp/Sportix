@@ -5,7 +5,8 @@ import Card from '../../components/Card.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import { VARIANT_LABELS } from '../../lib/exercises.ts'
 import { findRecords } from '../../lib/records.ts'
-import { formatDuration, formatNumber, formatWeight, groupSetsByExercise, sessionSummary } from '../../lib/sessions.ts'
+import { formatNumber, formatWeight, groupSetsByExercise, sessionSummary } from '../../lib/sessions.ts'
+import { formatHoursMinutes } from '../../lib/week.ts'
 import { useExercisesById, useHistorySets, useSession, useSessionSets } from './useSession.ts'
 
 function SessionDetailPage() {
@@ -43,7 +44,7 @@ function SessionDetailPage() {
         size="m"
       />
       <div className="num -mt-2 shrink-0 pl-10 text-body font-medium text-muted">
-        {formatDuration(summary.durationMs)} · {summary.exerciseCount} exercice{summary.exerciseCount > 1 ? 's' : ''} ·{' '}
+        {formatHoursMinutes(summary.durationMs)} · {summary.exerciseCount} exercice{summary.exerciseCount > 1 ? 's' : ''} ·{' '}
         {formatWeight(summary.volume)}
       </div>
 

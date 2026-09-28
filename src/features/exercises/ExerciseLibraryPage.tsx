@@ -18,7 +18,9 @@ import {
 } from '../../lib/exercises.ts'
 import { useActiveExercises } from './useExercises.ts'
 
-const groupOptions = MUSCLE_GROUPS.map((g) => ({ value: g, label: MUSCLE_GROUP_LABELS[g] }))
+// « Tous » en tête (maquette D5) : on voit d'un coup d'œil qu'aucun filtre n'est actif.
+const ALL = 'tous'
+const groupOptions = [{ value: ALL, label: 'Tous' }, ...MUSCLE_GROUPS.map((g) => ({ value: g, label: MUSCLE_GROUP_LABELS[g] }))]
 
 /** « hack sq » → « Hack sq » (nom proposé à la création depuis une recherche infructueuse) */
 function capitalize(text: string): string {
@@ -50,8 +52,8 @@ function ExerciseLibraryPage() {
         label="Groupe musculaire"
         scroll
         options={groupOptions}
-        selected={group ? [group] : []}
-        onToggle={(g) => setGroup((current) => (current === g ? null : g))}
+        selected={[group ?? ALL]}
+        onToggle={(g) => setGroup((current) => (g === ALL || current === g ? null : (g as MuscleGroup)))}
       />
 
       {nothingFound ? (

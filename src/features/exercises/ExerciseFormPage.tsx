@@ -10,7 +10,7 @@ import ScreenHeader from '../../components/ScreenHeader.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import TextField from '../../components/TextField.tsx'
 import { IconCorbeille } from '../../components/icons.tsx'
-import { addExercise, getExercise, softDeleteExercise, updateExercise } from '../../db/exercises.ts'
+import { addExercise, countExerciseSessions, getExercise, softDeleteExercise, updateExercise } from '../../db/exercises.ts'
 import { countExerciseInPrograms } from '../../db/programs.ts'
 import {
   EXERCISE_TYPES,
@@ -46,6 +46,7 @@ function ExerciseFormPage() {
   const saved = result?.value
   // Combien de jours de programme utilisent cet exercice : la suppression l'en retirera, autant le dire.
   const usedInPrograms = useLiveQuery(async () => (id ? countExerciseInPrograms(id) : 0), [id]) ?? 0
+  const usedInSessions = useLiveQuery(async () => (id ? countExerciseSessions(id) : 0), [id]) ?? 0
 
   // `draft` = ce que l'utilisateur a modifié ; tant qu'il n'a rien touché, on affiche soit un
   // formulaire vide (création), soit l'exercice venu de la base (modification, d'où le `null`
@@ -158,6 +159,12 @@ function ExerciseFormPage() {
           <p className="text-small text-muted">Facultatif pour un exercice au poids du corps ou au temps.</p>
         )}
       </fieldset>
+
+      {usedInSessions > 0 && (
+        <p className="text-small text-muted">
+          Utilisé dans {usedInSessions} séance{usedInSessions > 1 ? 's' : ''}.
+        </p>
+      )}
 
       <div className="flex-1" />
 

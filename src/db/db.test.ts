@@ -1,7 +1,7 @@
 // Tests de la base : fake-indexeddb fournit une fausse IndexedDB en mémoire (pas besoin de navigateur).
 import 'fake-indexeddb/auto'
 import { afterEach, describe, expect, it } from 'vitest'
-import { addExercise, getExercise, listActiveExercises, softDeleteExercise, updateExercise } from './exercises.ts'
+import { addExercise, countExerciseSessions, getExercise, listActiveExercises, softDeleteExercise, updateExercise } from './exercises.ts'
 import { SportixDB } from './schema.ts'
 import { SEED_EXERCISES } from './seed.ts'
 
@@ -54,5 +54,14 @@ describe('base Sportix', () => {
     await softDeleteExercise(id, db)
     expect((await listActiveExercises(db)).some((e) => e.id === id)).toBe(false)
     expect((await getExercise(id, db))?.deletedAt).toBeTypeOf('number')
+  })
+
+  it('compte les séances où l’exercice a une série faite', async () => {
+    freshDb()
+    const set = (id: string, sessionId: string, done: boolean) => ({
+      id, sessionId, exerciseId: 'squat', variant: null, exerciseOrder: 1, order: 1, weight: 100, reps: 5, done,
+    })
+    await db.sets.bulkAdd([set('1', 'a', true), set('2', 'a', true), set('3', 'b', true), set('4', 'c', false)])
+    expect(await countExerciseSessions('squat', db)).toBe(2)
   })
 })

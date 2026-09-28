@@ -342,7 +342,15 @@ describe('comparer deux blocs', () => {
     expect(h.sessionsPerWeek).toBe(2 / 4)
     expect(h.volumePerWeek).toBe((450 + 475 + 400) / 4)
     const f = blockFigures(force, sessions, sets, NOW)
-    expect(f.sessionsPerWeek).toBe(1) // 2 séances, semaines 1 et 2 commencées
+    expect(f.sessionsPerWeek).toBe(1) // semaine 1 finie (1 séance) ; la semaine 2, en cours, attend
+  })
+
+  it('la semaine en cours ne fait pas baisser la moyenne (le lundi, par exemple)', () => {
+    const monday = new Date(2026, 8, 21, 8).getTime() // lundi de la semaine 2, avant la séance
+    const week1 = [1, 3, 5].map((d) => session(`f${d}`, at(8, 13 + d), { blockId: 'force' }))
+    expect(blockFigures(force, week1, [], monday).sessionsPerWeek).toBe(3)
+    // Semaine 1 en cours : c'est la seule, elle compte
+    expect(blockFigures(force, week1.slice(0, 1), [], at(8, 15)).sessionsPerWeek).toBe(1)
   })
 
   it('1RM gagné dans chaque bloc, pour les exercices des deux blocs', () => {

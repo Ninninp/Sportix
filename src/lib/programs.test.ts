@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { increaseSuggested, nextDay, planDaySets, type ProgramDay, type ProgramExercise } from './programs.ts'
+import { increaseSuggested, lastDoneLabel, nextDay, planDaySets, type ProgramDay, type ProgramExercise } from './programs.ts'
 import type { Session, SessionSet } from './sessions.ts'
 
 const days: ProgramDay[] = [
@@ -21,6 +21,20 @@ describe('nextDay (rotation A → B → A)', () => {
   })
   it('programme sans jour : rien à proposer', () => {
     expect(nextDay([], [])).toBeUndefined()
+  })
+})
+
+describe('lastDoneLabel', () => {
+  const now = new Date(2026, 8, 25, 12).getTime() // vendredi 25 septembre
+  const at = (d: number) => new Date(2026, 8, d, 18).getTime()
+  it('jamais fait : rien', () => {
+    expect(lastDoneLabel('A', [session('s', at(20), 'B')], now)).toBeNull()
+  })
+  it('aujourd’hui, hier, jour de la semaine, puis la date', () => {
+    expect(lastDoneLabel('A', [session('s', at(25), 'A')], now)).toBe('aujourd’hui')
+    expect(lastDoneLabel('A', [session('s', at(24), 'A')], now)).toBe('hier')
+    expect(lastDoneLabel('A', [session('s', at(10), 'A'), session('t', at(19), 'A')], now)).toBe('samedi')
+    expect(lastDoneLabel('A', [session('s', at(18), 'A')], now)).toBe('18 sept.')
   })
 })
 

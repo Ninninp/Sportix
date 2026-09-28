@@ -31,6 +31,12 @@ export async function softDeleteExercise(id: string, db: SportixDB = defaultDb):
   })
 }
 
+/** Nombre de séances où l'exercice a au moins une série faite (« Utilisé dans 18 séances »). */
+export async function countExerciseSessions(id: string, db: SportixDB = defaultDb): Promise<number> {
+  const sets = await db.sets.where('exerciseId').equals(id).filter((s) => s.done).toArray()
+  return new Set(sets.map((s) => s.sessionId)).size
+}
+
 export function getExercise(id: string, db: SportixDB = defaultDb): Promise<Exercise | undefined> {
   return db.exercises.get(id)
 }

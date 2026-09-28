@@ -56,6 +56,24 @@ export function nextDay(days: ProgramDay[], sessions: Session[]): ProgramDay | u
 }
 
 /**
+ * Quand ce jour a été fait pour la dernière fois, en quelques lettres à côté de son nom
+ * (maquette J5) : « aujourd’hui », « hier », le jour de la semaine sur les 6 derniers jours
+ * (« jeudi »), sinon la date (« 12 sept. »). null s'il n'a jamais été fait.
+ */
+export function lastDoneLabel(dayId: string, sessions: Session[], now = Date.now()): string | null {
+  const last = Math.max(...sessions.filter((s) => s.programDayId === dayId).map((s) => s.startedAt))
+  if (!Number.isFinite(last)) return null
+  const midnight = (t: number) => new Date(t).setHours(0, 0, 0, 0)
+  // Écart en jours de calendrier (arrondi : juste aux changements d'heure)
+  const days = Math.round((midnight(now) - midnight(last)) / 86_400_000)
+  if (days <= 0) return 'aujourd’hui'
+  if (days === 1) return 'hier'
+  const date = new Date(last)
+  if (days < 7) return date.toLocaleDateString('fr-FR', { weekday: 'long' })
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
+/**
  * La prochaine fois, la charge de cet exercice augmente-t-elle d'un pas ? Oui si la double
  * progression est activée et que toutes les séries de la dernière fois (même variante) ont atteint
  * le haut de la fourchette du programme. Sert au pré-remplissage et au badge ↑ de l'accueil.

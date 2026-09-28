@@ -1,14 +1,18 @@
 // Historique des séances (maquette D5) : liste par mois, avec durée, volume et badge PR.
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { BadgePR } from '../../components/Badge.tsx'
+import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
 import ScreenHeader from '../../components/ScreenHeader.tsx'
 import { IconChevronDroite, IconHistorique } from '../../components/icons.tsx'
+import { startSession } from '../../db/sessions.ts'
 import { sessionsWithRecords } from '../../lib/records.ts'
-import { describeSessionExercises, formatDuration, formatWeight, sessionSummary } from '../../lib/sessions.ts'
+import { describeSessionExercises, formatWeight, sessionSummary } from '../../lib/sessions.ts'
+import { formatHoursMinutes } from '../../lib/week.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from './useSession.ts'
 
 function HistoryPage() {
+  const navigate = useNavigate()
   const sessions = useFinishedSessions()
   const sets = useAllSets()
   const exercises = useExercisesById()
@@ -27,13 +31,24 @@ function HistoryPage() {
       <ScreenHeader title="Historique" backTo="/" backLabel="Retour à l’accueil" />
 
       {sessions.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-          <span className="flex size-16 items-center justify-center rounded-full bg-surface-2 text-muted">
-            <IconHistorique size={28} />
-          </span>
-          <h2 className="mt-2 text-title font-bold">Aucune séance pour l’instant</h2>
-          <p className="text-body text-muted">Chaque séance terminée s’ajoute ici, avec ses records.</p>
-        </div>
+        <>
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
+            <span className="flex size-16 items-center justify-center rounded-full bg-surface-2 text-muted">
+              <IconHistorique size={28} />
+            </span>
+            <h2 className="mt-2 text-title font-bold">Aucune séance pour l’instant</h2>
+            <p className="text-body text-muted">Chaque séance terminée s’ajoute ici, avec ses records.</p>
+          </div>
+          {/* Séance libre (reprend la séance en cours s'il y en a une : startSession ne crée pas de doublon) */}
+          <Button
+            onClick={async () => {
+              await startSession()
+              navigate('/seance')
+            }}
+          >
+            Démarrer une séance
+          </Button>
+        </>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           {[...byMonth].map(([month, list]) => (
@@ -62,7 +77,7 @@ function HistoryPage() {
                           {s.title ?? describeSessionExercises(sessionSets, (id) => exercises.get(id)?.name)}
                         </span>
                         <span className="num text-small font-medium text-muted">
-                          {formatDuration(summary.durationMs)} · {formatWeight(summary.volume)}
+                          {formatHoursMinutes(summary.durationMs)} · {formatWeight(summary.volume)}
                         </span>
                       </span>
                       {withRecords.has(s.id) && <BadgePR />}

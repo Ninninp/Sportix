@@ -143,6 +143,7 @@ src/
 - **Objectif** : changer de téléphone sans rien perdre.
 
 ### J9 — Finitions & revue design (continu)
+> 28/09/2026 : revue design faite (tous les écrans, clair et sombre, face aux maquettes D5 à J8) et écarts corrigés (détail dans `CLAUDE.md`).
 - **Revue design** : captures de chaque écran (Browser pane) comparées aux maquettes ; corriger les écarts.
 - Mode clair/sombre, kg/lb, supersets, échauffement, bannière « nouvelle version ».
 

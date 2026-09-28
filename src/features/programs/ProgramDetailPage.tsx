@@ -12,7 +12,7 @@ import Switch from '../../components/Switch.tsx'
 import { IconChevronDroite, IconCorbeille, IconFleche, IconFlecheBas, IconOptions, IconPlus } from '../../components/icons.tsx'
 import { addDay, deleteDay, deleteProgram, moveDay, renameDay, renameProgram, setActiveProgram } from '../../db/programs.ts'
 import { VARIANT_LABELS, type Exercise } from '../../lib/exercises.ts'
-import { nextDay, type ProgramDay, type ProgramExercise } from '../../lib/programs.ts'
+import { lastDoneLabel, nextDay, type ProgramDay, type ProgramExercise } from '../../lib/programs.ts'
 import { formatRest } from '../../lib/rest.ts'
 import { formatTarget } from '../../lib/sessions.ts'
 import { useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
@@ -91,7 +91,7 @@ function ProgramDetailPage() {
         <Card key={day.id} className="shrink-0 overflow-hidden">
           <div className="flex min-h-13 items-center gap-2 pt-1 pr-2 pl-4">
             <h2 className="flex-1 text-[20px] leading-6 font-extrabold tracking-[-0.01em]">{day.name}</h2>
-            {next?.id === day.id && <Pill>Prochaine</Pill>}
+            {next?.id === day.id ? <Pill>Prochaine</Pill> : <span className="text-small text-muted">{lastDoneLabel(day.id, sessions)}</span>}
             <button
               type="button"
               aria-label={`Options du jour ${day.name}`}

@@ -4,7 +4,7 @@
 // (retour du test sur iPhone, 19/09/2026).
 // J8 : une pastille rouge sur Réglages rappelle d'exporter les données (plus de 30 jours sans sauvegarde).
 import type { ComponentType } from 'react'
-import { NavLink } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 import { IconCalendrier, IconProgrammes, IconReglages, IconSeance, IconStats } from './icons.tsx'
 
 const tabs: { to: string; label: string; Icon: ComponentType<{ size?: number }> }[] = [
@@ -17,6 +17,9 @@ const tabs: { to: string; label: string; Icon: ComponentType<{ size?: number }> 
 
 /** `badge` : adresse de l'onglet qui porte une pastille (sauvegarde à faire, sur Réglages). */
 function BottomNav({ badge }: { badge?: string }) {
+  // L'historique s'ouvre depuis l'accueil : l'onglet Séance reste allumé (maquette D5).
+  const { pathname } = useLocation()
+  const lit = (to: string, isActive: boolean) => isActive || (to === '/' && pathname.startsWith('/historique'))
   return (
     <nav
       aria-label="Navigation principale"
@@ -30,14 +33,14 @@ function BottomNav({ badge }: { badge?: string }) {
               end={to === '/'}
               className={({ isActive }) =>
                 'flex flex-1 flex-col items-center justify-center gap-[3px] text-caption no-underline ' +
-                (isActive ? 'font-bold text-text' : 'font-medium text-muted')
+                (lit(to, isActive) ? 'font-bold text-text' : 'font-medium text-muted')
               }
             >
               {({ isActive }) => (
                 <>
                   <span
                     aria-hidden="true"
-                    className={`h-[3px] w-6 rounded-sm ${isActive ? 'bg-text' : 'bg-transparent'}`}
+                    className={`h-[3px] w-6 rounded-sm ${lit(to, isActive) ? 'bg-text' : 'bg-transparent'}`}
                   />
                   <span className="relative flex">
                     <Icon size={24} />

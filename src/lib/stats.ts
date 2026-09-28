@@ -7,7 +7,7 @@
 // - Les séances de deload restent affichées (points creux, gris) mais sont EXCLUES des courbes,
 //   des moyennes et des comparaisons : une semaine allégée n'est pas une baisse de niveau.
 // - Les records, eux, voient tout l'historique (même règle qu'en séance, src/lib/records.ts).
-import { activeBlock, addWeeks, blockEnd, isDeloadAt, type Block } from './blocks.ts'
+import { activeBlock, addWeeks, blockEnd, isDeloadAt, weekIndexAt, type Block } from './blocks.ts'
 import { MUSCLE_GROUPS, VARIANTS, type Exercise, type MuscleGroup, type Variant } from './exercises.ts'
 import { formatNumber, type Session, type SessionSet } from './sessions.ts'
 import { mondayOf } from './week.ts'
@@ -447,7 +447,11 @@ export function defaultComparison(blocks: Block[], now = Date.now()): [Block, Bl
 }
 
 export type BlockFigures = {
-  /** Séances par semaine, hors semaines de deload, sur les semaines déjà commencées. */
+  /**
+   * Séances par semaine, hors semaines de deload, sur les semaines finies du bloc : la semaine en
+   * cours n'est comptée que tant qu'aucune autre n'est finie (sinon, un lundi, elle diviserait la
+   * moyenne par deux alors qu'elle vient de commencer — même règle que `averagePerWeek`).
+   */
   sessionsPerWeek: number
   /** Volume (kg) par semaine, même règle. */
   volumePerWeek: number
@@ -467,9 +471,18 @@ const inBlock = (block: Block, sessions: Session[]) =>
   sessions.filter((s) => s.blockId === block.id && s.endedAt !== undefined && !s.deload)
 
 export function blockFigures(block: Block, sessions: Session[], sets: SessionSet[], now = Date.now()): BlockFigures {
-  const own = inBlock(block, sessions)
+  let own = inBlock(block, sessions)
+  let weeks = Math.max(1, countedWeeks(block, Math.min(now, blockEnd(block) - 1)))
+  const current = weekIndexAt(block, now)
+  if (current !== null) {
+    const currentStart = addWeeks(block.startsOn, current - 1)
+    const finished = countedWeeks(block, currentStart - 1)
+    if (finished > 0) {
+      own = own.filter((s) => s.startedAt < currentStart)
+      weeks = finished
+    }
+  }
   const ids = new Set(own.map((s) => s.id))
-  const weeks = Math.max(1, countedWeeks(block, Math.min(now, blockEnd(block) - 1)))
   const volume = sets.filter((s) => counts(s) && ids.has(s.sessionId)).reduce((sum, s) => sum + setVolume(s), 0)
   return { sessionsPerWeek: own.length / weeks, volumePerWeek: volume / weeks }
 }

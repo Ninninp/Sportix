@@ -39,7 +39,11 @@ type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> & {
 }
 
 function Button({ variant = 'primary', to, className = '', children, ...rest }: Props) {
-  const classes = `${base} ${variants[variant]} ${className}`
+  // Couleur du lien donnée par l'écran (`text-text`, `text-danger`) : on retire le gris par défaut.
+  // Deux classes de couleur à la fois, c'est l'ordre du CSS de Tailwind qui gagne, pas celui
+  // de l'attribut : `text-danger` restait gris (relevé à la revue design du J9).
+  const own = variant === 'link' && /(^|\s)text-(text|danger|muted|faint)(\s|$)/.test(className)
+  const classes = `${base} ${own ? variants.link.replace(' text-muted', '') : variants[variant]} ${className}`
   // Un lien ne sait pas être « désactivé » : désactivé, on affiche un vrai bouton inerte.
   if (to && !rest.disabled) {
     const { onClick, id, title, 'aria-label': ariaLabel, 'aria-describedby': ariaDescribedBy } = rest
