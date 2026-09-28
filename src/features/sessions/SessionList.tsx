@@ -5,7 +5,7 @@
 // J9 (maquettes validées le 28/09/2026) : un superset est une seule carte « Superset » qui contient
 // ses exercices l'un sous l'autre (un seul « + Série » : un tour de plus) ; les séries
 // d'échauffement sont des lignes « É », plus basses, avant les séries de travail.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import Card from '../../components/Card.tsx'
 import { IconChevronBas, IconCoche, IconLien, IconOptions, IconPlus } from '../../components/icons.tsx'
@@ -48,6 +48,12 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
   useEffect(() => {
     nowRef.current?.scrollIntoView({ block: 'nearest' })
   }, [editingId])
+
+  // J10 : la coche « rebondit » sur une série qu'on vient de valider, pas sur celles déjà faites
+  // quand la séance s'affiche (retenues à l'ouverture). La coche naît avec son animation, qui ne
+  // joue qu'une fois : les rendus suivants ne la relancent pas.
+  const [doneAtOpen] = useState(() => new Set(blocks.flatMap((b) => b.sets.filter((s) => s.done).map((s) => s.id))))
+  const justDone = (id: string) => !doneAtOpen.has(id)
 
   const nameOf = (b: ExerciseBlock) => exercises.get(b.exerciseId)?.name ?? 'Exercice'
 
@@ -96,7 +102,7 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
                 role="row"
                 aria-label={`${label}${state === 'done' ? ', faite' : state === 'now' ? ', en cours' : ''}`}
                 aria-current={state === 'now' ? 'true' : undefined}
-                className={`${COLUMNS} ${warmup ? 'min-h-11' : 'min-h-13'} items-center rounded-[10px] px-2.5 ${
+                className={`${COLUMNS} ${warmup ? 'min-h-11' : 'min-h-13'} items-center rounded-[10px] px-2.5 transition-colors duration-200 ${
                   state === 'done' ? 'bg-surface-2 text-muted' : state === 'now' ? 'bg-inverse text-on-inverse' : 'text-faint'
                 }`}
               >
@@ -110,7 +116,10 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
                 <span role="cell" className={`num text-right ${warmup ? 'text-[18px]' : 'text-[22px]'}`}>{s.reps}</span>
                 <span role="cell" className="flex justify-end">
                   {state === 'done' ? (
-                    <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-text text-bg">
+                    <span
+                      aria-hidden="true"
+                      className={`flex size-7 items-center justify-center rounded-full bg-text text-bg ${justDone(s.id) ? 'sx-pop' : ''}`}
+                    >
                       <IconCoche size={18} strokeWidth={3} />
                     </span>
                   ) : (

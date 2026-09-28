@@ -108,6 +108,7 @@
   --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
 /* Styles de base de l'app */
@@ -161,6 +162,80 @@
     transform: translateY(-160px) scale(1.15);
     opacity: 0;
   }
+}
+
+/* J10 — animations de l'app (durées et courbes de tokens.md § 4). Les entrées durent
+   duration-slow (320 ms) en ease-out, les sorties sont plus brèves (200 ms) en ease-in : ce qui part
+   ne doit pas faire attendre. Un élément qui apparaît avec un décalage (`animation-delay`, posé par
+   l'écran) garde son état de départ en attendant son tour (`both`). */
+@keyframes sx-apparaitre {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+/* Coche d'une série validée, trophée du récap : petit rebond */
+@keyframes sx-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+/* Panneau du bas et son voile */
+@keyframes sx-panneau-entre {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sx-panneau-sort {
+  to {
+    transform: translateY(100%);
+  }
+}
+@keyframes sx-voile-entre {
+  from {
+    opacity: 0;
+  }
+}
+/* Séance : elle monte à l'ouverture, redescend quand on la réduit */
+@keyframes sx-seance-monte {
+  from {
+    opacity: 0;
+    transform: translateY(24vh);
+  }
+}
+@keyframes sx-seance-descend {
+  to {
+    opacity: 0;
+    transform: translateY(24vh);
+  }
+}
+/* Barre « Séance en cours » : sort de derrière les onglets */
+@keyframes sx-barre-monte {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+/* Record battu : un reflet passe sur la carte */
+@keyframes sx-reflet {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@utility sx-apparaitre {
+  animation: sx-apparaitre 320ms var(--ease-out) both;
+}
+@utility sx-pop {
+  animation: sx-pop 240ms var(--ease-out) both;
 }
 
 /* Réglage iOS « Réduire les animations » : on coupe les mouvements */

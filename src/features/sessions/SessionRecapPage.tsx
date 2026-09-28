@@ -1,5 +1,7 @@
 // Fin de séance (maquette D5 « Fin de séance · récapitulatif ») : durée, volume, séries,
 // records battus, et ce que l'app proposera la prochaine fois.
+// J10 : tout arrive en cascade (tuiles aux chiffres qui défilent, records, prochaine fois) ; les
+// records sont mis en valeur : le trophée rebondit, un reflet passe sur la carte, les lignes suivent.
 import { useParams } from 'react-router'
 import { BadgeIncrease, BadgePR } from '../../components/Badge.tsx'
 import Button from '../../components/Button.tsx'
@@ -12,6 +14,11 @@ import { findRecords } from '../../lib/records.ts'
 import { formatDuration, formatNumber, formatWeight, groupSetsByExercise, sessionSummary } from '../../lib/sessions.ts'
 import { useSettings } from '../settings/useSettings.ts'
 import { useExercisesById, useHistorySets, useSession, useSessionSets } from './useSession.ts'
+import CountUp from '../motion/CountUp.tsx'
+import { staggerDelay } from '../../lib/motion.ts'
+
+/** Moment où arrivent les records, puis « La prochaine fois » (après les trois tuiles). */
+const RECORDS_DELAY = 240
 
 
 function SessionRecapPage() {
@@ -63,15 +70,43 @@ function SessionRecapPage() {
       </header>
 
       <div className="grid shrink-0 grid-cols-3 gap-2">
-        <Tile label="Durée" value={formatDuration(summary.durationMs)} />
-        <Tile label="Volume" value={formatWeight(summary.volume)} />
-        <Tile label="Séries" value={String(summary.setCount)} />
+        <Tile
+          className="sx-apparaitre"
+          label="Durée"
+          value={<CountUp value={summary.durationMs} format={formatDuration} />}
+        />
+        <Tile
+          className="sx-apparaitre"
+          style={{ animationDelay: '60ms' }}
+          label="Volume"
+          value={<CountUp value={summary.volume} format={formatWeight} />}
+        />
+        <Tile
+          className="sx-apparaitre"
+          style={{ animationDelay: '120ms' }}
+          label="Séries"
+          value={<CountUp value={summary.setCount} format={(v) => String(Math.round(v))} />}
+        />
       </div>
 
       {records.length > 0 && (
-        <Card inverse as="section" aria-label="Records" className="flex shrink-0 flex-col gap-2.5 p-4">
+        <Card
+          inverse
+          as="section"
+          aria-label="Records"
+          className="sx-apparaitre relative flex shrink-0 flex-col gap-2.5 overflow-hidden p-4"
+          style={{ animationDelay: `${RECORDS_DELAY}ms` }}
+        >
+          {/* Reflet qui balaie la carte une fois, juste après son arrivée */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 animate-[sx-reflet_900ms_var(--ease-out)_both] bg-linear-to-r from-transparent via-on-inverse/20 to-transparent"
+            style={{ animationDelay: `${RECORDS_DELAY + 320}ms` }}
+          />
           <div className="flex items-center gap-2.5">
-            <IconTrophee size={28} />
+            <span className="sx-pop flex" style={{ animationDelay: `${RECORDS_DELAY + 200}ms` }}>
+              <IconTrophee size={28} />
+            </span>
             <h2 className="text-title font-bold">
               {records.length} record{records.length > 1 ? 's' : ''}
             </h2>
@@ -79,7 +114,8 @@ function SessionRecapPage() {
           {records.map(({ set }, i) => (
             <div
               key={set.id}
-              className={`flex min-h-11 items-center gap-2 ${i > 0 ? 'border-t border-on-inverse/15' : ''}`}
+              className={`sx-apparaitre flex min-h-11 items-center gap-2 ${i > 0 ? 'border-t border-on-inverse/15' : ''}`}
+              style={{ animationDelay: `${RECORDS_DELAY + 120 + staggerDelay(i)}ms` }}
             >
               <span className="flex-1">
                 <span className="text-body-strong font-semibold">{exercises.get(set.exerciseId)?.name}</span>{' '}
@@ -95,7 +131,10 @@ function SessionRecapPage() {
       )}
 
       {nextTime.length > 0 && (
-        <Card className="flex shrink-0 flex-col gap-1.5 p-4">
+        <Card
+          className="sx-apparaitre flex shrink-0 flex-col gap-1.5 p-4"
+          style={{ animationDelay: `${records.length > 0 ? RECORDS_DELAY + 180 : 180}ms` }}
+        >
           <span className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">La prochaine fois</span>
           {nextTime.map(({ block, badge }) => (
             <div key={block.exerciseOrder} className="flex min-h-10 items-center gap-2">

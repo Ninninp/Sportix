@@ -142,7 +142,8 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
             </span>
           )}
         </span>
-        <span className={`num text-num-xl tracking-[-0.02em] ${fromEnd ? 'animate-[sx-grandir_320ms_var(--ease-out)]' : ''}`}>
+        {/* Le chrono grandit à l'arrivée : après « Valider la série » (J10) comme après « +15 s » */}
+        <span className="num animate-[sx-grandir_320ms_var(--ease-out)] text-num-xl tracking-[-0.02em]">
           {formatRest(remaining)}
         </span>
         <span className="num text-body font-medium text-muted">sur {formatRest(rest.duration)}</span>
@@ -159,7 +160,9 @@ function RestScreen({ session, progress, upcoming, onEnd, onDone }: Props) {
 
       {upcoming && (
         <Card
-          className={`flex shrink-0 flex-col gap-0.5 px-4 py-3 ${fromEnd ? 'animate-[sx-ranger_320ms_var(--ease-out)]' : ''}`}
+          className={`flex shrink-0 flex-col gap-0.5 px-4 py-3 ${
+            fromEnd ? 'animate-[sx-ranger_320ms_var(--ease-out)]' : 'sx-apparaitre [animation-delay:80ms]'
+          }`}
         >
           <div className="text-small text-muted">Ensuite</div>
           <div className="flex items-baseline justify-between gap-2">

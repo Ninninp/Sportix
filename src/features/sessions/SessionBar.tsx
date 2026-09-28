@@ -32,7 +32,8 @@ function SessionBar({ session }: { session: Session }) {
   const time = rest ? formatRest(restRemaining(rest, now)) : formatDuration(sessionDuration(session, now))
 
   return (
-    <div className="shrink-0 bg-bg p-2">
+    // J10 : la barre sort de derrière les onglets quand on réduit la séance
+    <div className="shrink-0 animate-[sx-barre-monte_320ms_var(--ease-out)] bg-bg p-2">
       <div
         className={`flex min-h-14 items-center gap-3 rounded-lg pr-1.5 pl-4 ${
           finished ? 'bg-rest text-on-rest' : 'bg-inverse text-on-inverse'

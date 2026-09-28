@@ -35,7 +35,16 @@ function App() {
       {/* overflow-x-hidden : la page ne glisse jamais de gauche à droite, même si un élément dépasse
           (le champ date de Safari iOS est plus large que prévu). Les lignes de pastilles qui défilent
           à l'horizontale ont leur propre défilement, elles ne sont pas concernées. */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)]">
+      {/* J10 : le contenu change de clé en entrant dans la séance (/seance, choix d'exercice, récap) :
+          il monte depuis le bas une seule fois, et pas à chaque écran de la séance. `data-seance` sert
+          à « Réduire » (SessionHeader), qui le fait redescendre avant de quitter la séance. */}
+      <div
+        key={inSession ? 'seance' : 'app'}
+        data-seance={inSession ? '' : undefined}
+        className={`flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)] ${
+          inSession ? 'animate-[sx-seance-monte_320ms_var(--ease-out)]' : ''
+        }`}
+      >
         <Outlet />
       </div>
       {fullScreen ? (

@@ -6,6 +6,9 @@
 //   le bouton « Démarrer la séance » dans la zone du pouce (2 appuis depuis l'ouverture de l'app).
 // - J6 : la ligne du bloc en cours (« Bloc Force » + barre des semaines), SOUS les chiffres de la
 //   semaine et juste avant la grande carte (place choisie dans le canvas J6) ; elle ouvre le bloc.
+// - J10 : l'accueil ne s'affiche plus d'un bloc. Les parties arrivent en cascade (60 ms d'écart),
+//   les chiffres de la semaine défilent jusqu'à leur valeur, les pastilles des jours faits
+//   rebondissent l'une après l'autre, les lignes de la grande carte suivent.
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import Card from '../../components/Card.tsx'
@@ -26,6 +29,8 @@ import { useProgram } from '../programs/usePrograms.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
 import { useActiveSession, useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
 import { useSettings } from '../settings/useSettings.ts'
+import CountUp from '../motion/CountUp.tsx'
+import { staggerDelay } from '../../lib/motion.ts'
 
 /** Flèche d'évolution à côté du libellé (rien si c'est pareil que la semaine passée). */
 function TrendArrow({ trend }: { trend: Trend }) {
@@ -51,9 +56,12 @@ function WeekFigure({ label, trend, children }: { label: string; trend: Trend; c
 }
 
 /** Ligne d'exercice dans la grande carte. */
-function HeroRow({ first, name, increase, value }: { first: boolean; name: string; increase?: boolean; value?: string }) {
+function HeroRow({ index, name, increase, value }: { index: number; name: string; increase?: boolean; value?: string }) {
   return (
-    <div className={`flex min-h-[38px] items-center gap-2 ${first ? '' : 'border-t border-on-inverse/15'}`}>
+    <div
+      className={`sx-apparaitre flex min-h-[38px] items-center gap-2 ${index === 0 ? '' : 'border-t border-on-inverse/15'}`}
+      style={{ animationDelay: `${HERO_ROWS_DELAY + staggerDelay(index, 50)}ms` }}
+    >
       <span className="flex-1 text-body-strong font-semibold">{name}</span>
       {increase && <BadgeIncrease> </BadgeIncrease>}
       {value && <span className="num text-num-s">{value}</span>}
@@ -61,12 +69,18 @@ function HeroRow({ first, name, increase, value }: { first: boolean; name: strin
   )
 }
 
+/** Les lignes de la grande carte arrivent après la carte elle-même. */
+const HERO_ROWS_DELAY = 160
+
 const FIRST_STEPS = ['Ajoute tes exercices au fil de la séance', 'Règle charge et reps avec − / +, puis valide la série', 'La fois suivante, tout est pré-rempli']
 
 /** Étape numérotée de la carte « Première séance ». */
-function StepRow({ first, n, text }: { first: boolean; n: number; text: string }) {
+function StepRow({ n, text }: { n: number; text: string }) {
   return (
-    <div className={`flex min-h-[38px] items-center gap-2 py-1.5 ${first ? '' : 'border-t border-on-inverse/15'}`}>
+    <div
+      className={`sx-apparaitre flex min-h-[38px] items-center gap-2 py-1.5 ${n === 1 ? '' : 'border-t border-on-inverse/15'}`}
+      style={{ animationDelay: `${HERO_ROWS_DELAY + staggerDelay(n - 1, 50)}ms` }}
+    >
       <span className="num flex size-7 shrink-0 items-center justify-center rounded-full border-[1.5px] border-on-inverse text-[14px]">{n}</span>
       <span className="flex-1 text-body font-semibold">{text}</span>
     </div>
@@ -86,9 +100,9 @@ function heroRows(rows: HeroRowData[]) {
   return (
     <>
       {shown.map((r, i) => (
-        <HeroRow key={r.key} first={i === 0} name={r.name} increase={r.increase} value={r.value} />
+        <HeroRow key={r.key} index={i} name={r.name} increase={r.increase} value={r.value} />
       ))}
-      {rest > 0 && <HeroRow first={false} name={`+ ${rest} exercice${rest > 1 ? 's' : ''}`} />}
+      {rest > 0 && <HeroRow index={shown.length} name={`+ ${rest} exercice${rest > 1 ? 's' : ''}`} />}
     </>
   )
 }
@@ -180,7 +194,7 @@ function HomePage() {
     hero = {
       title: 'Première séance',
       sub: 'Pas besoin de programme pour commencer.',
-      rows: FIRST_STEPS.map((step, i) => <StepRow key={i} first={i === 0} n={i + 1} text={step} />),
+      rows: FIRST_STEPS.map((step, i) => <StepRow key={i} n={i + 1} text={step} />),
       cta: 'Démarrer la séance',
       onStart: async () => void (await startSession()),
     }
@@ -218,7 +232,7 @@ function HomePage() {
       )}
 
       {/* Cette semaine : chiffres, évolution, pastilles des jours */}
-      <section aria-label="Cette semaine" className="flex shrink-0 flex-col gap-1.5">
+      <section aria-label="Cette semaine" className="sx-apparaitre flex shrink-0 flex-col gap-1.5">
         <div className="-mr-3 flex min-h-12 items-center justify-between">
           <h2 className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">Cette semaine</h2>
           {!active && programDays.length > 0 && (
@@ -229,13 +243,13 @@ function HomePage() {
         </div>
         <div className="grid grid-cols-3 gap-3">
           <WeekFigure label="Séances" trend={stats.sessions.trend}>
-            {stats.sessions.value}
+            <CountUp value={stats.sessions.value} format={(v) => String(Math.round(v))} />
           </WeekFigure>
           <WeekFigure label="Durée" trend={stats.durationMs.trend}>
-            {formatHoursMinutes(stats.durationMs.value)}
+            <CountUp value={stats.durationMs.value} format={formatHoursMinutes} />
           </WeekFigure>
           <WeekFigure label="Volume" trend={stats.volume.trend}>
-            {new Intl.NumberFormat('fr-FR').format(Math.round(stats.volume.value))}{' '}
+            <CountUp value={stats.volume.value} format={(v) => new Intl.NumberFormat('fr-FR').format(Math.round(v))} />{' '}
             <span className="text-body font-semibold text-muted">kg</span>
           </WeekFigure>
         </div>
@@ -248,8 +262,10 @@ function HomePage() {
             >
               <span
                 className={`size-6 rounded-full ${
-                  d.done ? 'border-2 border-inverse bg-inverse' : d.today ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'
+                  d.done ? 'sx-pop border-2 border-inverse bg-inverse' : d.today ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'
                 }`}
+                // Les jours faits se remplissent l'un après l'autre, pendant que les chiffres défilent
+                style={d.done ? { animationDelay: `${200 + staggerDelay(i, 50)}ms` } : undefined}
               />
               {d.letter}
             </div>
@@ -262,7 +278,8 @@ function HomePage() {
         <Link
           to={`/calendrier/${block.id}`}
           aria-label={`Bloc ${block.name}, ${describeWeeks(weekSegments(block, now))}`}
-          className="flex min-h-13 shrink-0 items-center gap-3 rounded-lg border border-border bg-surface pr-3 pl-4 text-text"
+          className="sx-apparaitre flex min-h-13 shrink-0 items-center gap-3 rounded-lg border border-border bg-surface pr-3 pl-4 text-text"
+          style={{ animationDelay: '60ms' }}
         >
           <span className="max-w-[45%] truncate text-body whitespace-nowrap">
             <span className="text-muted">Bloc</span> <strong>{block.name}</strong>
@@ -277,7 +294,13 @@ function HomePage() {
       )}
 
       {/* Grande carte : séance en cours, séance du jour ou séance libre */}
-      <Card inverse as="section" aria-label={hero.title} className="flex min-h-0 flex-1 flex-col gap-2 p-4">
+      <Card
+        inverse
+        as="section"
+        aria-label={hero.title}
+        className="sx-apparaitre flex min-h-0 flex-1 flex-col gap-2 p-4"
+        style={{ animationDelay: block ? '120ms' : '60ms' }}
+      >
         <div>
           <h2 className="text-title-l font-extrabold tracking-[-0.02em]">{hero.title}</h2>
           <p className="mt-1 truncate text-[14px] leading-[18px] text-on-inverse-muted">{hero.sub}</p>
