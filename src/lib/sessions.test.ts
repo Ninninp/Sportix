@@ -5,9 +5,14 @@ import {
   formatNumber,
   formatWeight,
   groupSetsByExercise,
+  restFollows,
   sessionProgress,
+  sessionSequence,
   sessionSummary,
   sessionVolume,
+  supersetFollow,
+  supersetGroups,
+  workIndex,
   type SessionSet,
 } from './sessions.ts'
 
@@ -22,6 +27,58 @@ const set = (over: Partial<SessionSet> = {}): SessionSet => ({
   reps: 5,
   done: false,
   ...over,
+})
+
+describe('échauffement et superset (J9)', () => {
+  // Développé militaire (1, relié au suivant) + Élévations (2) en superset, puis Rowing (3) seul
+  const dm = (order: number, over: Partial<SessionSet> = {}) =>
+    set({ id: `dm${order}`, exerciseId: 'dm', exerciseOrder: 1, order, supersetNext: true, ...over })
+  const el = (order: number, over: Partial<SessionSet> = {}) => set({ id: `el${order}`, exerciseId: 'el', exerciseOrder: 2, order, ...over })
+  const row = (order: number) => set({ id: `row${order}`, exerciseId: 'row', exerciseOrder: 3, order })
+
+  it('regroupe les exercices reliés, et ignore le lien du dernier exercice', () => {
+    const groups = supersetGroups(groupSetsByExercise([dm(1), el(1), row(1)]))
+    expect(groups.map((g) => g.map((b) => b.exerciseId))).toEqual([['dm', 'el'], ['row']])
+    const last = supersetGroups(groupSetsByExercise([set({ supersetNext: true })]))
+    expect(last).toHaveLength(1)
+  })
+
+  it('fait les échauffements d’abord, puis alterne les séries du superset', () => {
+    const warm = dm(1, { id: 'dmE', warmup: true })
+    const order = sessionSequence([el(2), dm(2), el(1), dm(1), warm, row(1)]).map((s) => s.id)
+    expect(order).toEqual(['dmE', 'dm1', 'el1', 'dm2', 'el2', 'row1'])
+  })
+
+  it('un exercice qui a plus de séries finit seul', () => {
+    expect(sessionSequence([dm(1), dm(2), el(1)]).map((s) => s.id)).toEqual(['dm1', 'el1', 'dm2'])
+  })
+
+  it('le repos vient après le dernier exercice du tour, jamais après un échauffement', () => {
+    const sets = [dm(1, { done: true }), el(1), dm(2), el(2), row(1)]
+    expect(restFollows(sets, sets[0])).toBe(false) // Élévations 1 reste à faire
+    expect(restFollows(sets, sets[1])).toBe(true)
+    expect(restFollows(sets, row(1))).toBe(true)
+    expect(restFollows(sets, dm(1, { warmup: true }))).toBe(false)
+  })
+
+  it('le pavé annonce la suite : l’autre exercice, puis le repos ; rien hors superset', () => {
+    const sets = [dm(1, { done: true }), el(1), dm(2), el(2), row(1)]
+    expect(supersetFollow(sets, dm(2))).toMatchObject({ id: 'el2' })
+    expect(supersetFollow(sets, sets[1])).toBe('rest')
+    expect(supersetFollow(sets, row(1))).toBeNull()
+    expect(supersetFollow(sets, dm(1, { warmup: true }))).toBeNull()
+  })
+
+  it('les échauffements ne comptent ni dans la progression, ni dans le volume', () => {
+    const warm = set({ id: 'w', warmup: true, done: true, weight: 60, reps: 10 })
+    const work = set({ id: 'w1', done: true })
+    expect(sessionProgress([warm, work, set({ id: 'w2', order: 2 })])).toEqual({ done: 1, total: 2 })
+    expect(sessionVolume([warm, work])).toBe(500)
+    const [block] = groupSetsByExercise([work, warm])
+    expect(block.sets.map((s) => s.id)).toEqual(['w', 'w1'])
+    expect(workIndex(block, work)).toBe(0)
+    expect(workIndex(block, warm)).toBe(-1)
+  })
 })
 
 describe('groupSetsByExercise', () => {

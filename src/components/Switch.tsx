@@ -1,12 +1,20 @@
 // Interrupteur marche / arrêt (maquette « Réglages » de D5) : 52 × 32 px, pastille qui glisse.
 // Toute la ligne qui le contient est cliquable (le libellé est dans le <label> parent).
 // `inset` : sans marge sur les côtés (dans un panneau, déjà bordé), au lieu des 16 px d'une carte.
-type Props = { checked: boolean; onChange: (checked: boolean) => void; label: string; inset?: boolean }
+// `hint` : une ligne grise sous le libellé (« Élévations latérales » sous « Superset avec la suivante »).
+type Props = { checked: boolean; onChange: (checked: boolean) => void; label: string; hint?: string; inset?: boolean }
 
-function Switch({ checked, onChange, label, inset = false }: Props) {
+function Switch({ checked, onChange, label, hint, inset = false }: Props) {
   return (
-    <label className={`flex min-h-14 cursor-pointer items-center justify-between gap-3 ${inset ? '' : 'px-4'}`}>
-      <span className="text-body-strong">{label}</span>
+    <label className={`flex cursor-pointer items-center justify-between gap-3 ${hint ? 'min-h-16' : 'min-h-14'} ${inset ? '' : 'px-4'}`}>
+      {hint ? (
+        <span className="flex min-w-0 flex-col">
+          <span className="text-body-strong">{label}</span>
+          <span className="truncate text-small text-muted">{hint}</span>
+        </span>
+      ) : (
+        <span className="text-body-strong">{label}</span>
+      )}
       <input
         type="checkbox"
         role="switch"

@@ -55,7 +55,14 @@ export const IconOptions = (p: IconProps) => (
     <circle cx="19" cy="12" r="1.5" />
   </Icon>
 )
-export const IconEchange = (p: IconProps) => <Icon {...p}><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" /></Icon>
+/** Maillons de chaîne : superset (J9). */
+export const IconLien = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </Icon>
+)
+export const IconEchange =(p: IconProps) => <Icon {...p}><path d="M16 3l4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16" /></Icon>
 export const IconTrophee = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2-1.1.6-2 2-2 3.8M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0V2z" />

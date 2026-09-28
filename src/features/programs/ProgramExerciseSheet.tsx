@@ -1,5 +1,6 @@
 // Panneau d'un exercice du programme (maquettes J5 « Exercice du programme ») : variante, séries,
-// double progression, reps, repos, et « Retirer du jour ». Chaque réglage est enregistré aussitôt.
+// double progression, reps, repos, superset avec l'exercice suivant (J9), et « Retirer du jour ».
+// Chaque réglage est enregistré aussitôt.
 // Double progression activée : une fourchette de reps (au moins / au plus) ; désactivée : un
 // nombre de reps fixe (retour du 21/09/2026).
 import ChipGroup from '../../components/ChipGroup.tsx'
@@ -19,9 +20,15 @@ import { REST_MAX, REST_MIN, stepRest } from '../../lib/settings.ts'
 const MAX_SETS = 10
 const MAX_REPS = 50
 
-type Props = { exercise: ProgramExercise | undefined; info: Exercise | undefined; onClose: () => void }
+type Props = {
+  exercise: ProgramExercise | undefined
+  info: Exercise | undefined
+  /** Nom de l'exercice suivant du jour (superset possible) ; absent pour le dernier. */
+  nextName?: string
+  onClose: () => void
+}
 
-function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
+function ProgramExerciseSheet({ exercise: pe, info, nextName, onClose }: Props) {
   const update = (changes: Partial<ProgramExercise>) => pe && void updateDayExercise(pe.id, changes)
   // Boutons − / + : la nouvelle valeur part de la base, pas de l'affichage (qui a un cycle de
   // retard). Sans cela, trois appuis rapides sur « + » n'en comptaient qu'un ou deux.
@@ -111,6 +118,16 @@ function ProgramExerciseSheet({ exercise: pe, info, onClose }: Props) {
               onDecrement={() => step((c) => ({ restSeconds: stepRest(c.restSeconds, -1) }))}
               onIncrement={() => step((c) => ({ restSeconds: stepRest(c.restSeconds, 1) }))}
             />
+            {/* Superset (J9) : seulement s'il y a un exercice après celui-ci dans le jour */}
+            {nextName !== undefined && (
+              <Switch
+                inset
+                label="Superset avec la suivante"
+                hint={nextName}
+                checked={pe.supersetNext === true}
+                onChange={(on) => update({ supersetNext: on ? true : undefined })}
+              />
+            )}
           </div>
 
           <div className="flex items-center justify-between">

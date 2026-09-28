@@ -1,6 +1,7 @@
 // Accès aux exercices dans la base. Chaque fonction écrit immédiatement :
 // l'app peut être fermée à tout moment, rien ne doit rester « en attente ».
 import type { Exercise, ExerciseDraft } from '../lib/exercises.ts'
+import { removeDayExercises } from './programs.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 
 /** Nettoie ce que l'utilisateur a saisi (espaces en trop dans le nom). */
@@ -27,7 +28,8 @@ export async function updateExercise(id: string, draft: ExerciseDraft, db: Sport
 export async function softDeleteExercise(id: string, db: SportixDB = defaultDb): Promise<void> {
   await db.transaction('rw', db.exercises, db.programExercises, async () => {
     await db.exercises.update(id, { deletedAt: Date.now() })
-    await db.programExercises.filter((pe) => pe.exerciseId === id).delete()
+    const inPrograms = await db.programExercises.filter((pe) => pe.exerciseId === id).primaryKeys()
+    await removeDayExercises(inPrograms, db)
   })
 }
 

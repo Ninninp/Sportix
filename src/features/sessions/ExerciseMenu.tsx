@@ -1,13 +1,13 @@
-// Menu ⋯ d'un exercice pendant la séance (maquette D5) : remplacer, changer de variante,
-// modifier l'objectif du jour, retirer de la séance.
+// Menu ⋯ d'un exercice pendant la séance (maquette D5) : remplacer, superset avec l'exercice
+// suivant (J9), changer de variante, modifier l'objectif du jour, retirer de la séance.
 import { useNavigate } from 'react-router'
 import Button from '../../components/Button.tsx'
 import ChipGroup from '../../components/ChipGroup.tsx'
 import Sheet from '../../components/Sheet.tsx'
-import { IconCorbeille, IconEchange } from '../../components/icons.tsx'
-import { changeVariant, removeExercise, setTargetReps } from '../../db/sessions.ts'
+import { IconCorbeille, IconEchange, IconLien } from '../../components/icons.tsx'
+import { changeVariant, removeExercise, setSuperset, setTargetReps } from '../../db/sessions.ts'
 import { VARIANT_LABELS, type Exercise, type Variant } from '../../lib/exercises.ts'
-import type { ExerciseBlock } from '../../lib/sessions.ts'
+import { isWorkSet, type ExerciseBlock } from '../../lib/sessions.ts'
 
 type Props = {
   open: boolean
@@ -15,12 +15,15 @@ type Props = {
   sessionId: string
   block: ExerciseBlock
   exercise: Exercise | undefined
+  /** Nom de l'exercice suivant de la séance (superset possible) ; absent pour le dernier. */
+  nextName?: string
   onRemoved: () => void
 }
 
-function ExerciseMenu({ open, onClose, sessionId, block, exercise, onRemoved }: Props) {
+function ExerciseMenu({ open, onClose, sessionId, block, exercise, nextName, onRemoved }: Props) {
   const navigate = useNavigate()
-  const editing = block.sets.find((s) => !s.done)
+  // L'objectif du jour est celui des séries de travail (un échauffement n'en a pas)
+  const editing = block.sets.find((s) => !s.done && isWorkSet(s))
   const min = editing?.targetRepsMin
   const max = editing?.targetRepsMax
 
@@ -56,7 +59,7 @@ function ExerciseMenu({ open, onClose, sessionId, block, exercise, onRemoved }: 
         <div className="text-title font-bold">{exercise?.name ?? 'Exercice'}</div>
         <div className="text-body text-muted">
           {block.doneCount} série{block.doneCount > 1 ? 's' : ''} faite{block.doneCount > 1 ? 's' : ''} sur{' '}
-          {block.sets.length}
+          {block.workCount}
         </div>
       </div>
 
@@ -68,6 +71,21 @@ function ExerciseMenu({ open, onClose, sessionId, block, exercise, onRemoved }: 
         <IconEchange size={20} />
         Remplacer l’exercice
       </Button>
+
+      {/* Superset (J9) : relie l'exercice au suivant de la séance, ou défait ce lien */}
+      {nextName !== undefined && (
+        <Button
+          variant="secondary"
+          className="justify-start px-4"
+          onClick={async () => {
+            await setSuperset(sessionId, block.exerciseOrder, !block.supersetNext)
+            onClose()
+          }}
+        >
+          <IconLien size={20} />
+          <span className="truncate">{block.supersetNext ? 'Défaire le superset' : `Superset avec ${nextName}`}</span>
+        </Button>
+      )}
 
       {exercise && exercise.variants.length > 1 && (
         <div className="flex flex-col gap-2">

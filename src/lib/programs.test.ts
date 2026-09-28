@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { increaseSuggested, lastDoneLabel, nextDay, planDaySets, type ProgramDay, type ProgramExercise } from './programs.ts'
+import {
+  increaseSuggested,
+  lastDoneLabel,
+  nextDay,
+  planDaySets,
+  programSupersetGroups,
+  type ProgramDay,
+  type ProgramExercise,
+} from './programs.ts'
 import type { Session, SessionSet } from './sessions.ts'
 
 const days: ProgramDay[] = [
@@ -47,6 +55,27 @@ const past = (reps: number[], weight = 100): SessionSet[] =>
     id: `x${i}`, sessionId: 'old', exerciseId: 'squat', variant: 'barre', exerciseOrder: 1, order: i + 1,
     weight, reps: r, done: true, doneAt: 10 + i,
   }))
+
+describe('superset dans un jour (J9)', () => {
+  const pe = (id: string, order: number, supersetNext?: boolean): ProgramExercise => ({
+    ...squat,
+    id,
+    exerciseId: id,
+    order,
+    ...(supersetNext ? { supersetNext } : {}),
+  })
+
+  it('regroupe les exercices reliés ; le lien du dernier est ignoré', () => {
+    const groups = programSupersetGroups([pe('dc', 1), pe('dm', 2, true), pe('el', 3), pe('row', 4, true)])
+    expect(groups.map((g) => g.map((e) => e.id))).toEqual([['dc'], ['dm', 'el'], ['row']])
+  })
+
+  it('les séries du jour portent le lien, sauf pour le dernier exercice', () => {
+    const sets = planDaySets([pe('dm', 1, true), pe('el', 2, true)], [])
+    expect(sets.filter((s) => s.exerciseId === 'dm').every((s) => s.supersetNext)).toBe(true)
+    expect(sets.filter((s) => s.exerciseId === 'el').some((s) => s.supersetNext)).toBe(false)
+  })
+})
 
 describe('planDaySets pendant un deload', () => {
   it('garde la charge de la dernière séance normale, sans hausse ni objectif rehaussé', () => {

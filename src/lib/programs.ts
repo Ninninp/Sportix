@@ -89,6 +89,19 @@ export function increaseSuggested(pe: ProgramExercise, history: SessionSet[], de
   return pe.doubleProgression && last !== null && last.sets.length > 0 && last.sets.every((s) => s.reps >= pe.repsMax)
 }
 
+/**
+ * Exercices d'un jour (déjà triés) rangés par superset, comme `supersetGroups` en séance : un
+ * exercice seul, ou plusieurs qui se suivent et sont reliés. Le lien du dernier est ignoré.
+ */
+export function programSupersetGroups(exercises: ProgramExercise[]): ProgramExercise[][] {
+  const groups: ProgramExercise[][] = []
+  exercises.forEach((pe, i) => {
+    if (exercises[i - 1]?.supersetNext && groups.length > 0) groups[groups.length - 1].push(pe)
+    else groups.push([pe])
+  })
+  return groups
+}
+
 /** Une série à créer au démarrage d'une séance de programme. */
 export type PlannedSet = Pick<
   SessionSet,

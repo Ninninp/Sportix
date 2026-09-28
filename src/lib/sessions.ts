@@ -167,6 +167,24 @@ export function restFollows(sets: SessionSet[], set: SessionSet): boolean {
   return !group.some((b) => b !== own && b.sets.filter(isWorkSet)[round]?.done === false)
 }
 
+/**
+ * Ce qui suit `set` dans un superset, pour le pavé de saisie : « repos », ou la série de l'autre
+ * exercice qu'on enchaîne. null hors superset et pour un échauffement (rien à annoncer).
+ */
+export function supersetFollow(sets: SessionSet[], set: SessionSet): 'rest' | SessionSet | null {
+  if (set.warmup) return null
+  const group = groupOf(groupSetsByExercise(sets), set.exerciseOrder)
+  if (!group || group.length < 2) return null
+  if (restFollows(sets, set)) return 'rest'
+  const sequence = groupSequence(group)
+  return sequence.slice(sequence.findIndex((s) => s.id === set.id) + 1).find((s) => !s.done) ?? 'rest'
+}
+
+/** Rang de `set` parmi les séries de travail de son exercice (0, 1…) ; -1 pour un échauffement. */
+export function workIndex(block: ExerciseBlock, set: SessionSet): number {
+  return block.sets.filter(isWorkSet).findIndex((s) => s.id === set.id)
+}
+
 /** Progression de la séance : séries de travail faites / prévues. */
 export function sessionProgress(sets: SessionSet[]): { done: number; total: number } {
   const work = sets.filter(isWorkSet)

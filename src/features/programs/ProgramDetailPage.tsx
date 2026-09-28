@@ -12,7 +12,7 @@ import Switch from '../../components/Switch.tsx'
 import { IconChevronDroite, IconCorbeille, IconFleche, IconFlecheBas, IconOptions, IconPlus } from '../../components/icons.tsx'
 import { addDay, deleteDay, deleteProgram, moveDay, renameDay, renameProgram, setActiveProgram } from '../../db/programs.ts'
 import { VARIANT_LABELS, type Exercise } from '../../lib/exercises.ts'
-import { lastDoneLabel, nextDay, type ProgramDay, type ProgramExercise } from '../../lib/programs.ts'
+import { lastDoneLabel, nextDay, programSupersetGroups, type ProgramDay, type ProgramExercise } from '../../lib/programs.ts'
 import { formatRest } from '../../lib/rest.ts'
 import { formatTarget } from '../../lib/sessions.ts'
 import { useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
@@ -58,7 +58,11 @@ function ProgramDetailPage() {
   const active = settings.activeProgramId === program.id
   const next = active ? nextDay(days.map((d) => d.day), sessions) : undefined
   const openId = params.get('exercice')
-  const opened = openId ? days.flatMap((d) => d.exercises).find((pe) => pe.id === openId) : undefined
+  const openedDay = openId ? days.find((d) => d.exercises.some((pe) => pe.id === openId)) : undefined
+  const openedIndex = openedDay ? openedDay.exercises.findIndex((pe) => pe.id === openId) : -1
+  const opened = openedDay?.exercises[openedIndex]
+  // L'exercice qui suit dans le jour : celui avec lequel on peut faire un superset
+  const openedNext = openedDay?.exercises[openedIndex + 1]
   const closeMenu = () => {
     setMenu(null)
     setConfirmDelete(false)
@@ -102,28 +106,47 @@ function ProgramDetailPage() {
             </button>
           </div>
           <div className="divide-y divide-border">
-            {dayExercises.map((pe) => {
-              const info = exercises.get(pe.exerciseId)
-              return (
-                <button
-                  key={pe.id}
-                  type="button"
-                  onClick={() => setParams({ exercice: pe.id }, { replace: true })}
-                  className="flex min-h-15 w-full items-center gap-3 pr-2 pl-4 text-left text-text active:bg-surface-2"
-                >
-                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="text-body-strong font-semibold">{info?.name ?? 'Exercice'}</span>
-                    <span className="text-small text-muted">
-                      {[equipment(pe, info), `repos ${formatRest(pe.restSeconds)}`].filter(Boolean).join(' · ')}
+            {programSupersetGroups(dayExercises).map((group) => {
+              const rows = group.map((pe, i) => {
+                const info = exercises.get(pe.exerciseId)
+                // Relié au suivant : pas de repos entre les deux, « superset » à la place (maquette J9)
+                const linked = i < group.length - 1
+                return (
+                  <button
+                    key={pe.id}
+                    type="button"
+                    onClick={() => setParams({ exercice: pe.id }, { replace: true })}
+                    className="flex min-h-15 w-full items-center gap-3 pr-2 pl-4 text-left text-text active:bg-surface-2"
+                  >
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="text-body-strong font-semibold">{info?.name ?? 'Exercice'}</span>
+                      <span className="text-small text-muted">
+                        {equipment(pe, info) && `${equipment(pe, info)} · `}
+                        {linked ? (
+                          <span className="font-semibold text-text">superset</span>
+                        ) : (
+                          <>
+                            repos <span className="num font-medium">{formatRest(pe.restSeconds)}</span>
+                          </>
+                        )}
+                      </span>
                     </span>
-                  </span>
-                  <span className="num text-[18px] whitespace-nowrap">
-                    {pe.sets} × {formatTarget(pe.repsMin, pe.repsMax)}
-                  </span>
-                  <span className="flex text-muted">
-                    <IconChevronDroite size={20} />
-                  </span>
-                </button>
+                    <span className="num text-[18px] whitespace-nowrap">
+                      {pe.sets} × {formatTarget(pe.repsMin, pe.repsMax)}
+                    </span>
+                    <span className="flex text-muted">
+                      <IconChevronDroite size={20} />
+                    </span>
+                  </button>
+                )
+              })
+              if (group.length === 1) return rows[0]
+              // Superset : un trait à gauche relie ses exercices
+              return (
+                <div key={group[0].id} className="relative divide-y divide-border">
+                  <span aria-hidden="true" className="absolute top-3.5 bottom-3.5 left-1.5 w-[3px] rounded-full bg-text" />
+                  {rows}
+                </div>
               )
             })}
           </div>
@@ -145,6 +168,7 @@ function ProgramDetailPage() {
       <ProgramExerciseSheet
         exercise={opened}
         info={opened ? exercises.get(opened.exerciseId) : undefined}
+        nextName={openedNext && (exercises.get(openedNext.exerciseId)?.name ?? 'Exercice')}
         onClose={() => setParams({}, { replace: true })}
       />
 

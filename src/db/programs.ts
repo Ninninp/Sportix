@@ -151,8 +151,24 @@ export async function changeDayExercise(
   })
 }
 
+/**
+ * Retire des exercices de leurs jours. S'il fermait un superset, l'exercice d'avant n'est plus
+ * relié : sinon il se retrouverait relié à celui d'après (même règle que `removeExercise` en séance).
+ */
+export async function removeDayExercises(ids: string[], db: SportixDB = defaultDb): Promise<void> {
+  await db.transaction('rw', db.programExercises, async () => {
+    for (const id of ids) {
+      const removed = await db.programExercises.get(id)
+      if (!removed) continue
+      const previous = (await listDayExercises(removed.dayId, db)).filter((pe) => pe.order < removed.order).at(-1)
+      if (previous?.supersetNext && !removed.supersetNext) await db.programExercises.update(previous.id, { supersetNext: undefined })
+      await db.programExercises.delete(id)
+    }
+  })
+}
+
 export async function removeDayExercise(id: string, db: SportixDB = defaultDb): Promise<void> {
-  await db.programExercises.delete(id)
+  await removeDayExercises([id], db)
 }
 
 /** Dans combien de jours de programme cet exercice figure-t-il ? (prévenir avant de le supprimer) */

@@ -82,6 +82,21 @@ describe('programmes', () => {
     expect((await listDays(id, db)).map((d) => d.name)).toEqual(['A'])
     expect(await listDayExercises(bId, db)).toEqual([])
   })
+
+  it('retirer le dernier exercice d’un superset défait le lien de celui d’avant (J9)', async () => {
+    freshDb()
+    const id = await createProgram('P', 'A', db)
+    const [a] = await listDays(id, db)
+    const dm = await addDayExercise(a.id, 'militaire', 'halteres', db)
+    const el = await addDayExercise(a.id, 'elevations', 'halteres', db)
+    await addDayExercise(a.id, 'rowing', 'poulie', db)
+    await updateDayExercise(dm, { supersetNext: true }, db)
+    await removeDayExercise(el, db)
+    expect((await listDayExercises(a.id, db)).map((e) => [e.exerciseId, e.supersetNext === true])).toEqual([
+      ['militaire', false],
+      ['rowing', false],
+    ])
+  })
 })
 
 describe('ordre des jours', () => {

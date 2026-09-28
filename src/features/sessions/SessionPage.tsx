@@ -13,7 +13,8 @@ import NumberStepper from '../../components/NumberStepper.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import { IconPlus } from '../../components/icons.tsx'
 import {
-  addSet,
+  addRound,
+  addWarmup,
   clearSessionRest,
   discardSession,
   endSession,
@@ -30,7 +31,16 @@ import {
   stepWeight,
   weightStep,
 } from '../../lib/progression.ts'
-import { currentSet, formatNumber, groupSetsByExercise, sessionProgress, type SessionSet } from '../../lib/sessions.ts'
+import {
+  currentSet,
+  formatNumber,
+  groupOf,
+  groupSequence,
+  groupSetsByExercise,
+  sessionProgress,
+  supersetFollow,
+  type SessionSet,
+} from '../../lib/sessions.ts'
 import { useSettings } from '../settings/useSettings.ts'
 import RestScreen from '../timer/RestScreen.tsx'
 import { unlockAudio } from '../timer/sound.ts'
@@ -47,6 +57,9 @@ function SessionPage() {
   const exercises = useExercisesById()
   const settings = useSettings()
   const [selected, setSelected] = useState<number | null>(null)
+  // Menu ⋯ ouvert : rang de l'exercice concerné (chaque exercice d'un superset a le sien)
+  // (gardé à la fermeture, pour que le panneau puisse s'effacer avec son contenu)
+  const [menuOrder, setMenuOrder] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
 
@@ -82,9 +95,19 @@ function SessionPage() {
   const blocks = groupSetsByExercise(sets)
   const nextSet = currentSet(sets)
   const activeOrder = selected ?? nextSet?.exerciseOrder ?? blocks[0]?.exerciseOrder ?? null
-  const block = blocks.find((b) => b.exerciseOrder === activeOrder)
-  const editing: SessionSet | undefined = block?.sets.find((s) => !s.done)
+  // Exercice seul ou superset ouvert : la série en cours suit l'ordre où on les fait
+  // (échauffements, puis A1 → B1 → A2… dans un superset)
+  const activeGroup = activeOrder === null ? undefined : groupOf(blocks, activeOrder)
+  const editing: SessionSet | undefined = activeGroup ? groupSequence(activeGroup).find((s) => !s.done) : undefined
+  const block = blocks.find((b) => b.exerciseOrder === (editing?.exerciseOrder ?? activeOrder))
   const exercise = block ? exercises.get(block.exerciseId) : undefined
+  // Dans un superset, le pavé annonce la suite : « puis repos » ou « puis Élévations latérales »
+  const follow = editing ? supersetFollow(sets, editing) : null
+  const followLabel =
+    follow === null ? null : follow === 'rest' ? 'puis repos' : `puis ${exercises.get(follow.exerciseId)?.name ?? 'l’exercice suivant'}`
+  const menuIndex = blocks.findIndex((b) => b.exerciseOrder === menuOrder)
+  const menuBlock = menuIndex >= 0 ? blocks[menuIndex] : undefined
+  const menuNext = menuIndex >= 0 ? blocks[menuIndex + 1] : undefined
   const progress = sessionProgress(sets)
   const steps = settings.weightSteps
   // Séance de deload : jamais de proposition de hausse (parcours.md § 2.1).
@@ -196,8 +219,12 @@ function SessionPage() {
         exercises={exercises}
         history={history}
         onOpen={setSelected}
-        onAddSet={(order: number) => void addSet(session.id, order)}
-        onMenu={() => setMenuOpen(true)}
+        onAddSet={(orders) => void addRound(session.id, orders)}
+        onAddWarmup={(order) => void addWarmup(session.id, order)}
+        onMenu={(order) => {
+          setMenuOrder(order)
+          setMenuOpen(true)
+        }}
       />
 
       {/* Pavé de saisie de la série en cours */}
@@ -206,10 +233,14 @@ function SessionPage() {
           <Card className="flex shrink-0 flex-col gap-2 px-3 pt-2.5 pb-3">
             <div className="flex items-center justify-between gap-2">
               <span className="truncate text-body font-bold">
-                {exercise?.name ?? 'Exercice'} · série {editing.order}
+                {exercise?.name ?? 'Exercice'} · {editing.warmup ? 'échauffement' : `série ${editing.order}`}
               </span>
-              {/* Pas de proposition de charge quand la double progression est désactivée (programme) */}
-              {badge && editing.progression !== false && <BadgeIncrease>{badge}</BadgeIncrease>}
+              <span className="flex shrink-0 items-center gap-2">
+                {followLabel && <span className="text-small text-muted">{followLabel}</span>}
+                {/* Pas de proposition de charge quand la double progression est désactivée (programme),
+                    ni sur un échauffement */}
+                {badge && editing.progression !== false && !editing.warmup && <BadgeIncrease>{badge}</BadgeIncrease>}
+              </span>
             </div>
             {exercise?.type !== 'poids-du-corps' && (
               <NumberStepper
@@ -272,7 +303,7 @@ function SessionPage() {
         // à portée de pouce ; « Terminer la séance » passe par la confirmation.
         <div className="flex shrink-0 flex-col gap-2.5">
           <div className="flex gap-2.5">
-            <Button variant="secondary" onClick={() => addSet(session.id, block!.exerciseOrder)}>
+            <Button variant="secondary" onClick={() => addRound(session.id, (activeGroup ?? [block!]).map((b) => b.exerciseOrder))}>
               <IconPlus size={20} />
               Série
             </Button>
@@ -289,13 +320,14 @@ function SessionPage() {
 
       {endSheet}
 
-      {block && (
+      {menuBlock && (
         <ExerciseMenu
           open={menuOpen}
           onClose={() => setMenuOpen(false)}
           sessionId={session.id}
-          block={block}
-          exercise={exercise}
+          block={menuBlock}
+          exercise={exercises.get(menuBlock.exerciseId)}
+          nextName={menuNext && (exercises.get(menuNext.exerciseId)?.name ?? 'Exercice')}
           onRemoved={() => setSelected(null)}
         />
       )}

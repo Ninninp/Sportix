@@ -5,7 +5,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { groupSetsByExercise } from '../lib/sessions.ts'
 import {
   addExerciseToSession,
+  addRound,
   addSet,
+  addWarmup,
   changeVariant,
   clearSessionRest,
   endSession,
@@ -15,6 +17,7 @@ import {
   listFinishedSessions,
   removeExercise,
   replaceExercise,
+  setSuperset,
   startSession,
   validateSet,
   validateSetAndRest,
@@ -45,6 +48,80 @@ async function seance(reps: number[], weight = 80, target: [number, number] = [8
   await endSession(id, db)
   return id
 }
+
+describe('échauffement et superset (J9)', () => {
+  it('« + Échauffement » : la moitié de la charge, 10 reps, puis une copie du précédent', async () => {
+    freshDb()
+    await seance([8], 80)
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'developpe', 'barre', db)
+    await addWarmup(id, 1, db)
+    const [first] = (await getSessionSets(id, db)).filter((s) => s.warmup)
+    expect(first).toMatchObject({ weight: 40, reps: 10, order: 1, done: false })
+    await db.sets.update(first.id, { weight: 60, reps: 5 })
+    await addWarmup(id, 1, db)
+    const warmups = (await getSessionSets(id, db)).filter((s) => s.warmup).sort((a, b) => a.order - b.order)
+    expect(warmups.map((s) => [s.order, s.weight, s.reps])).toEqual([
+      [1, 60, 5],
+      [2, 60, 5],
+    ])
+  })
+
+  it('pas de repos après un échauffement, et il ne compte pas dans la « dernière fois »', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'developpe', 'barre', db)
+    await addWarmup(id, 1, db)
+    const [warmup] = (await getSessionSets(id, db)).filter((s) => s.warmup)
+    await validateSetAndRest(id, warmup.id, { weight: 20, reps: 10 }, db)
+    expect((await db.sessions.get(id))?.rest).toBeUndefined()
+    const [work] = (await getSessionSets(id, db)).filter((s) => !s.warmup)
+    expect(work.reps).toBe(0) // l'échauffement ne remplit pas les séries de travail
+    await validateSetAndRest(id, work.id, { weight: 80, reps: 8 }, db)
+    await endSession(id, db)
+
+    const next = await startSession(db)
+    await addExerciseToSession(next, 'developpe', 'barre', db)
+    expect((await getSessionSets(next, db))[0]).toMatchObject({ weight: 80, reps: 8 })
+  })
+
+  it('superset : on enchaîne sans repos, le repos vient à la fin du tour', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'militaire', 'halteres', db)
+    await addExerciseToSession(id, 'elevations', 'halteres', db)
+    await setSuperset(id, 1, true, db)
+    await addRound(id, [1, 2], db)
+    const blocks = groupSetsByExercise(await getSessionSets(id, db))
+    expect(blocks.map((b) => [b.workCount, b.supersetNext])).toEqual([
+      [2, true],
+      [2, false],
+    ])
+
+    await validateSetAndRest(id, blocks[0].sets[0].id, { weight: 20, reps: 10 }, db)
+    expect((await db.sessions.get(id))?.rest).toBeUndefined()
+    await validateSetAndRest(id, blocks[1].sets[0].id, { weight: 8, reps: 15 }, db)
+    expect((await db.sessions.get(id))?.rest).toBeDefined()
+
+    await setSuperset(id, 1, false, db)
+    expect(groupSetsByExercise(await getSessionSets(id, db))[0].supersetNext).toBe(false)
+  })
+
+  it('retirer le dernier exercice d’un superset défait le lien de celui d’avant', async () => {
+    freshDb()
+    const id = await startSession(db)
+    await addExerciseToSession(id, 'militaire', 'halteres', db)
+    await addExerciseToSession(id, 'elevations', 'halteres', db)
+    await addExerciseToSession(id, 'rowing', 'poulie', db)
+    await setSuperset(id, 1, true, db)
+    await removeExercise(id, 2, db)
+    const blocks = groupSetsByExercise(await getSessionSets(id, db))
+    expect(blocks.map((b) => [b.exerciseId, b.supersetNext])).toEqual([
+      ['militaire', false],
+      ['rowing', false],
+    ])
+  })
+})
 
 describe('séance en cours', () => {
   it('ne démarre pas deux séances à la fois', async () => {
