@@ -34,6 +34,11 @@ export type ProgramExercise = {
   doubleProgression: boolean
   /** Repos après chaque série de cet exercice, en secondes. */
   restSeconds: number
+  /**
+   * Superset avec l'exercice suivant du jour (J9) : on enchaîne sans repos, le repos du tour est
+   * celui du dernier exercice relié. Champ facultatif, non indexé : pas de nouvelle version du schéma.
+   */
+  supersetNext?: boolean
 }
 
 /** Valeurs d'un exercice ajouté à un jour (modifiables ensuite dans son panneau). */
@@ -87,7 +92,18 @@ export function increaseSuggested(pe: ProgramExercise, history: SessionSet[], de
 /** Une série à créer au démarrage d'une séance de programme. */
 export type PlannedSet = Pick<
   SessionSet,
-  'exerciseId' | 'variant' | 'exerciseOrder' | 'order' | 'weight' | 'reps' | 'targetRepsMin' | 'targetRepsMax' | 'restSeconds' | 'progression' | 'deload'
+  | 'exerciseId'
+  | 'variant'
+  | 'exerciseOrder'
+  | 'order'
+  | 'weight'
+  | 'reps'
+  | 'targetRepsMin'
+  | 'targetRepsMax'
+  | 'restSeconds'
+  | 'progression'
+  | 'deload'
+  | 'supersetNext'
 >
 
 /**
@@ -109,8 +125,10 @@ export function planDaySets(
 ): PlannedSet[] {
   return [...exercises]
     .sort((a, b) => a.order - b.order)
-    .flatMap((pe, index) => {
+    .flatMap((pe, index, ordered) => {
       const last = lastPerformance(history, pe.exerciseId, pe.variant)
+      // Le dernier exercice du jour n'a pas de suivant : son lien éventuel est ignoré
+      const superset = pe.supersetNext === true && index < ordered.length - 1
       const increase = increaseSuggested(pe, history, deload)
       const step = increase ? weightStep(pe.variant, steps) : 0
       const min = minWeight(pe.variant)
@@ -128,6 +146,7 @@ export function planDaySets(
           restSeconds: pe.restSeconds,
           progression: pe.doubleProgression,
           ...(deload ? { deload: true } : {}),
+          ...(superset ? { supersetNext: true } : {}),
         }
       })
     })

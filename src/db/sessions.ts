@@ -2,9 +2,9 @@
 // en salle, l'app peut être fermée ou tuée par le système à tout moment.
 import { blockIdFor, isDeloadAt } from '../lib/blocks.ts'
 import type { Variant } from '../lib/exercises.ts'
-import { lastPerformance, prefillSets } from '../lib/progression.ts'
+import { lastPerformance, prefillSets, WARMUP_REPS, warmupWeight } from '../lib/progression.ts'
 import { extendRest, startRest } from '../lib/rest.ts'
-import { groupSetsByExercise, type Session, type SessionSet } from '../lib/sessions.ts'
+import { groupSetsByExercise, isWorkSet, restFollows, type Session, type SessionSet } from '../lib/sessions.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 import { getSettings } from './settings.ts'
 
@@ -46,10 +46,13 @@ export function getSessionSets(sessionId: string, db: SportixDB = defaultDb): Pr
   return db.sets.where('sessionId').equals(sessionId).toArray()
 }
 
-/** Séries validées des séances passées : base du pré-remplissage et des records. */
+/**
+ * Séries validées des séances passées : base du pré-remplissage et des records.
+ * Sans les échauffements (J9), qui ne comptent nulle part hors de leur séance.
+ */
 export async function getHistorySets(exceptSessionId?: string, db: SportixDB = defaultDb): Promise<SessionSet[]> {
   const sets = await db.sets.toArray()
-  return sets.filter((s) => s.done && s.sessionId !== exceptSessionId)
+  return sets.filter((s) => s.done && !s.warmup && s.sessionId !== exceptSessionId)
 }
 
 /**
@@ -107,6 +110,7 @@ export async function validateSet(
  * Valide la série ET lance le repos, en une seule écriture atomique : si l'app est tuée juste après
  * l'appui, on ne retrouve jamais une série faite sans son repos. Durée du repos : celle de
  * l'exercice dans le programme (J5), sinon le repos par défaut des Réglages.
+ * Pas de repos après un échauffement, ni au milieu d'un tour de superset (J9, `restFollows`).
  */
 export async function validateSetAndRest(
   sessionId: string,
@@ -118,18 +122,23 @@ export async function validateSetAndRest(
   const now = Date.now()
   await db.transaction('rw', db.sets, db.sessions, async () => {
     const validated = await db.sets.get(setId)
-    const restSeconds = validated?.restSeconds ?? defaultRest
+    if (!validated) return
+    const done = { ...validated, ...values, done: true, doneAt: now }
     await db.sets.update(setId, { ...values, done: true, doneAt: now })
-    // Séries suivantes du même exercice encore vides (0 rep : jamais remplies, puisqu'on ne peut
-    // pas valider 0 rep) : elles reprennent ces valeurs. Cas d'un exercice nouveau où l'on a prévu
-    // ses séries avant de remplir la première.
-    if (validated) {
-      const blanks = (await getSessionSets(sessionId, db)).filter(
-        (s) => s.exerciseOrder === validated.exerciseOrder && s.order > validated.order && !s.done && s.reps === 0,
+    const sets = (await getSessionSets(sessionId, db)).map((s) => (s.id === setId ? done : s))
+    // Séries de travail suivantes du même exercice encore vides (0 rep : jamais remplies, puisqu'on
+    // ne peut pas valider 0 rep) : elles reprennent ces valeurs. Cas d'un exercice nouveau où l'on
+    // a prévu ses séries avant de remplir la première.
+    if (!validated.warmup) {
+      const blanks = sets.filter(
+        (s) =>
+          s.exerciseOrder === validated.exerciseOrder && !s.warmup && s.order > validated.order && !s.done && s.reps === 0,
       )
       await Promise.all(blanks.map((s) => db.sets.update(s.id, values)))
     }
-    await db.sessions.update(sessionId, { rest: startRest(restSeconds, now) })
+    if (restFollows(sets, done)) {
+      await db.sessions.update(sessionId, { rest: startRest(validated.restSeconds ?? defaultRest, now) })
+    }
   })
 }
 
@@ -146,12 +155,12 @@ export async function clearSessionRest(sessionId: string, db: SportixDB = defaul
   await db.sessions.update(sessionId, { rest: undefined })
 }
 
-/** Ajoute une série à un exercice de la séance, copiée sur la dernière de cet exercice. */
+/** Ajoute une série de travail à un exercice de la séance, copiée sur la dernière de cet exercice. */
 export async function addSet(sessionId: string, exerciseOrder: number, db: SportixDB = defaultDb): Promise<void> {
   const sets = await getSessionSets(sessionId, db)
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
-  if (!block) return
-  const last = block.sets[block.sets.length - 1]
+  const last = block?.sets.filter(isWorkSet).at(-1)
+  if (!last) return
   await db.sets.add({
     ...last,
     id: crypto.randomUUID(),
@@ -161,15 +170,72 @@ export async function addSet(sessionId: string, exerciseOrder: number, db: Sport
   })
 }
 
+/** « + Série » d'un superset : une série de plus à chaque exercice du groupe (un tour de plus). */
+export async function addRound(sessionId: string, exerciseOrders: number[], db: SportixDB = defaultDb): Promise<void> {
+  await db.transaction('rw', db.sets, async () => {
+    for (const order of exerciseOrders) await addSet(sessionId, order, db)
+  })
+}
+
+/**
+ * « + Échauffement » (J9) : une série d'échauffement de plus, avant les séries de travail. La
+ * première part de la moitié de la charge de travail (10 reps), les suivantes copient la précédente.
+ */
+export async function addWarmup(sessionId: string, exerciseOrder: number, db: SportixDB = defaultDb): Promise<void> {
+  const [sets, settings] = await Promise.all([getSessionSets(sessionId, db), getSettings(db)])
+  const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
+  const work = block?.sets.find(isWorkSet)
+  if (!block || !work) return
+  const lastWarmup = block.sets.filter((s) => s.warmup).at(-1)
+  await db.sets.add({
+    id: crypto.randomUUID(),
+    sessionId,
+    exerciseId: work.exerciseId,
+    variant: work.variant,
+    exerciseOrder,
+    order: (lastWarmup?.order ?? 0) + 1,
+    weight: lastWarmup?.weight ?? warmupWeight(work.weight, work.variant, settings.weightSteps),
+    reps: lastWarmup?.reps ?? WARMUP_REPS,
+    done: false,
+    warmup: true,
+    ...(work.supersetNext ? { supersetNext: true } : {}),
+    ...(work.deload ? { deload: true } : {}),
+  })
+}
+
 export async function removeSet(setId: string, db: SportixDB = defaultDb): Promise<void> {
   await db.sets.delete(setId)
 }
 
-/** Retire un exercice de la séance (toutes ses séries). */
+/** Relie (ou sépare) un exercice et le suivant de la séance : superset (J9). */
+export async function setSuperset(
+  sessionId: string,
+  exerciseOrder: number,
+  linked: boolean,
+  db: SportixDB = defaultDb,
+): Promise<void> {
+  await db.transaction('rw', db.sets, async () => {
+    const sets = (await getSessionSets(sessionId, db)).filter((s) => s.exerciseOrder === exerciseOrder)
+    await Promise.all(sets.map((s) => db.sets.update(s.id, { supersetNext: linked ? true : undefined })))
+  })
+}
+
+/**
+ * Retire un exercice de la séance (toutes ses séries). S'il fermait un superset, l'exercice
+ * d'avant n'est plus relié : sinon il se retrouverait relié à celui d'après.
+ */
 export async function removeExercise(sessionId: string, exerciseOrder: number, db: SportixDB = defaultDb): Promise<void> {
-  const sets = await getSessionSets(sessionId, db)
-  const ids = sets.filter((s) => s.exerciseOrder === exerciseOrder).map((s) => s.id)
-  await db.sets.bulkDelete(ids)
+  await db.transaction('rw', db.sets, async () => {
+    const sets = await getSessionSets(sessionId, db)
+    const blocks = groupSetsByExercise(sets)
+    const index = blocks.findIndex((b) => b.exerciseOrder === exerciseOrder)
+    const removed = blocks[index]
+    const previous = blocks[index - 1]
+    if (removed && previous?.supersetNext && !removed.supersetNext) {
+      await Promise.all(previous.sets.map((s) => db.sets.update(s.id, { supersetNext: undefined })))
+    }
+    await db.sets.bulkDelete(sets.filter((s) => s.exerciseOrder === exerciseOrder).map((s) => s.id))
+  })
 }
 
 /**
@@ -192,8 +258,11 @@ export async function changeVariant(
   if (!block) return
   const prefilled = prefillSets(lastPerformance(history, block.exerciseId, variant), variant, settings.weightSteps, session?.deload === true)
 
-  await Promise.all(
-    block.sets.map((s, i) =>
+  // Les échauffements changent de variante sans toucher à leurs valeurs (réglées à la main)
+  const warmups = block.sets.filter((s) => s.warmup)
+  await Promise.all([
+    ...warmups.map((s) => db.sets.update(s.id, { variant })),
+    ...block.sets.filter(isWorkSet).map((s, i) =>
       s.done
         ? db.sets.update(s.id, { variant }) // une série déjà faite garde ses valeurs
         : db.sets.update(s.id, {
@@ -204,7 +273,7 @@ export async function changeVariant(
             targetRepsMax: prefilled[i]?.targetRepsMax,
           }),
     ),
-  )
+  ])
 }
 
 /**
@@ -227,15 +296,19 @@ export async function replaceExercise(
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
 
-  const remaining = block.sets.filter((s) => !s.done)
+  const remaining = block.sets.filter((s) => !s.done && isWorkSet(s))
   if (remaining.length === 0) return
   const prefilled = prefillSets(lastPerformance(history, exerciseId, variant), variant, settings.weightSteps, session?.deload === true)
-  const doneCount = block.sets.length - remaining.length
-  // Le nouvel exercice prend la place suivante s'il reste des séries faites à l'ancien.
+  // Le nouvel exercice prend la place suivante s'il reste des séries faites à l'ancien
+  // (échauffements compris : ils ont eu lieu sur l'ancien exercice).
+  const doneCount = block.sets.filter((s) => s.done).length
   const newOrder = doneCount > 0 ? nextExerciseOrder(sets) : exerciseOrder
+  // Échauffements pas encore faits : prévus pour l'ancien exercice, ils sont retirés
+  const pendingWarmups = block.sets.filter((s) => s.warmup && !s.done).map((s) => s.id)
 
-  await Promise.all(
-    remaining.map((s, i) =>
+  await Promise.all([
+    db.sets.bulkDelete(pendingWarmups),
+    ...remaining.map((s, i) =>
       db.sets.update(s.id, {
         exerciseId,
         variant,
@@ -246,9 +319,11 @@ export async function replaceExercise(
         // L'objectif de reps du jour suit l'exercice remplacé.
         targetRepsMin: s.targetRepsMin,
         targetRepsMax: s.targetRepsMax,
+        // Déplacé en fin de séance : il n'est plus relié à l'exercice qui suivait l'ancien
+        ...(newOrder !== exerciseOrder ? { supersetNext: undefined } : {}),
       }),
     ),
-  )
+  ])
 }
 
 /** Modifie l'objectif de reps d'un exercice pour cette séance (menu ⋯). */
@@ -262,7 +337,9 @@ export async function setTargetReps(
   const block = groupSetsByExercise(sets).find((b) => b.exerciseOrder === exerciseOrder)
   if (!block) return
   await Promise.all(
-    block.sets.filter((s) => !s.done).map((s) => db.sets.update(s.id, { targetRepsMin: target.min, targetRepsMax: target.max })),
+    block.sets
+      .filter((s) => !s.done && isWorkSet(s))
+      .map((s) => db.sets.update(s.id, { targetRepsMin: target.min, targetRepsMax: target.max })),
   )
 }
 

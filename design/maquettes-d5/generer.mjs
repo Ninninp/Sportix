@@ -1067,8 +1067,127 @@ S['Accueil-rappel'] = { title: 'Rappel : pastille sur l’onglet Réglages (plus
   main: homeJ5(t,
     thinRow(t, `<span style="font-size: 15px; white-space: nowrap;"><span style="color: ${t.muted};">Bloc</span> <strong>Force</strong></span><span style="flex-grow: 1;">${weekBar(t, { weeks: 5, current: 2, deload: 4, done: [1] })}</span>`, '#', 'Bloc Force, semaine 2 sur 5, deload en semaine 4'), true) }) };
 
+// ===================================================================================
+// J9 — Finitions : thème manuel, échauffement, supersets
+// Choix du 28/09/2026 : échauffement ajouté à la main (pas de calcul automatique) ; superset =
+// on alterne les exercices reliés (A1 → B1 → repos → A2 → B2…), le repos ne se lance qu'après le
+// dernier exercice du tour ; pas de bannière « nouvelle version » (mise à jour automatique gardée) ;
+// pas de kg/lb.
+// ===================================================================================
+P.link = '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>';
+const J9NAV = (t) => ({ seance: '#', prog: file(t, 'Programme-superset'), reglages: file(t, 'Reglages-J9') });
+
+// Réglages : section « Apparence » (Auto suit le réglage de l'iPhone, comme jusqu'ici)
+const reglagesJ9 = (t) =>
+  `<h1 style="${H1} flex-shrink: 0;">Réglages</h1>` +
+  section(t, 'Sauvegarde', card(t,
+    dataRow(t, 'share', 'Exporter mes données', 'Dernière sauvegarde : il y a 3 jours', '#', true) +
+    dataRow(t, 'upload', 'Importer une sauvegarde', 'Remplace les données de ce téléphone', '#'), 'overflow: hidden;')) +
+  section(t, 'Séance', card(t, valueRow(t, 'Repos par défaut', '2:00', true) +
+    `<label style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px; border-top: 1px solid ${t.border};"><span style="font-size: 17px;">Son de fin de repos</span><input class="sw" type="checkbox" role="switch" checked></label>`, 'overflow: hidden;')) +
+  section(t, 'Apparence', seg(t, ['Auto', 'Clair', 'Sombre'], 0, 'Apparence')) +
+  section(t, 'Pas de charge (boutons − / +)', card(t, [['Barre', '2,5 kg'], ['Smith', '2,5 kg'], [`Haltères <span style="font-size: 13px; color: ${t.muted};">(par haltère)</span>`, '2 kg'], ['Machine', '5 kg'], ['Poulie', '2,5 kg']].map(([n, v], i) => valueRow(t, n, v, i === 0)).join(''), 'overflow: hidden;')) +
+  section(t, 'Stats', card(t, valueRow(t, 'Objectifs', '76 kg · 4 / sem.', true), 'overflow: hidden;')) +
+  section(t, 'Exercices', card(t, `<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px 0 16px; color: ${t.text}; text-decoration: none;"><span style="display: flex; color: ${t.muted};">${ic('book', 20)}</span><span style="flex-grow: 1; font-size: 17px;">Bibliothèque d'exercices</span><span class="num" style="font-size: 17px; color: ${t.muted};">32</span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`, 'overflow: hidden;')) +
+  `<p style="margin: 4px 0 0; font-size: 13px; line-height: 18px; color: ${t.muted}; text-align: center; flex-shrink: 0;">Tes données restent sur ce téléphone.<br><span class="num">Version f9da537 · 28/09/2026</span></p>`;
+
+S['Reglages-J9'] = { title: 'Réglages · Apparence (la page défile)', page: 'j9', h: 1240, render: (t) => frame(t, { h: 1240, navActive: 'reglages', navLinks: J9NAV(t), gap: 16, main: reglagesJ9(t) }) };
+
+// Séance en liste (J5) : en-tête du tableau, carte d'un exercice, pavé et bouton du bas
+const colHead = (t) => `<div role="row" style="display: grid; ${COLS} padding: 0 10px; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: ${t.muted};"><span>N°</span><span>Dernière fois</span><span style="text-align: right;">Kg</span><span style="text-align: right;">Reps</span><span></span></div>`;
+const exTitle = (t, name, target, href = '#') => `<div style="display: flex; align-items: center; gap: 8px; padding: 6px 0 2px 6px;"><div style="flex-grow: 1; display: flex; align-items: baseline; gap: 8px;"><span style="font-size: 20px; line-height: 24px; font-weight: 800;">${name}</span><span class="num" style="font-size: 15px; color: ${t.muted};">${target}</span></div>${iconBtn(t, 'more', `Options de ${name}`, href)}</div>`;
+const smallBtn = (t, label) => `<button style="min-height: 44px; padding: 0 6px; border: 0; background: transparent; color: ${t.text}; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;">${label}</button>`;
+const pad = (t, title, right, kg, reps) =>
+  card(t, `<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"><span style="font-size: 15px; font-weight: 700;">${title}</span>${right}</div>` +
+    (kg ? stepperS(t, 'Charge', kg, 'kg', 'Charge', 'Retirer', 'Ajouter') : '') +
+    stepperS(t, 'Reps', reps, 'reps', 'Répétitions', 'Retirer une rep', 'Ajouter une rep'),
+    'flex-shrink: 0; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;');
+const seanceListe = (t, title, list, padHtml) =>
+  seanceHeader(t, '31:42').replace('>Séance libre<', `>${title}<`) +
+  `<div style="flex-grow: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 8px;">${list}</div>` +
+  padHtml + btn.pri(t, 'Valider la série', '#', 'font-size: 20px; font-weight: 800;');
+
+// Série d'échauffement : « É » à la place du numéro, ligne plus basse et chiffres plus petits
+// (elle compte moins), pas de « dernière fois ».
+const warmSet = (t, kg, reps, state) =>
+  listSet(t, 'É', '', kg, reps, state)
+    .replace('min-height: 52px;', 'min-height: 44px;')
+    .replaceAll('font-size: 22px; text-align: right;', 'font-size: 18px; text-align: right;')
+    .replace('aria-label="Série É"', 'aria-label="Échauffement"');
+
+S['Seance-echauffement'] = { title: 'Séance · échauffement', page: 'j9', render: (t) => frame(t, { pad: '4px 16px 16px', main: seanceListe(t, 'Force A — Jambes',
+  card(t, exTitle(t, 'Squat', '4–6 reps') + colHead(t) +
+    warmSet(t, '20', 10, 'done') + warmSet(t, '60', 5, 'now') +
+    listSet(t, 1, '100 × 5', '102,5', 5, 'next') + listSet(t, 2, '100 × 5', '102,5', 5, 'next') + listSet(t, 3, '100 × 4', '102,5', 5, 'next') +
+    `<div style="display: flex; justify-content: space-between;">${smallBtn(t, '+ Série')}${smallBtn(t, '+ Échauffement')}</div>`,
+    'flex-shrink: 0; padding: 6px; display: flex; flex-direction: column; gap: 4px;') +
+  folded(t, 'Presse à cuisses', '0/3') + folded(t, 'Leg curl', '0/3') + folded(t, 'Fentes bulgares', '0/3'),
+  pad(t, 'Squat · échauffement', '', '60', '5')) }) };
+
+// Superset : les exercices reliés sont dans une même carte, sous l'étiquette « Superset » ;
+// l'ordre des séries alterne, le repos vient après le dernier exercice du tour.
+const supersetCard = (t, menuHref = '#') =>
+  card(t, `<div style="display: flex; align-items: center; gap: 6px; padding: 6px 6px 0; color: ${t.muted};">${ic('link', 16, 2.5)}${lbl(t, 'Superset')}</div>` +
+    exTitle(t, 'Développé militaire', '8–10 reps', menuHref) + colHead(t) +
+    listSet(t, 1, '22 × 10', '22', 10, 'done') + listSet(t, 2, '22 × 9', '22', 9, 'done') + listSet(t, 3, '22 × 8', '22', 9, 'next') +
+    `<div style="height: 1px; margin: 4px 6px; background: ${t.border};"></div>` +
+    exTitle(t, 'Élévations latérales', '12–15 reps', menuHref) +
+    listSet(t, 1, '10 × 15', '10', 15, 'done') + listSet(t, 2, '10 × 14', '10', 14, 'now') + listSet(t, 3, '10 × 12', '10', 13, 'next') +
+    smallBtn(t, '+ Série').replace('<button style="', '<button style="align-self: flex-start; '),
+    'flex-shrink: 0; padding: 6px; display: flex; flex-direction: column; gap: 4px;');
+const supersetList = (t, menuHref) =>
+  folded(t, 'Développé couché', '3/3') + supersetCard(t, menuHref) + folded(t, 'Rowing', '0/3');
+
+S['Seance-superset'] = { title: 'Séance · superset', page: 'j9', render: (t) => frame(t, { pad: '4px 16px 16px', main: seanceListe(t, 'Force B — Haut du corps',
+  supersetList(t, file(t, 'Seance-menu-superset')),
+  pad(t, 'Élévations latérales · série 2', `<span style="font-size: 13px; color: ${t.muted};">puis repos</span>`, '10', '14')) }) };
+
+// Menu ⋯ d'un exercice en séance : « Superset avec l'exercice suivant » sous « Remplacer »
+// (« Séparer le superset » quand il en fait déjà partie).
+S['Seance-menu-superset'] = { title: 'Séance · menu ⋯ (superset)', page: 'j9', render: (t) => frame(t, { pad: '4px 16px 16px',
+  main: seanceListe(t, 'Force B — Haut du corps', folded(t, 'Développé couché', '3/3') + folded(t, 'Développé militaire', '2/3') + folded(t, 'Élévations latérales', '0/3') + folded(t, 'Rowing', '0/3'), pad(t, 'Développé militaire · série 3', '', '22', '9')),
+  overlay: sheet(t, 'Options de Développé militaire',
+    `<div><div style="font-size: 22px; line-height: 26px; font-weight: 700;">Développé militaire</div><div style="font-size: 15px; color: ${t.muted};">2 séries faites sur 3</div></div>` +
+    btn.sec(t, `${ic('swap', 20)}Remplacer l'exercice`, '#', 'justify-content: flex-start; padding: 0 16px;') +
+    btn.sec(t, `${ic('link', 20)}Superset avec Élévations latérales`, file(t, 'Seance-superset'), 'justify-content: flex-start; padding: 0 16px;') +
+    `<div style="display: flex; flex-direction: column; gap: 8px;">${lbl(t, 'Variante')}${chips(t, ['Haltères', 'Barre', 'Smith'], [0])}</div>` +
+    `<div style="display: flex; justify-content: space-between; align-items: center;"><a href="#" style="min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 0 4px; font-size: 15px; font-weight: 600; color: ${t.danger}; text-decoration: none;">${ic('trash', 20)}Retirer de la séance</a>${btn.link(t, 'Fermer', file(t, 'Seance-superset'), t.text)}</div>`) }) };
+
+// Programme : les exercices reliés sont joints par un trait à gauche ; le premier n'a pas de repos
+// (on enchaîne), le repos affiché est celui du dernier.
+const ssRows = (t, rows) =>
+  `<div style="position: relative;"><span aria-hidden="true" style="position: absolute; left: 6px; top: 14px; bottom: 14px; width: 3px; border-radius: 2px; background: ${t.text};"></span>${rows}</div>`;
+const progExRowSS = (t, n, sub, sets) =>
+  `<a href="${file(t, 'Programme-exercice-superset')}" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 0 8px 0 16px; text-decoration: none; color: ${t.text}; border-top: 1px solid ${t.border};"><span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 17px; font-weight: 600;">${n}</span><span style="font-size: 13px; color: ${t.muted};">${sub}</span></span><span class="num" style="font-size: 18px; white-space: nowrap;">${sets}</span><span style="display: flex; color: ${t.muted};">${ic('chevR', 20)}</span></a>`;
+const dayCardSS = (t) =>
+  card(t, `<div style="display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 8px 0 16px;"><h2 style="margin: 0; flex-grow: 1; font-size: 20px; line-height: 24px; font-weight: 800; letter-spacing: -0.01em;">Force B — Haut du corps</h2>${pill(t, 'Prochaine')}${iconBtn(t, 'more', 'Options du jour Force B', '#')}</div>` +
+    progExRow(t, DAY_B[0], true) + progExRow(t, DAY_B[1]) +
+    ssRows(t, progExRowSS(t, 'Développé militaire', `Haltères · <span style="font-weight: 600; color: ${t.text};">superset</span>`, '3 × 8–10') +
+      progExRowSS(t, 'Élévations latérales', `Haltères · repos <span class="num" style="font-weight: 500;">1:30</span>`, '3 × 12–15')) +
+    progExRow(t, DAY_B[3]) +
+    `<div style="border-top: 1px solid ${t.border};"><a href="#" style="min-height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 16px; text-decoration: none; color: ${t.text}; font-size: 15px; font-weight: 600;">${ic('plus', 20)}Ajouter un exercice</a></div>`,
+    'flex-shrink: 0; overflow: hidden;');
+const progDetailJ9 = (t) =>
+  header(t, 'Force A/B', '#', 'Retour aux programmes', iconBtn(t, 'more', 'Options du programme', '#'), 24) +
+  card(t, `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 0 16px;"><span style="font-size: 17px;">Programme actif</span><input class="sw" type="checkbox" role="switch" checked></label>`, 'flex-shrink: 0;') +
+  dayCardSS(t) + dayCard(t, 'Force A — Jambes', 'lundi', DAY_A);
+
+S['Programme-superset'] = { title: 'Programme · superset dans un jour', page: 'j9', h: 1240, render: (t) => frame(t, { h: 1240, navActive: 'prog', navLinks: J9NAV(t), main: progDetailJ9(t) }) };
+
+// Panneau de l'exercice : « Superset avec la suivante » ; activé, la ligne Repos disparaît
+// (on enchaîne sans repos, celui du tour est le repos de l'exercice suivant).
+S['Programme-exercice-superset'] = { title: 'Exercice du programme · superset', page: 'j9', render: (t) => frame(t, { navActive: 'prog', navLinks: J9NAV(t), main: progDetailJ9(t),
+  overlay: sheet(t, 'Développé militaire dans Force B',
+    `<div style="font-size: 22px; line-height: 26px; font-weight: 700;">Développé militaire</div>` +
+    `<div style="display: flex; flex-direction: column; gap: 8px;">${lbl(t, 'Variante')}${chips(t, ['Haltères', 'Barre', 'Smith'], [0])}</div>` +
+    `<div style="display: flex; flex-direction: column;">${mini(t, 'Séries', '3', 'Séries')}` +
+    `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px;"><span style="font-size: 17px;">Double progression</span><input class="sw" type="checkbox" role="switch" checked></label>` +
+    mini(t, 'Reps, au moins', '8', 'Reps minimum') + mini(t, 'Reps, au plus', '10', 'Reps maximum') +
+    `<label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px;"><span style="display: flex; flex-direction: column;"><span style="font-size: 17px;">Superset avec la suivante</span><span style="font-size: 13px; color: ${t.muted};">Élévations latérales</span></span><input class="sw" type="checkbox" role="switch" checked></label></div>` +
+    `<div style="display: flex; justify-content: space-between; align-items: center;"><a href="#" style="min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 0 4px; font-size: 15px; font-weight: 600; color: ${t.danger}; text-decoration: none;">${ic('trash', 20)}Retirer du jour</a>${btn.link(t, 'OK', file(t, 'Programme-superset'), t.text)}</div>`) }) };
+
 // ---------- Écriture des fichiers ----------
-const page = (t, title, h, body) => `<!doctype html>
+const page =(t, title, h, body) => `<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -1195,4 +1314,16 @@ writeCanvas('../maquettes-j8/', { title: 'Sportix — Maquettes J8', at: '2026-0
     'j8-import': noteJ8(840, 'Importer REMPLACE tout, sans fusion : fusionner deux historiques créerait des doublons (la même séance deux fois) et des conflits (un programme modifié des deux côtés). Avant de confirmer, on voit la sauvegarde face au téléphone, et combien de séances seraient perdues. Un fichier d’une version plus récente de Sportix est refusé (« mets l’app à jour ») ; une sauvegarde plus ancienne passe par les mêmes migrations que la base.', 'orange'),
     'j8-rappel': noteJ8(1260, 'Rappel (dernière planche, retouche du 25/09/2026) : pas de ligne sur l’accueil. Une pastille sur l’onglet Réglages quand la dernière sauvegarde date de plus de 30 jours et qu’il y a eu des séances depuis (jamais sauvegardé : après 10 séances). Elle disparaît dès qu’on exporte.', 'red'),
     'j8-stockage': noteJ8(1680, 'Stockage protégé : l’app demande au navigateur de ne jamais effacer ses données (déjà fait depuis le J2), sans rien afficher (ligne retirée dans le canvas le 25/09/2026).'),
+  } });
+
+// ===== Canvas J9 (finitions) : son propre dossier, son propre lien =====
+MAIN = 'Seance-superset';
+const J9_ORDER = ['Reglages-J9', 'Seance-echauffement', 'Seance-superset', 'Seance-menu-superset', 'Programme-superset', 'Programme-exercice-superset'];
+const noteJ9 = (y, text, color) => ({ x: (J9_ORDER.length + 1) * 470, y, w: 400, page: 'j9', ...(color ? { color } : {}), text });
+writeCanvas('../maquettes-j9/', { title: 'Sportix — Maquettes J9', at: '2026-09-28T12:00:00Z',
+  pages: [{ id: 'j9', name: 'J9 · Finitions', order: J9_ORDER }], launch: { view: 'canvas', page: 'j9' }, notesCol: true, extraNotes: {
+    'j9-theme': noteJ9(0, 'Apparence (Réglages) : Auto suit le réglage clair/sombre de l’iPhone, comme aujourd’hui ; Clair ou Sombre l’imposent. Auto par défaut.', 'teal'),
+    'j9-echauffement': noteJ9(420, 'Échauffement, ajouté à la main : « + Échauffement » ajoute une série « É » avant les séries de travail (la première à la moitié de la charge de travail, 10 reps ; les suivantes copient la précédente). Pas de repos après une série d’échauffement. Elles ne comptent ni dans le volume, ni dans les records, ni dans la « dernière fois » et la double progression, ni dans les stats.', 'orange'),
+    'j9-superset': noteJ9(840, 'Superset : on relie un exercice au suivant (menu ⋯ en séance, ou panneau de l’exercice dans le programme). En séance, les séries alternent : Développé militaire 1 → Élévations 1 → repos → Développé militaire 2… Pas de repos entre les deux ; le repos du tour est celui du dernier exercice. « puis repos » sur le pavé dit si un repos suit. Trois exercices et plus se relient de la même façon.', 'purple'),
+    'j9-reste': noteJ9(1260, 'Retirés du J9 (28/09/2026) : kg/lb, et la bannière « nouvelle version » (l’app se met déjà à jour toute seule au retour dans l’app, sans rien perdre).'),
   } });

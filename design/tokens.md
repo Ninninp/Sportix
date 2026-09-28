@@ -2,7 +2,7 @@
 
 Source de vérité des couleurs, de la typographie, des espacements, des arrondis et des mouvements. **Toute couleur change d'abord ici**, puis dans `src/index.css` et le canvas.
 
-Deux thèmes, choisis automatiquement selon le réglage de l'iPhone (`prefers-color-scheme`) :
+Deux thèmes, choisis automatiquement selon le réglage de l'iPhone (`prefers-color-scheme`), ou imposés par le réglage « Apparence » de l'app (J9 : Auto / Clair / Sombre, attribut `data-theme` sur `<html>`) :
 - **clair** = « Énergie corrigée » (crème, encre, orange) ;
 - **sombre** = « Nuit + Énergie » (quasi noir, citron, orange).
 
@@ -148,7 +148,10 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
 ```css
 @import "tailwindcss";
 
-/* Valeurs du thème clair, remplacées par celles du thème sombre si l'iPhone est en mode sombre */
+/* Valeurs du thème clair, remplacées par celles du thème sombre si l'iPhone est en mode sombre.
+   Réglage « Apparence » (J9) : `data-theme="clair"` ou `"sombre"` sur <html> impose un thème ;
+   sans l'attribut (Auto), c'est le réglage de l'iPhone qui décide. Le bloc sombre est donc écrit
+   deux fois (dans la media query, et pour « Sombre ») : les modifier ensemble. */
 :root {
   color-scheme: light dark;
   --sx-bg: #FFF4E8; --sx-surface: #FFFFFF; --sx-surface-2: #FFE8D2;
@@ -165,7 +168,7 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
   --sx-on-block: #1A1030; --sx-on-block-muted: #5E5470;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="clair"]) {
     --sx-bg: #0E0F0C; --sx-surface: #181A16; --sx-surface-2: #23261F;
     --sx-border: #2E322B; --sx-border-strong: #6B6F66;
     --sx-text: #F2F3EE; --sx-text-muted: #A3A79C; --sx-text-faint: #8A8E83;
@@ -178,6 +181,13 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
     --sx-block-bleu: #8DB1E6; --sx-block-violet: #B7A0E3; --sx-block-rose: #E39BB8;
     --sx-on-block: #0E0F0C; --sx-on-block-muted: #3E4138;
   }
+}
+:root[data-theme="sombre"] {
+  color-scheme: dark;
+  /* … les mêmes valeurs que le bloc sombre ci-dessus … */
+}
+:root[data-theme="clair"] {
+  color-scheme: light;
 }
 
 /* « inline » : Tailwind génère bg-surface, text-muted… qui lisent les variables ci-dessus */

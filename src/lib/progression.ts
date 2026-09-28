@@ -43,6 +43,19 @@ export function stepWeight(
   return Math.max(minWeight(variant), weight + direction * weightStep(variant, steps))
 }
 
+/** Reps proposées pour une série d'échauffement (J9). */
+export const WARMUP_REPS = 10
+
+/**
+ * Charge proposée pour le premier échauffement (J9) : la moitié de la charge de travail, arrondie
+ * au pas de la variante, jamais sous le minimum (barre à vide). Ce n'est qu'un point de départ :
+ * l'échauffement se règle à la main, comme toute série.
+ */
+export function warmupWeight(workWeight: number, variant: Variant | null, steps: WeightSteps = WEIGHT_STEPS): number {
+  const step = weightStep(variant, steps)
+  return Math.max(minWeight(variant), Math.round(workWeight / 2 / step) * step)
+}
+
 /** Ce qu'on sait de la dernière fois, pour un exercice et une variante donnés. */
 export type LastPerformance = {
   sessionId: string
@@ -53,13 +66,16 @@ export type LastPerformance = {
  * Retrouve la dernière séance où cet exercice (et cette variante) a été travaillé.
  * Les séances de deload sont sautées (parcours.md § 2.1 et § 3.6) : elles ne déclenchent pas de
  * hausse de charge, et après un deload on reprend les charges d'avant, pas les charges allégées.
+ * Les échauffements (J9) sont ignorés : seules les séries de travail sont reprises.
  */
 export function lastPerformance(
   history: SessionSet[],
   exerciseId: string,
   variant: Variant | null,
 ): LastPerformance | null {
-  const done = history.filter((s) => s.exerciseId === exerciseId && s.variant === variant && s.done && !s.deload)
+  const done = history.filter(
+    (s) => s.exerciseId === exerciseId && s.variant === variant && s.done && !s.deload && !s.warmup,
+  )
   if (done.length === 0) return null
   // La série faite le plus récemment désigne la séance à reprendre.
   const latest = done.reduce((a, b) => ((b.doneAt ?? 0) > (a.doneAt ?? 0) ? b : a))

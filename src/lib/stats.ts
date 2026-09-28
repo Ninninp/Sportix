@@ -133,7 +133,7 @@ export type Point = {
   best: SessionSet
 }
 
-const counts = (s: SessionSet) => s.done && s.reps >= 1
+const counts = (s: SessionSet) => s.done && s.reps >= 1 && !s.warmup
 
 /** Nombre d'exercices travaillés depuis `from` (« 4 exercices suivis »), sans rien calculer d'autre. */
 export function countExercises(sessions: Session[], sets: SessionSet[], from: number): number {

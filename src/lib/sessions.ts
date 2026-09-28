@@ -48,14 +48,34 @@ export type SessionSet = {
    * `lastPerformance` puisse l'écarter sans relire les séances).
    */
   deload?: boolean
+  /**
+   * Série d'échauffement (J9), ajoutée à la main avant les séries de travail. Elle ne compte nulle
+   * part : ni volume, ni records, ni « dernière fois », ni stats, ni progression de la séance.
+   * Son `order` est son rang parmi les échauffements de l'exercice (1, 2…).
+   */
+  warmup?: boolean
+  /**
+   * Superset (J9) : cet exercice est relié au suivant de la séance (porté par toutes ses séries).
+   * Les exercices reliés alternent (A1 → B1 → repos → A2…), voir `sessionSequence`.
+   */
+  supersetNext?: boolean
 }
+
+/** Série de travail : tout sauf l'échauffement. */
+export const isWorkSet = (s: SessionSet) => !s.warmup
 
 export type ExerciseBlock = {
   exerciseId: string
   variant: Variant | null
   exerciseOrder: number
+  /** Échauffements d'abord (dans leur ordre), puis séries de travail. */
   sets: SessionSet[]
+  /** Séries de travail faites (les échauffements ne comptent pas). */
   doneCount: number
+  /** Nombre de séries de travail. */
+  workCount: number
+  /** Relié à l'exercice suivant de la séance (superset). */
+  supersetNext: boolean
 }
 
 /** Regroupe les séries par exercice, dans l'ordre d'ajout, séries triées. */
@@ -69,37 +89,97 @@ export function groupSetsByExercise(sets: SessionSet[]): ExerciseBlock[] {
       exerciseOrder: set.exerciseOrder,
       sets: [],
       doneCount: 0,
+      workCount: 0,
+      supersetNext: false,
     }
     block.sets.push(set)
     blocks.set(key, block)
   }
   return [...blocks.values()]
-    .map((b) => ({
-      ...b,
-      sets: b.sets.sort((x, y) => x.order - y.order),
-      doneCount: b.sets.filter((s) => s.done).length,
-    }))
+    .map((b) => {
+      const work = b.sets.filter(isWorkSet)
+      return {
+        ...b,
+        sets: b.sets.sort((x, y) => Number(isWorkSet(x)) - Number(isWorkSet(y)) || x.order - y.order),
+        doneCount: work.filter((s) => s.done).length,
+        workCount: work.length,
+        supersetNext: b.sets.some((s) => s.supersetNext),
+      }
+    })
     .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+}
+
+/**
+ * Exercices de la séance rangés par superset : chaque groupe est un exercice seul, ou plusieurs
+ * exercices qui se suivent et sont reliés (`supersetNext`). Le dernier exercice de la séance ne
+ * peut être relié à rien : son `supersetNext` est ignoré.
+ */
+export function supersetGroups(blocks: ExerciseBlock[]): ExerciseBlock[][] {
+  const groups: ExerciseBlock[][] = []
+  blocks.forEach((b, i) => {
+    const previous = blocks[i - 1]
+    if (previous?.supersetNext && groups.length > 0) groups[groups.length - 1].push(b)
+    else groups.push([b])
+  })
+  return groups
+}
+
+/**
+ * Les séries d'un groupe dans l'ordre où on les fait : les échauffements de chaque exercice, puis
+ * les séries de travail en alternant (A1, B1, A2, B2…). Un exercice qui a plus de séries que les
+ * autres finit seul.
+ */
+export function groupSequence(group: ExerciseBlock[]): SessionSet[] {
+  const warmups = group.flatMap((b) => b.sets.filter((s) => s.warmup))
+  const work = group.map((b) => b.sets.filter(isWorkSet))
+  const rounds = Math.max(0, ...work.map((w) => w.length))
+  const alternated = Array.from({ length: rounds }, (_, r) => work.flatMap((w) => (w[r] ? [w[r]] : []))).flat()
+  return [...warmups, ...alternated]
+}
+
+/** Toutes les séries de la séance dans l'ordre où on les fait (supersets alternés). */
+export function sessionSequence(sets: SessionSet[]): SessionSet[] {
+  return supersetGroups(groupSetsByExercise(sets)).flatMap(groupSequence)
 }
 
 /** La première série non faite de la séance (celle que le pavé de saisie modifie). */
 export function currentSet(sets: SessionSet[]): SessionSet | undefined {
-  return groupSetsByExercise(sets)
-    .flatMap((b) => b.sets)
-    .find((s) => !s.done)
+  return sessionSequence(sets).find((s) => !s.done)
 }
 
-export function sessionProgress(sets: SessionSet[]): { done: number; total: number } {
-  return { done: sets.filter((s) => s.done).length, total: sets.length }
+/** Le groupe (superset, ou exercice seul) qui contient cet exercice. */
+export function groupOf(blocks: ExerciseBlock[], exerciseOrder: number): ExerciseBlock[] | undefined {
+  return supersetGroups(blocks).find((g) => g.some((b) => b.exerciseOrder === exerciseOrder))
 }
 
 /**
- * Volume total soulevé (kg) : somme de charge × reps des séries faites.
+ * Après avoir validé `set`, faut-il un repos ? Pas après un échauffement ; pas au milieu d'un tour
+ * de superset : tant qu'un autre exercice du groupe a encore sa série du même tour à faire, on
+ * enchaîne. Le repos vient donc après le dernier exercice du tour.
+ */
+export function restFollows(sets: SessionSet[], set: SessionSet): boolean {
+  if (set.warmup) return false
+  const blocks = groupSetsByExercise(sets)
+  const group = groupOf(blocks, set.exerciseOrder)
+  const own = group?.find((b) => b.exerciseOrder === set.exerciseOrder)
+  if (!group || !own) return true
+  const round = own.sets.filter(isWorkSet).findIndex((s) => s.id === set.id)
+  return !group.some((b) => b !== own && b.sets.filter(isWorkSet)[round]?.done === false)
+}
+
+/** Progression de la séance : séries de travail faites / prévues. */
+export function sessionProgress(sets: SessionSet[]): { done: number; total: number } {
+  const work = sets.filter(isWorkSet)
+  return { done: work.filter((s) => s.done).length, total: work.length }
+}
+
+/**
+ * Volume total soulevé (kg) : somme de charge × reps des séries faites (hors échauffement).
  * Haltères : la charge saisie est celle d'un haltère, le volume compte donc double.
  */
 export function sessionVolume(sets: SessionSet[]): number {
   return sets
-    .filter((s) => s.done)
+    .filter((s) => s.done && isWorkSet(s))
     .reduce((total, s) => total + s.weight * s.reps * (s.variant === 'halteres' ? 2 : 1), 0)
 }
 
@@ -144,7 +224,7 @@ export function sessionSummary(session: Session, sets: SessionSet[], now = Date.
   return {
     durationMs: sessionDuration(session, now),
     volume: sessionVolume(sets),
-    setCount: sets.filter((s) => s.done).length,
+    setCount: sets.filter((s) => s.done && isWorkSet(s)).length,
     exerciseCount: groupSetsByExercise(sets).length,
   }
 }

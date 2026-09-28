@@ -12,6 +12,8 @@ export type Record_ = {
 }
 
 const key = (s: SessionSet) => `${s.exerciseId}|${s.variant ?? ''}`
+/** Série qui peut compter pour un record : faite, au moins 1 rep, pas un échauffement (J9). */
+const counts = (s: SessionSet) => s.done && s.reps >= 1 && !s.warmup
 /** Valeur comparée : la charge, ou les reps quand l'exercice se fait sans charge. */
 const value = (s: SessionSet) => (s.weight > 0 ? s.weight : s.reps)
 
@@ -22,13 +24,13 @@ const value = (s: SessionSet) => (s.weight > 0 ? s.weight : s.reps)
 export function findRecords(sets: SessionSet[], history: SessionSet[]): Record_[] {
   const best = new Map<string, number>()
   for (const s of history) {
-    if (!s.done || s.reps < 1) continue
+    if (!counts(s)) continue
     best.set(key(s), Math.max(best.get(key(s)) ?? 0, value(s)))
   }
 
   const bySession = new Map<string, SessionSet>()
   for (const s of sets) {
-    if (!s.done || s.reps < 1) continue
+    if (!counts(s)) continue
     const current = bySession.get(key(s))
     if (!current || value(s) > value(current)) bySession.set(key(s), s)
   }
@@ -53,7 +55,7 @@ export function sessionsWithRecords(
   const withRecords = new Set<string>()
 
   for (const session of [...sessions].sort((a, b) => a.startedAt - b.startedAt)) {
-    const sets = allSets.filter((s) => s.sessionId === session.id && s.done && s.reps >= 1)
+    const sets = allSets.filter((s) => s.sessionId === session.id && counts(s))
     for (const s of sets) {
       const previous = best.get(key(s))
       if (previous !== undefined && value(s) > previous) withRecords.add(session.id)

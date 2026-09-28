@@ -1,0 +1,193 @@
+{
+  "v": 3,
+  "attachments": {},
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-28T12:00:00Z"
+  },
+  "title": "Sportix — Maquettes J9",
+  "launch": {
+    "view": "canvas",
+    "page": "j9"
+  },
+  "pages": [
+    {
+      "id": "j9",
+      "name": "J9 · Finitions"
+    }
+  ],
+  "boards": {
+    "S-Reglages-J9.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 1240,
+      "title": "Réglages · Apparence (la page défile) — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "S-Seance-echauffement.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · échauffement — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "Main.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · superset — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "S-Seance-menu-superset.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · menu ⋯ (superset) — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "S-Programme-superset.dc.html": {
+      "x": 1880,
+      "y": 0,
+      "w": 390,
+      "h": 1240,
+      "title": "Programme · superset dans un jour — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "S-Programme-exercice-superset.dc.html": {
+      "x": 2350,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Exercice du programme · superset — sombre",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Reglages-J9.dc.html": {
+      "x": 0,
+      "y": 1660,
+      "w": 390,
+      "h": 1240,
+      "title": "Réglages · Apparence (la page défile) — clair",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Seance-echauffement.dc.html": {
+      "x": 470,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · échauffement — clair",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Seance-superset.dc.html": {
+      "x": 940,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · superset — clair",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Seance-menu-superset.dc.html": {
+      "x": 1410,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Séance · menu ⋯ (superset) — clair",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Programme-superset.dc.html": {
+      "x": 1880,
+      "y": 1660,
+      "w": 390,
+      "h": 1240,
+      "title": "Programme · superset dans un jour — clair",
+      "page": "j9",
+      "is_interactive": true
+    },
+    "C-Programme-exercice-superset.dc.html": {
+      "x": 2350,
+      "y": 1660,
+      "w": 390,
+      "h": 844,
+      "title": "Exercice du programme · superset — clair",
+      "page": "j9",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "S-Reglages-J9.dc.html",
+    "S-Seance-echauffement.dc.html",
+    "Main.dc.html",
+    "S-Seance-menu-superset.dc.html",
+    "S-Programme-superset.dc.html",
+    "S-Programme-exercice-superset.dc.html",
+    "C-Reglages-J9.dc.html",
+    "C-Seance-echauffement.dc.html",
+    "C-Seance-superset.dc.html",
+    "C-Seance-menu-superset.dc.html",
+    "C-Programme-superset.dc.html",
+    "C-Programme-exercice-superset.dc.html"
+  ],
+  "notes": {
+    "j9-S": {
+      "x": 0,
+      "y": -300,
+      "text": "J9 · Finitions — thème sombre",
+      "kind": "title1",
+      "page": "j9",
+      "maxW": 3210
+    },
+    "j9-C": {
+      "x": 0,
+      "y": 1360,
+      "text": "J9 · Finitions — thème clair",
+      "kind": "title1",
+      "page": "j9",
+      "maxW": 3210
+    },
+    "j9-theme": {
+      "x": 3290,
+      "y": 0,
+      "w": 400,
+      "page": "j9",
+      "color": "teal",
+      "text": "Apparence (Réglages) : Auto suit le réglage clair/sombre de l’iPhone, comme aujourd’hui ; Clair ou Sombre l’imposent. Auto par défaut."
+    },
+    "j9-echauffement": {
+      "x": 3290,
+      "y": 420,
+      "w": 400,
+      "page": "j9",
+      "color": "orange",
+      "text": "Échauffement, ajouté à la main : « + Échauffement » ajoute une série « É » avant les séries de travail (la première à la moitié de la charge de travail, 10 reps ; les suivantes copient la précédente). Pas de repos après une série d’échauffement. Elles ne comptent ni dans le volume, ni dans les records, ni dans la « dernière fois » et la double progression, ni dans les stats."
+    },
+    "j9-superset": {
+      "x": 3290,
+      "y": 840,
+      "w": 400,
+      "page": "j9",
+      "color": "purple",
+      "text": "Superset : on relie un exercice au suivant (menu ⋯ en séance, ou panneau de l’exercice dans le programme). En séance, les séries alternent : Développé militaire 1 → Élévations 1 → repos → Développé militaire 2… Pas de repos entre les deux ; le repos du tour est celui du dernier exercice. « puis repos » sur le pavé dit si un repos suit. Trois exercices et plus se relient de la même façon."
+    },
+    "j9-reste": {
+      "x": 3290,
+      "y": 1260,
+      "w": 400,
+      "page": "j9",
+      "text": "Retirés du J9 (28/09/2026) : kg/lb, et la bannière « nouvelle version » (l’app se met déjà à jour toute seule au retour dans l’app, sans rien perdre)."
+    }
+  },
+  "designSystems": []
+}

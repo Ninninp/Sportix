@@ -2,7 +2,8 @@
 // d'installation automatique, il faut passer par Partager) disparaît quand l'app est installée.
 // J4 : repos par défaut, son de fin de repos, pas de charge des boutons − / + par variante.
 // Chaque changement est enregistré aussitôt (pas de bouton « Enregistrer »).
-// Unité (kg / lb) et RPE, présents sur la maquette, arriveront avec les jalons qui les utilisent.
+// Unité (kg / lb) : abandonnée au J9 (28/09/2026). RPE : pas prévu pour l'instant.
+// J9 : « Apparence » (Auto / Clair / Sombre), appliquée par src/features/settings/theme.ts.
 // J7 : les objectifs des Stats (poids cible, séances par semaine), le même panneau que dans les Stats.
 // J8 : la section « Sauvegarde » en tête (exporter, importer), voir src/features/backup/.
 import { useState, type ReactNode } from 'react'
@@ -11,6 +12,7 @@ import Card from '../../components/Card.tsx'
 import ChipGroup from '../../components/ChipGroup.tsx'
 import ListRow from '../../components/ListRow.tsx'
 import NumberStepper from '../../components/NumberStepper.tsx'
+import SegmentedControl from '../../components/SegmentedControl.tsx'
 import Sheet from '../../components/Sheet.tsx'
 import Switch from '../../components/Switch.tsx'
 import { IconChevronDroite, IconLivre, IconPartager } from '../../components/icons.tsx'
@@ -18,7 +20,7 @@ import { updateSettings } from '../../db/settings.ts'
 import { VARIANTS, VARIANT_LABELS, type Variant } from '../../lib/exercises.ts'
 import { formatRest } from '../../lib/rest.ts'
 import { formatNumber } from '../../lib/sessions.ts'
-import { REST_MIN, WEIGHT_STEP_CHOICES, stepRest } from '../../lib/settings.ts'
+import { REST_MIN, THEME_LABELS, WEIGHT_STEP_CHOICES, stepRest, type Theme } from '../../lib/settings.ts'
 import { useActiveExercises } from '../exercises/useExercises.ts'
 import BackupSection from '../backup/BackupSection.tsx'
 import GoalsSheet from '../stats/GoalsSheet.tsx'
@@ -44,7 +46,9 @@ function SettingButton({ label, value, onClick }: { label: ReactNode; value: str
   )
 }
 
-const sectionTitle = 'text-caption font-semibold tracking-[0.06em] text-muted uppercase'
+const THEMES: Theme[] = ['auto', 'clair', 'sombre']
+
+const sectionTitle ='text-caption font-semibold tracking-[0.06em] text-muted uppercase'
 
 function SettingsPage() {
   const installed = isStandalone(window)
@@ -103,6 +107,16 @@ function SettingsPage() {
             onChange={(restSound) => void updateSettings({ restSound })}
           />
         </Card>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className={sectionTitle}>Apparence</h2>
+        <SegmentedControl
+          label="Apparence"
+          options={THEMES.map((value) => ({ value, label: THEME_LABELS[value] }))}
+          value={settings.theme}
+          onChange={(theme) => void updateSettings({ theme })}
+        />
       </section>
 
       <section className="flex flex-col gap-2">

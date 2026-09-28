@@ -3,6 +3,11 @@
 import { BODY_WEIGHT_MAX, BODY_WEIGHT_MIN } from './bodyWeight.ts'
 import { WEIGHT_STEPS, type WeightSteps } from './progression.ts'
 
+/** Réglage « Apparence » (J9) : `auto` suit le réglage clair/sombre de l'iPhone. */
+export type Theme = 'auto' | 'clair' | 'sombre'
+
+export const THEME_LABELS: Record<Theme, string> = { auto: 'Auto', clair: 'Clair', sombre: 'Sombre' }
+
 export type Settings = {
   /** Repos par défaut entre deux séries, en secondes (au J5, un programme pourra le fixer par exercice). */
   restSeconds: number
@@ -17,12 +22,15 @@ export type Settings = {
   goalWeeklySessions?: number
   /** Date du dernier export réussi (J8), pour « Dernière sauvegarde » et la pastille de rappel. */
   lastBackupAt?: number
+  /** Thème de l'app (J9). */
+  theme: Theme
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   restSeconds: 120, // 2:00, valeur des maquettes D5
   restSound: true,
   weightSteps: WEIGHT_STEPS,
+  theme: 'auto',
 }
 
 /** Bornes et pas du réglage « Repos par défaut » : de 0:15 à 10:00, de 15 s en 15 s. */

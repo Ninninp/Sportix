@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import BottomNav from './components/BottomNav.tsx'
 import SessionBar from './features/sessions/SessionBar.tsx'
@@ -5,6 +6,7 @@ import { useActiveSession } from './features/sessions/useSession.ts'
 import { useSettings } from './features/settings/useSettings.ts'
 import { useRestAlarm } from './features/timer/useRestAlarm.ts'
 import { useBackupReminder } from './features/backup/useBackupReminder.ts'
+import { applyTheme } from './features/settings/theme.ts'
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,
 // la barre d'onglets reste en bas — sauf pendant une séance, où l'écran est plein
@@ -22,6 +24,11 @@ function App() {
   const settings = useSettings()
   useRestAlarm(active?.rest, settings?.restSound ?? true)
   const remindBackup = useBackupReminder(settings)
+  // Apparence (J9) : suit le réglage en base, y compris après l'import d'une sauvegarde
+  const theme = settings?.theme
+  useEffect(() => {
+    if (theme) applyTheme(theme)
+  }, [theme])
 
   return (
     <div className="flex h-dvh flex-col bg-bg text-text">

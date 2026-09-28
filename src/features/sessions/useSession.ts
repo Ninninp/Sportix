@@ -29,9 +29,12 @@ export function useFinishedSessions() {
   return useLiveQuery(() => listFinishedSessions(), [])
 }
 
-/** Toutes les séries enregistrées (historique complet, pour les résumés et les records). */
+/**
+ * Toutes les séries de travail enregistrées (historique complet, pour les résumés, les records et
+ * les stats). Les échauffements (J9) sont écartés ici une fois pour toutes : ils ne comptent nulle part.
+ */
 export function useAllSets() {
-  return useLiveQuery(() => db.sets.toArray(), [])
+  return useLiveQuery(async () => (await db.sets.toArray()).filter((s) => !s.warmup), [])
 }
 
 /** Tous les exercices par identifiant (y compris supprimés : l'historique doit rester lisible). */
