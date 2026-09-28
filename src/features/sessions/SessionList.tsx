@@ -42,6 +42,12 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
   useEffect(() => {
     openRef.current?.scrollIntoView({ block: 'nearest' })
   }, [openOrder])
+  // …et la série en cours aussi : dans un superset, la carte est haute et la série de l'autre
+  // exercice peut être sous le pavé de saisie
+  const nowRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    nowRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [editingId])
 
   const nameOf = (b: ExerciseBlock) => exercises.get(b.exerciseId)?.name ?? 'Exercice'
 
@@ -86,6 +92,7 @@ function SessionList({ blocks, openOrder, editingId, exercises, history, onOpen,
             return (
               <div
                 key={s.id}
+                ref={state === 'now' ? nowRef : undefined}
                 role="row"
                 aria-label={`${label}${state === 'done' ? ', faite' : state === 'now' ? ', en cours' : ''}`}
                 aria-current={state === 'now' ? 'true' : undefined}

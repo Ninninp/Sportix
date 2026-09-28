@@ -232,11 +232,12 @@ function SessionPage() {
         <>
           <Card className="flex shrink-0 flex-col gap-2 px-3 pt-2.5 pb-3">
             <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-body font-bold">
+              <span className="max-w-full shrink-0 truncate text-body font-bold">
                 {exercise?.name ?? 'Exercice'} · {editing.warmup ? 'échauffement' : `série ${editing.order}`}
               </span>
-              <span className="flex shrink-0 items-center gap-2">
-                {followLabel && <span className="text-small text-muted">{followLabel}</span>}
+              {/* L'annonce de la suite cède la place au titre quand les noms sont longs */}
+              <span className="flex min-w-0 items-center gap-2">
+                {followLabel && <span className="truncate text-small text-muted">{followLabel}</span>}
                 {/* Pas de proposition de charge quand la double progression est désactivée (programme),
                     ni sur un échauffement */}
                 {badge && editing.progression !== false && !editing.warmup && <BadgeIncrease>{badge}</BadgeIncrease>}
