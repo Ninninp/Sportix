@@ -168,7 +168,8 @@
 
 /* J10 — animations de l'app (durées et courbes de tokens.md § 4). Les entrées durent
    duration-slow (320 ms) en ease-out, les sorties sont plus brèves (200 ms) en ease-in : ce qui part
-   ne doit pas faire attendre. Un élément qui apparaît avec un décalage (`animation-delay`, posé par
+   ne doit pas faire attendre. Exception : les panneaux du bas entrent et sortent en 200 ms, l'une
+   des courbes étant le miroir exact de l'autre (Sheet.tsx). Un élément qui apparaît avec un décalage (`animation-delay`, posé par
    l'écran) garde son état de départ en attendant son tour (`both`). */
 @keyframes sx-apparaitre {
   from {
@@ -246,6 +247,34 @@
     opacity: 0;
     transform: translateX(-48px);
   }
+}
+/* Pages : le glissement et le fondu sont deux animations séparées (courbes différentes), pour que
+   le fondu enchaîné soit exact : la nouvelle page monte de 0 à 1, l'ancienne descend de 1 à 0 avec
+   la même durée et la même courbe (PageStage.tsx) */
+@keyframes sx-glisse-droite {
+  from {
+    transform: translateX(48px);
+  }
+}
+@keyframes sx-glisse-gauche {
+  from {
+    transform: translateX(-48px);
+  }
+}
+@keyframes sx-deplace-gauche {
+  to {
+    transform: translateX(-28px);
+  }
+}
+@keyframes sx-deplace-droite {
+  to {
+    transform: translateX(28px);
+  }
+}
+/* La copie de l'ancienne page est une image figée : rien ne bouge à l'intérieur */
+.sx-fantome * {
+  animation: none !important;
+  transition: none !important;
 }
 /* Sortie de l'ancien mois du calendrier, avant l'arrivée du nouveau */
 @keyframes sx-sort-gauche {

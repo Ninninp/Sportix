@@ -1,8 +1,10 @@
 // Panneau qui monte du bas de l'écran, par-dessus la page (menu, confirmation…).
 // Un voile sombre couvre le reste : le toucher ferme le panneau, tout comme la touche Échap.
 // Le focus est placé dans le panneau à l'ouverture (clavier et lecteurs d'écran).
-// J10 : il glisse depuis le bas (320 ms, ease-out) et redescend à la fermeture (200 ms, ease-in)
-// avant de quitter la page. Il doit la quitter pour de bon : même invisible, un voile `fixed`
+// J10 : il glisse depuis le bas et redescend à la fermeture. L'entrée est la sortie passée à
+// l'envers : même durée (200 ms) et courbe symétrique (ease-out `0.16, 1, 0.3, 1` face à ease-in
+// `0.7, 0, 0.84, 0`, l'une est le miroir exact de l'autre). À la fermeture il reste affiché le temps
+// de sa sortie, puis quitte la page. Il doit la quitter pour de bon : même invisible, un voile `fixed`
 // qui couvre le haut de l'écran colore la barre d'état d'iOS (leçon du J4).
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { EXIT_MS, prefersReducedMotion } from '../features/motion/useMotion.ts'
@@ -56,7 +58,7 @@ function Sheet({ open, onClose, label, children }: Props) {
         tabIndex={-1}
         onKeyDown={(e) => e.key === 'Escape' && onClose()}
         className={`relative flex flex-col gap-4 rounded-t-lg bg-surface px-4 pt-2 pb-[calc(env(safe-area-inset-bottom)+16px)] text-text shadow-[0_-8px_24px_rgb(0_0_0/0.25)] outline-none ${
-          open ? 'animate-[sx-panneau-entre_320ms_var(--ease-out)]' : 'animate-[sx-panneau-sort_200ms_var(--ease-in)_forwards]'
+          open ? 'animate-[sx-panneau-entre_200ms_var(--ease-out)]' : 'animate-[sx-panneau-sort_200ms_var(--ease-in)_forwards]'
         }`}
       >
         <span aria-hidden="true" className="h-[5px] w-9 self-center rounded-full bg-border-strong" />
