@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import BottomNav from './components/BottomNav.tsx'
 import SessionBar from './features/sessions/SessionBar.tsx'
@@ -7,6 +7,15 @@ import { useSettings } from './features/settings/useSettings.ts'
 import { useRestAlarm } from './features/timer/useRestAlarm.ts'
 import { useBackupReminder } from './features/backup/useBackupReminder.ts'
 import { applyTheme } from './features/settings/theme.ts'
+import { pageAnimation, type PageAnimation } from './lib/motion.ts'
+
+/** Entrée de la page selon d'où l'on vient (J10) : durées de tokens.md. */
+const PAGE_ANIMATIONS: Record<PageAnimation, string> = {
+  seance: 'animate-[sx-seance-monte_320ms_var(--ease-out)]',
+  droite: 'animate-[sx-page-droite_260ms_var(--ease-out)]',
+  gauche: 'animate-[sx-page-gauche_260ms_var(--ease-out)]',
+  fondu: 'animate-[sx-fondu_200ms_var(--ease-out)]',
+}
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,
 // la barre d'onglets reste en bas — sauf pendant une séance, où l'écran est plein
@@ -19,6 +28,9 @@ import { applyTheme } from './features/settings/theme.ts'
 function App() {
   const { pathname } = useLocation()
   const inSession = pathname.startsWith('/seance')
+  // Adresse précédente et animation d'entrée de la page affichée, recalculées quand l'adresse change
+  const [page, setPage] = useState<{ path: string; animation: PageAnimation | null }>({ path: pathname, animation: null })
+  if (page.path !== pathname) setPage({ path: pathname, animation: pageAnimation(page.path, pathname) })
   const fullScreen = inSession || /^\/calendrier\/(nouveau|[^/]+\/modifier)$/.test(pathname)
   const active = useActiveSession()
   const settings = useSettings()
@@ -31,18 +43,20 @@ function App() {
   }, [theme])
 
   return (
-    <div className="flex h-dvh flex-col bg-bg text-text">
+    // overflow-x-clip : une page qui glisse depuis le côté ne fait jamais glisser tout l'écran
+    <div className="flex h-dvh flex-col overflow-x-clip bg-bg text-text">
       {/* overflow-x-hidden : la page ne glisse jamais de gauche à droite, même si un élément dépasse
           (le champ date de Safari iOS est plus large que prévu). Les lignes de pastilles qui défilent
           à l'horizontale ont leur propre défilement, elles ne sont pas concernées. */}
-      {/* J10 : le contenu change de clé en entrant dans la séance (/seance, choix d'exercice, récap) :
-          il monte depuis le bas une seule fois, et pas à chaque écran de la séance. `data-seance` sert
-          à « Réduire » (SessionHeader), qui le fait redescendre avant de quitter la séance. */}
+      {/* J10 : une page neuve à chaque adresse (clé), qui arrive selon d'où l'on vient
+          (`pageAnimation`) : la séance monte, un niveau plus bas glisse depuis la droite, un niveau
+          plus haut depuis la gauche, un autre onglet en fondu. `data-seance` sert à « Réduire »
+          (SessionHeader), qui fait redescendre la séance avant de la quitter. */}
       <div
-        key={inSession ? 'seance' : 'app'}
+        key={pathname}
         data-seance={inSession ? '' : undefined}
         className={`flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)] ${
-          inSession ? 'animate-[sx-seance-monte_320ms_var(--ease-out)]' : ''
+          page.animation ? PAGE_ANIMATIONS[page.animation] : ''
         }`}
       >
         <Outlet />

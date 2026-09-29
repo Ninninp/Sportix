@@ -9,6 +9,7 @@ import { startSession } from '../../db/sessions.ts'
 import { sessionsWithRecords } from '../../lib/records.ts'
 import { describeSessionExercises, formatWeight, sessionSummary } from '../../lib/sessions.ts'
 import { formatHoursMinutes } from '../../lib/week.ts'
+import { staggerDelay } from '../../lib/motion.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from './useSession.ts'
 
 function HistoryPage() {
@@ -51,8 +52,9 @@ function HistoryPage() {
         </>
       ) : (
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
-          {[...byMonth].map(([month, list]) => (
-            <section key={month} className="flex flex-col gap-1.5">
+          {[...byMonth].map(([month, list], index) => (
+            // J10 : les mois arrivent l'un après l'autre
+            <section key={month} className="sx-apparaitre flex flex-col gap-1.5" style={{ animationDelay: `${staggerDelay(index)}ms` }}>
               <h2 className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{month}</h2>
               <Card className="divide-y divide-border overflow-hidden">
                 {list.map((s) => {

@@ -46,6 +46,12 @@ function CalendarPage() {
   const now = useNowOnResume()
   // Mois affiché : celui d'aujourd'hui au départ (état de l'écran, pas en base).
   const [month, setMonth] = useState(() => monthStart(Date.now()))
+  // J10 : sens du dernier changement de mois (le mois suivant arrive par la droite)
+  const [slide, setSlide] = useState<'droite' | 'gauche' | null>(null)
+  const changeMonth = (step: 1 | -1) => {
+    setMonth((m) => addMonths(m, step))
+    setSlide(step === 1 ? 'droite' : 'gauche')
+  }
 
   if (blocks === undefined || sessions === undefined) return null
 
@@ -92,13 +98,13 @@ function CalendarPage() {
       </header>
 
       <div className="-mx-2 flex shrink-0 items-center justify-between">
-        <button type="button" aria-label="Mois précédent" onClick={() => setMonth((m) => addMonths(m, -1))} className="flex size-12 items-center justify-center rounded-md text-text">
+        <button type="button" aria-label="Mois précédent" onClick={() => changeMonth(-1)} className="flex size-12 items-center justify-center rounded-md text-text">
           <IconChevronGauche />
         </button>
         <span aria-live="polite" className="text-body-strong font-bold">
           {formatMonth(month)}
         </span>
-        <button type="button" aria-label="Mois suivant" onClick={() => setMonth((m) => addMonths(m, 1))} className="flex size-12 items-center justify-center rounded-md text-text">
+        <button type="button" aria-label="Mois suivant" onClick={() => changeMonth(1)} className="flex size-12 items-center justify-center rounded-md text-text">
           <IconChevronDroite />
         </button>
       </div>
@@ -112,6 +118,14 @@ function CalendarPage() {
             </span>
           ))}
         </div>
+        {/* Les semaines du mois, qui glissent quand on change de mois (clé = le mois) */}
+        <div
+          key={month}
+          role="rowgroup"
+          className={`flex flex-col gap-1 ${
+            slide === 'droite' ? 'animate-[sx-page-droite_260ms_var(--ease-out)]' : slide === 'gauche' ? 'animate-[sx-page-gauche_260ms_var(--ease-out)]' : ''
+          }`}
+        >
         {grid.map((week) => (
           <div key={week.days[0].time} role="row" className={COLS}>
             <span role="rowheader" className={`flex items-center justify-center text-[11px] font-extrabold ${week.label ? 'text-muted' : 'text-transparent'}`}>
@@ -122,6 +136,7 @@ function CalendarPage() {
             ))}
           </div>
         ))}
+        </div>
       </div>
 
       <div className="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-caption text-muted">

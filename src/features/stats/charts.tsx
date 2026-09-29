@@ -5,10 +5,12 @@
 // de leur couleur, deload hachuré, ses points creux et gris.
 // Les couleurs viennent des variables CSS des tokens (`var(--sx-…)`) : les deux thèmes suivent
 // tout seuls. Tous les calculs (échelle, repères) sont dans src/lib/stats.ts.
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { BlockColor } from '../../lib/blocks.ts'
 import { niceScale, timeLabels, type WeekCount } from '../../lib/stats.ts'
 import { formatNumber } from '../../lib/sessions.ts'
+import { staggerDelay, traceDelay } from '../../lib/motion.ts'
+import { prefersReducedMotion } from '../motion/useMotion.ts'
 import { colorVar } from '../blocks/blockColors.ts'
 
 const C = {
@@ -26,6 +28,47 @@ const C = {
 const AXIS = 30 // place des graduations, à droite
 
 /** Largeur disponible de l'élément (les graphiques s'adaptent à l'écran). */
+/** Durée du tracé d'une courbe (J10). */
+const TRACE_MS = 700
+
+/**
+ * Courbe qui se trace de gauche à droite (J10). Sa longueur est mesurée (`getTotalLength`) : les
+ * pointillés à `pathLength="1"` ne sont pas appliqués par tous les navigateurs (Chrome laissait une
+ * courbe en tirets de 1 px). L'animation passe par l'API du navigateur (`animate`), rejouée quand
+ * la courbe change (période, mesure, variante) ; rien avec « Réduire les animations ».
+ */
+function TracedPath({ d, color }: { d: string; color: string }) {
+  const ref = useRef<SVGPathElement>(null)
+  useLayoutEffect(() => {
+    const path = ref.current
+    if (!path || prefersReducedMotion() || typeof path.animate !== 'function') return
+    const length = path.getTotalLength()
+    path.style.strokeDasharray = `${length} ${length}`
+    const animation = path.animate([{ strokeDashoffset: length }, { strokeDashoffset: 0 }], {
+      duration: TRACE_MS,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    })
+    // À la fin, plus de pointillés du tout : la courbe reste entière même si elle change de longueur
+    animation.onfinish = () => (path.style.strokeDasharray = '')
+    return () => {
+      animation.cancel()
+      path.style.strokeDasharray = ''
+    }
+  }, [d])
+  return <path ref={ref} d={d} fill="none" style={{ stroke: color }} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+}
+
+/** Petit rebond d'apparition d'un point (J10), centré sur lui-même, après `delay` ms. */
+function popIn(delay: number): CSSProperties {
+  return { transformBox: 'fill-box', transformOrigin: 'center', animation: `sx-pop 240ms var(--ease-out) ${Math.round(delay)}ms both` }
+}
+
+/** Barre qui pousse depuis sa base (`bottom` : colonne, `left` : barre horizontale), après `delay` ms. */
+function grow(from: 'bottom' | 'left', delay: number): CSSProperties {
+  const name = from === 'bottom' ? 'sx-pousser-haut' : 'sx-pousser-droite'
+  return { transformBox: 'fill-box', transformOrigin: from, animation: `${name} 420ms var(--ease-out) ${delay}ms both` }
+}
+
 function useWidth<T extends HTMLElement>(fallback = 326) {
   const ref = useRef<T>(null)
   const [width, setWidth] = useState(fallback)
@@ -122,6 +165,9 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
   })()
 
   const path = line.map((p, i) => `${i ? 'L' : 'M'}${x(p.time).toFixed(1)} ${y(p.value).toFixed(1)}`).join(' ')
+  // Début et fin horizontale de la courbe : un point apparaît quand le tracé passe à sa hauteur
+  const lineStart = line.length > 0 ? x(line[0].time) : 0
+  const lineEnd = line.length > 0 ? x(line[line.length - 1].time) : pw
 
   return (
     <div ref={ref} className="relative w-full">
@@ -169,19 +215,26 @@ export function TimeChart({ label, height, from, to, line = [], dots = [], targe
         {dots.filter((d) => d.kind === 'small').map((d, i) => (
           <circle key={`s${i}`} cx={x(d.time)} cy={y(d.value)} r={2.5} style={{ fill: C.strong }} />
         ))}
-        {path && <path d={path} fill="none" style={{ stroke: C.text }} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />}
+        {path && (
+          // J10 : la courbe se trace de gauche à droite (et se retrace quand elle change)
+          <TracedPath d={path} color={C.text} />
+        )}
         {dots.filter((d) => d.kind !== 'small').map((d, i) => (
           <circle
-            key={`d${i}`}
+            key={`d${i}-${from}-${to}`}
             cx={x(d.time)}
             cy={y(d.value)}
             r={4}
             strokeWidth={2}
-            style={d.kind === 'hollow' ? { fill: C.surface, stroke: C.strong } : { fill: C.text, stroke: C.surface }}
+            style={{
+              ...(d.kind === 'hollow' ? { fill: C.surface, stroke: C.strong } : { fill: C.text, stroke: C.surface }),
+              // Chaque point apparaît quand la courbe passe dessus
+              ...popIn(traceDelay((x(d.time) - lineStart) / Math.max(1, lineEnd - lineStart), TRACE_MS)),
+            }}
           />
         ))}
         {record && (
-          <g aria-hidden="true">
+          <g aria-hidden="true" key={`pr-${from}-${to}`} style={popIn(TRACE_MS)}>
             <rect x={x(record.time) - 12} y={y(record.value) - 28} width={24} height={18} rx={9} style={{ fill: C.accent2 }} />
             <Label x={x(record.time)} y={y(record.value) - 15} anchor="middle" weight={800} color={C.onAccent2}>PR</Label>
           </g>
@@ -229,7 +282,14 @@ export function WeekColumns({ label, weeks, target, height = 120 }: { label: str
             return (
               <path key={w.start} d={col(x0 + 0.75, bw - 1.5, Math.min(y(w.count), bottom - 4) + 0.75)} fill="none" style={{ stroke: C.text }} strokeWidth={1.5} strokeDasharray="3 3" />
             )
-          return <path key={w.start} d={col(x0, bw, y(w.count))} style={{ fill: w.deload ? C.strong : C.text }} />
+          return (
+            <path
+              key={w.start}
+              d={col(x0, bw, y(w.count))}
+              // J10 : les colonnes poussent depuis le bas, de gauche à droite
+              style={{ fill: w.deload ? C.strong : C.text, ...grow('bottom', staggerDelay(i, 25, 400)) }}
+            />
+          )
         })}
       </svg>
     </div>
@@ -252,8 +312,20 @@ export function HorizontalBars({ label, rows }: { label: string; rows: { name: s
           return (
             <g key={r.name}>
               <text x={0} y={cy + 5} fontSize={15} fontWeight={600} style={{ fill: C.text }}>{r.name}</text>
-              <path d={`M${lw} ${cy - 7} H${end - 4} Q${end} ${cy - 7} ${end} ${cy - 3} V${cy + 3} Q${end} ${cy + 7} ${end - 4} ${cy + 7} H${lw} Z`} style={{ fill: C.text }} />
-              <text x={end + 6} y={cy + 5} fontSize={15} fontWeight={700} style={{ fill: C.text, fontVariantNumeric: 'tabular-nums' }}>{r.text}</text>
+              {/* J10 : la barre pousse depuis la gauche, puis son chiffre apparaît */}
+              <path
+                d={`M${lw} ${cy - 7} H${end - 4} Q${end} ${cy - 7} ${end} ${cy - 3} V${cy + 3} Q${end} ${cy + 7} ${end - 4} ${cy + 7} H${lw} Z`}
+                style={{ fill: C.text, ...grow('left', staggerDelay(i, 50)) }}
+              />
+              <text
+                x={end + 6}
+                y={cy + 5}
+                fontSize={15}
+                fontWeight={700}
+                style={{ fill: C.text, fontVariantNumeric: 'tabular-nums', animation: `sx-fondu 200ms var(--ease-out) ${staggerDelay(i, 50) + 300}ms both` }}
+              >
+                {r.text}
+              </text>
             </g>
           )
         })}
@@ -274,7 +346,7 @@ export function Sparkline({ values }: { values: number[] }) {
     .join(' ')
   return (
     <svg width={w} height={h} aria-hidden="true" className="shrink-0">
-      <path d={d} fill="none" style={{ stroke: C.muted }} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+      <TracedPath d={d} color={C.muted} />
     </svg>
   )
 }

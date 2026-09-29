@@ -231,6 +231,37 @@
   }
 }
 
+/* Navigation entre les pages : un niveau plus bas arrive par la droite, un niveau plus haut par la
+   gauche, un autre onglet en fondu (règle dans `pageAnimation`, src/lib/motion.ts) */
+@keyframes sx-page-droite {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+@keyframes sx-page-gauche {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+@keyframes sx-fondu {
+  from {
+    opacity: 0;
+  }
+}
+/* Graphiques des stats : les barres poussent (la courbe se trace par `TracedPath`, charts.tsx) */
+@keyframes sx-pousser-haut {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes sx-pousser-droite {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 @utility sx-apparaitre {
   animation: sx-apparaitre 320ms var(--ease-out) both;
 }

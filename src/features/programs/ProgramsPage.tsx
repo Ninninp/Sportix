@@ -6,6 +6,7 @@ import Button from '../../components/Button.tsx'
 import { IconChevronDroite, IconPlus, IconProgrammes } from '../../components/icons.tsx'
 import { createProgram } from '../../db/programs.ts'
 import { nextDay } from '../../lib/programs.ts'
+import { staggerDelay } from '../../lib/motion.ts'
 import { useFinishedSessions } from '../sessions/useSession.ts'
 import { useSettings } from '../settings/useSettings.ts'
 import NameSheet from './NameSheet.tsx'
@@ -69,14 +70,16 @@ function ProgramsPage() {
   return (
     <main className="flex flex-1 flex-col gap-3 px-4 pt-2 pb-4">
       <h1 className="text-title-l font-extrabold tracking-[-0.02em]">Programmes</h1>
-      {programs.map(({ program, days }) => {
+      {programs.map(({ program, days }, index) => {
         const active = settings.activeProgramId === program.id
         const next = active ? nextDay(days.map((d) => d.day), sessions) : undefined
         return (
           <Link
             key={program.id}
             to={`/programmes/${program.id}`}
-            className="flex shrink-0 flex-col gap-2.5 rounded-lg border border-border bg-surface py-3.5 pr-3 pl-4 text-text no-underline active:bg-surface-2"
+            // J10 : les programmes arrivent l'un après l'autre
+            className="sx-apparaitre flex shrink-0 flex-col gap-2.5 rounded-lg border border-border bg-surface py-3.5 pr-3 pl-4 text-text no-underline active:bg-surface-2"
+            style={{ animationDelay: `${staggerDelay(index)}ms` }}
           >
             <span className="flex items-center gap-2">
               <span className="flex-1 text-[20px] leading-6 font-extrabold tracking-[-0.01em]">{program.name}</span>
