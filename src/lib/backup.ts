@@ -3,7 +3,7 @@
 // est la seule copie de secours. Importer une sauvegarde REMPLACE toutes les données (pas de
 // fusion : elle créerait des doublons et des conflits — maquettes J8, validées le 25/09/2026).
 // Calculs purs ici ; lecture et écriture de la base dans src/db/backup.ts.
-import { dayStart } from './bodyWeight.ts'
+import { dayStart } from './week.ts'
 
 /** Les tables enregistrées dans une sauvegarde (toutes celles de la base). */
 export const BACKUP_TABLES = [

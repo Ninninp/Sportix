@@ -4,6 +4,7 @@
 import type { Variant } from './exercises.ts'
 import { lastPerformance, minWeight, WEIGHT_STEPS, weightStep, type WeightSteps } from './progression.ts'
 import type { Session, SessionSet } from './sessions.ts'
+import { dayStart } from './week.ts'
 
 export type Program = {
   id: string
@@ -68,9 +69,8 @@ export function nextDay(days: ProgramDay[], sessions: Session[]): ProgramDay | u
 export function lastDoneLabel(dayId: string, sessions: Session[], now = Date.now()): string | null {
   const last = Math.max(...sessions.filter((s) => s.programDayId === dayId).map((s) => s.startedAt))
   if (!Number.isFinite(last)) return null
-  const midnight = (t: number) => new Date(t).setHours(0, 0, 0, 0)
   // Écart en jours de calendrier (arrondi : juste aux changements d'heure)
-  const days = Math.round((midnight(now) - midnight(last)) / 86_400_000)
+  const days = Math.round((dayStart(now) - dayStart(last)) / 86_400_000)
   if (days <= 0) return 'aujourd’hui'
   if (days === 1) return 'hier'
   const date = new Date(last)

@@ -21,7 +21,7 @@ import { activeBlock, describeWeeks, isDeloadAt, weekSegments } from '../../lib/
 import { startSession } from '../../db/sessions.ts'
 import { increaseBadge, lastPerformance } from '../../lib/progression.ts'
 import { increaseSuggested, nextDay } from '../../lib/programs.ts'
-import { formatNumber, groupSetsByExercise, type SessionSet } from '../../lib/sessions.ts'
+import { formatNumber, groupSetsByExercise, plural, type SessionSet } from '../../lib/sessions.ts'
 import { isStandalone } from '../../lib/standalone.ts'
 import { formatHoursMinutes, weekDays, weekStats, type Trend } from '../../lib/week.ts'
 import WeekBar from '../blocks/WeekBar.tsx'
@@ -164,7 +164,6 @@ function HomePage() {
       }
     })
 
-  const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`
   let hero: { title: string; sub: string; rows: ReactNode; cta: string; onStart: () => Promise<void> }
   if (active) {
     hero = {

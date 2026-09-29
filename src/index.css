@@ -291,6 +291,9 @@
   *::before,
   *::after {
     animation-duration: 0ms !important;
+    /* Sans ce délai à 0, un élément qui arrive « en cascade » (`animation-fill-mode: both`) reste
+       invisible jusqu'à la fin de son retard (60 à 600 ms), puis apparaît d'un coup */
+    animation-delay: 0ms !important;
     transition-duration: 0ms !important;
   }
 }

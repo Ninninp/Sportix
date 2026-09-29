@@ -78,6 +78,27 @@ export type ExerciseBlock = {
   supersetNext: boolean
 }
 
+/**
+ * Les séries rangées par séance, en une seule passe (l'ordre des séries est conservé dans chaque
+ * séance). À utiliser dès qu'on a besoin des séries de PLUSIEURS séances : refiltrer toute la liste
+ * pour chacune coûte séances × séries (300 séances × 9 600 séries = près de 3 millions de
+ * comparaisons, l'historique mettait alors plusieurs secondes à s'afficher).
+ */
+export function groupBySession(sets: SessionSet[]): Map<string, SessionSet[]> {
+  const bySession = new Map<string, SessionSet[]>()
+  for (const s of sets) {
+    const list = bySession.get(s.sessionId)
+    if (list) list.push(s)
+    else bySession.set(s.sessionId, [s])
+  }
+  return bySession
+}
+
+/** « 1 série », « 3 séries » : le mot prend un s au pluriel (un seul mot, sans autre accord). */
+export function plural(n: number, word: string): string {
+  return `${n} ${word}${n > 1 ? 's' : ''}`
+}
+
 /** Regroupe les séries par exercice, dans l'ordre d'ajout, séries triées. */
 export function groupSetsByExercise(sets: SessionSet[]): ExerciseBlock[] {
   const blocks = new Map<string, ExerciseBlock>()

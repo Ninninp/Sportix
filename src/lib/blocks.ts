@@ -8,7 +8,7 @@
 // Comme partout dans l'app, les dates se calculent en jours de calendrier (`setDate`) et jamais en
 // multiples de 24 h : aux changements d'heure une semaine dure 167 ou 169 heures.
 import { sessionVolume, type Session, type SessionSet } from './sessions.ts'
-import { mondayOf } from './week.ts'
+import { dayStart, mondayOf } from './week.ts'
 
 /** Objectif réutilisable (« Force », « Hypertrophie ») : c'est l'utilisateur qui les crée. */
 export type BlockGoal = { id: string; name: string; createdAt: number }
@@ -275,8 +275,8 @@ export function addMonths(time: number, n: number): number {
 export function monthGrid(month: number, blocks: Block[], sessions: Session[], now = Date.now()): CalendarWeek[] {
   const first = new Date(monthStart(month))
   const nextMonth = addMonths(first.getTime(), 1)
-  const todayStart = new Date(now).setHours(0, 0, 0, 0)
-  const doneDays = new Set(sessions.map((s) => new Date(s.startedAt).setHours(0, 0, 0, 0)))
+  const todayStart = dayStart(now)
+  const doneDays = new Set(sessions.map((s) => dayStart(s.startedAt)))
   const weeks: CalendarWeek[] = []
   for (let monday = mondayOf(first.getTime()); monday < nextMonth; monday = addWeeks(monday, 1)) {
     const block = activeBlock(blocks, monday)

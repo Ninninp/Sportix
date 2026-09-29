@@ -6,6 +6,7 @@ import Button from '../../components/Button.tsx'
 import { IconChevronDroite, IconPlus, IconProgrammes } from '../../components/icons.tsx'
 import { createProgram } from '../../db/programs.ts'
 import { nextDay } from '../../lib/programs.ts'
+import { plural } from '../../lib/sessions.ts'
 import { staggerDelay } from '../../lib/motion.ts'
 import { useFinishedSessions } from '../sessions/useSession.ts'
 import { useSettings } from '../settings/useSettings.ts'
@@ -18,8 +19,6 @@ export function Pill({ children }: { children: string }) {
     <span className="shrink-0 rounded-full bg-inverse px-2 py-0.5 text-caption font-extrabold text-on-inverse">{children}</span>
   )
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`
 
 function ProgramsPage() {
   const navigate = useNavigate()

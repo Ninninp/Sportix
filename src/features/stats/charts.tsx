@@ -5,7 +5,7 @@
 // de leur couleur, deload hachuré, ses points creux et gris.
 // Les couleurs viennent des variables CSS des tokens (`var(--sx-…)`) : les deux thèmes suivent
 // tout seuls. Tous les calculs (échelle, repères) sont dans src/lib/stats.ts.
-import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useId, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { BlockColor } from '../../lib/blocks.ts'
 import { niceScale, timeLabels, type WeekCount } from '../../lib/stats.ts'
 import { formatNumber } from '../../lib/sessions.ts'
@@ -27,7 +27,6 @@ const C = {
 }
 const AXIS = 30 // place des graduations, à droite
 
-/** Largeur disponible de l'élément (les graphiques s'adaptent à l'écran). */
 /** Durée du tracé d'une courbe (J10). */
 const TRACE_MS = 700
 
@@ -69,12 +68,19 @@ function grow(from: 'bottom' | 'left', delay: number): CSSProperties {
   return { transformBox: 'fill-box', transformOrigin: from, animation: `${name} 420ms var(--ease-out) ${delay}ms both` }
 }
 
+/**
+ * Largeur disponible de l'élément (les graphiques s'adaptent à l'écran). Elle est lue AVANT le
+ * premier affichage (`useLayoutEffect`), puis suivie par un `ResizeObserver` : sans cela le graphique
+ * apparaissait d'abord à la largeur de secours (326 px), puis se redessinait à la vraie, et la
+ * courbe se traçait deux fois de suite.
+ */
 function useWidth<T extends HTMLElement>(fallback = 326) {
   const ref = useRef<T>(null)
   const [width, setWidth] = useState(fallback)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current
     if (!el) return
+    setWidth(Math.round(el.getBoundingClientRect().width))
     const observer = new ResizeObserver(([entry]) => setWidth(Math.round(entry.contentRect.width)))
     observer.observe(el)
     return () => observer.disconnect()

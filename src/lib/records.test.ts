@@ -74,3 +74,43 @@ describe('sessionsWithRecords', () => {
     expect([...sessionsWithRecords(sessions, sets)]).toEqual(['s3'])
   })
 })
+
+describe('sessionsWithRecords : même résultat que le calcul direct, sur beaucoup de séances', () => {
+  // Version « évidente » (refiltre toutes les séries à chaque séance) : lente, mais sûre. Elle sert de
+  // référence pour vérifier que le regroupement par séance ne change aucun résultat.
+  const direct = (sessions: { id: string; startedAt: number }[], allSets: SessionSet[]) => {
+    const best = new Map<string, number>()
+    const result = new Set<string>()
+    const k = (s: SessionSet) => `${s.exerciseId}|${s.variant ?? ''}`
+    const v = (s: SessionSet) => (s.weight > 0 ? s.weight : s.reps)
+    for (const session of [...sessions].sort((a, b) => a.startedAt - b.startedAt)) {
+      const sets = allSets.filter((s) => s.sessionId === session.id && s.done && s.reps >= 1 && !s.warmup)
+      for (const s of sets) if (best.has(k(s)) && v(s) > best.get(k(s))!) result.add(session.id)
+      for (const s of sets) best.set(k(s), Math.max(best.get(k(s)) ?? 0, v(s)))
+    }
+    return result
+  }
+
+  it('200 séances tirées au hasard, avec échauffements, séries non faites et poids du corps', () => {
+    let seed = 42
+    const random = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296)
+    const sessions = Array.from({ length: 200 }, (_, i) => ({ id: `s${i}`, startedAt: Math.floor(random() * 1e6) }))
+    const sets: SessionSet[] = []
+    for (const s of sessions) {
+      for (let j = 0; j < 12; j++) {
+        sets.push(
+          set({
+            sessionId: s.id,
+            exerciseId: ['squat', 'bench', 'dips'][Math.floor(random() * 3)],
+            variant: random() < 0.3 ? null : 'barre',
+            weight: random() < 0.2 ? 0 : Math.round(random() * 40) * 2.5,
+            reps: Math.floor(random() * 12),
+            done: random() < 0.9,
+            warmup: random() < 0.15,
+          }),
+        )
+      }
+    }
+    expect([...sessionsWithRecords(sessions, sets)].sort()).toEqual([...direct(sessions, sets)].sort())
+  })
+})

@@ -37,6 +37,7 @@ import {
   groupOf,
   groupSequence,
   groupSetsByExercise,
+  plural,
   sessionProgress,
   supersetFollow,
   type SessionSet,
@@ -121,7 +122,6 @@ function SessionPage() {
   // Confirmation de fin de séance. Sans aucune série validée, il n'y a rien à garder :
   // la séance est abandonnée au lieu de laisser une séance vide dans l'historique.
   const remaining = progress.total - progress.done
-  const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? 's' : ''}`
   const endSheet = (
     <Sheet open={confirmEnd} onClose={() => setConfirmEnd(false)} label="Terminer la séance ?">
       <div>

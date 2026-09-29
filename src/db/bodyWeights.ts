@@ -2,7 +2,8 @@
 // Une seule pesée par jour : en enregistrer une deuxième le même jour la remplace (on se repèse
 // pour corriger une erreur de saisie, pas pour avoir deux points). L'identifiant est fixé à
 // l'ouverture du panneau : deux appuis rapprochés sur « Enregistrer » écrivent la même ligne.
-import { dayStart, type BodyWeight } from '../lib/bodyWeight.ts'
+import type { BodyWeight } from '../lib/bodyWeight.ts'
+import { dayStart } from '../lib/week.ts'
 import { db as defaultDb, type SportixDB } from './schema.ts'
 
 /** Toutes les pesées, de la plus ancienne à la plus récente. */

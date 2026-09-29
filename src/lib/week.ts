@@ -4,6 +4,11 @@
 // période de la semaine passée (du lundi précédent au même jour et à la même heure).
 import { sessionDuration, sessionVolume, type Session, type SessionSet } from './sessions.ts'
 
+/** 0 h du jour de cet instant (heure locale). */
+export function dayStart(time: number): number {
+  return new Date(time).setHours(0, 0, 0, 0)
+}
+
 /** Lundi 0 h de la semaine de `now` (heure locale). */
 export function mondayOf(now: number): number {
   const d = new Date(now)

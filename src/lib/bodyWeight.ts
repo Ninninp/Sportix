@@ -20,11 +20,6 @@ export const BODY_WEIGHT_STEP = 0.1
 /** Poids proposé à la toute première pesée. */
 export const BODY_WEIGHT_DEFAULT = 75
 
-/** 0 h du jour de cet instant (heure locale). */
-export function dayStart(time: number): number {
-  return new Date(time).setHours(0, 0, 0, 0)
-}
-
 /** Poids après un appui sur − / + : 0,1 kg de plus ou de moins, arrondi au dixième, dans les bornes. */
 export function stepBodyWeight(kg: number, direction: 1 | -1): number {
   const next = Math.round((kg + direction * BODY_WEIGHT_STEP) * 10) / 10

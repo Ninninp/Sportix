@@ -51,8 +51,20 @@ export function getSessionSets(sessionId: string, db: SportixDB = defaultDb): Pr
  * Sans les échauffements (J9), qui ne comptent nulle part hors de leur séance.
  */
 export async function getHistorySets(exceptSessionId?: string, db: SportixDB = defaultDb): Promise<SessionSet[]> {
-  const sets = await db.sets.toArray()
-  return sets.filter((s) => s.done && !s.warmup && s.sessionId !== exceptSessionId)
+  const counts = (s: SessionSet) => s.done && !s.warmup
+  if (exceptSessionId === undefined) return (await db.sets.toArray()).filter(counts)
+  // « Toutes les séances sauf celle-ci » : deux lectures en bloc par l'index `sessionId`, avant et après
+  // la séance exclue, plutôt qu'un filtre sur toute la table. Résultat identique (à l'ordre près),
+  // mais Dexie sait alors que la requête ne concerne PAS les séries de la séance exclue : quand on
+  // tape sur − / + en séance (une écriture par appui), l'historique n'est plus relu à chaque appui.
+  // (Un `notEqual` seul, lui, relit les séries une par une : 5 fois plus lent à l'ouverture.)
+  const [before, after] = await db.transaction('r', db.sets, () =>
+    Promise.all([
+      db.sets.where('sessionId').below(exceptSessionId).toArray(),
+      db.sets.where('sessionId').above(exceptSessionId).toArray(),
+    ]),
+  )
+  return [...before, ...after].filter(counts)
 }
 
 /**
@@ -201,10 +213,6 @@ export async function addWarmup(sessionId: string, exerciseOrder: number, db: Sp
     ...(work.supersetNext ? { supersetNext: true } : {}),
     ...(work.deload ? { deload: true } : {}),
   })
-}
-
-export async function removeSet(setId: string, db: SportixDB = defaultDb): Promise<void> {
-  await db.sets.delete(setId)
 }
 
 /** Relie (ou sépare) un exercice et le suivant de la séance : superset (J9). */

@@ -4,7 +4,9 @@ import {
   formatDuration,
   formatNumber,
   formatWeight,
+  groupBySession,
   groupSetsByExercise,
+  plural,
   restFollows,
   sessionProgress,
   sessionSequence,
@@ -141,5 +143,21 @@ describe('formatage', () => {
   it('affiche les kilos et les décimales à la française', () => {
     expect(formatWeight(9240)).toMatch(/^9\s?240 kg$/)
     expect(formatNumber(102.5)).toBe('102,5')
+  })
+})
+
+describe('groupBySession et plural', () => {
+  it('range les séries par séance en gardant leur ordre', () => {
+    const a1 = set({ id: 'a1', sessionId: 'A', order: 1 })
+    const b1 = set({ id: 'b1', sessionId: 'B', order: 1 })
+    const a2 = set({ id: 'a2', sessionId: 'A', order: 2 })
+    const grouped = groupBySession([a1, b1, a2])
+    expect([...grouped.keys()]).toEqual(['A', 'B'])
+    expect(grouped.get('A')?.map((s) => s.id)).toEqual(['a1', 'a2'])
+    expect(grouped.get('C')).toBeUndefined()
+    expect(groupBySession([]).size).toBe(0)
+  })
+  it('met le mot au pluriel à partir de 2', () => {
+    expect([0, 1, 2, 12].map((n) => plural(n, 'série'))).toEqual(['0 série', '1 série', '2 séries', '12 séries'])
   })
 })

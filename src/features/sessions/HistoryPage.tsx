@@ -7,10 +7,15 @@ import ScreenHeader from '../../components/ScreenHeader.tsx'
 import { IconChevronDroite, IconHistorique } from '../../components/icons.tsx'
 import { startSession } from '../../db/sessions.ts'
 import { sessionsWithRecords } from '../../lib/records.ts'
-import { describeSessionExercises, formatWeight, sessionSummary } from '../../lib/sessions.ts'
+import { describeSessionExercises, formatWeight, groupBySession, sessionSummary } from '../../lib/sessions.ts'
 import { formatHoursMinutes } from '../../lib/week.ts'
 import { staggerDelay } from '../../lib/motion.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from './useSession.ts'
+
+// Formats de date créés une seule fois : `toLocaleDateString` en recrée un à chaque appel, ce qui
+// devient long avec des centaines de séances (même texte affiché).
+const MONTH_FORMAT = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
+const WEEKDAY_FORMAT = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' })
 
 function HistoryPage() {
   const navigate = useNavigate()
@@ -21,10 +26,13 @@ function HistoryPage() {
   if (sessions === undefined || sets === undefined || exercises === undefined) return null
 
   const withRecords = sessionsWithRecords(sessions, sets)
+  const setsBySession = groupBySession(sets)
   const byMonth = new Map<string, typeof sessions>()
   for (const s of sessions) {
-    const label = new Date(s.startedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
-    byMonth.set(label, [...(byMonth.get(label) ?? []), s])
+    const label = MONTH_FORMAT.format(s.startedAt)
+    const list = byMonth.get(label)
+    if (list) list.push(s)
+    else byMonth.set(label, [s])
   }
 
   return (
@@ -58,7 +66,7 @@ function HistoryPage() {
               <h2 className="text-caption font-semibold tracking-[0.06em] text-muted uppercase">{month}</h2>
               <Card className="divide-y divide-border overflow-hidden">
                 {list.map((s) => {
-                  const sessionSets = sets.filter((x) => x.sessionId === s.id)
+                  const sessionSets = setsBySession.get(s.id) ?? []
                   const summary = sessionSummary(s, sessionSets)
                   const date = new Date(s.startedAt)
                   return (
@@ -70,7 +78,7 @@ function HistoryPage() {
                       <span className="flex w-10 shrink-0 flex-col items-center">
                         <span className="num text-num-m">{String(date.getDate()).padStart(2, '0')}</span>
                         <span className="text-caption font-semibold text-muted">
-                          {date.toLocaleDateString('fr-FR', { weekday: 'short' }).toUpperCase()}
+                          {WEEKDAY_FORMAT.format(date).toUpperCase()}
                         </span>
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5">

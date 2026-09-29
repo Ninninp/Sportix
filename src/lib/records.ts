@@ -3,7 +3,7 @@
 // temps), c'est le plus grand nombre de reps.
 // La première fois sur un exercice (et une variante) n'est PAS un record : il n'y a rien à battre,
 // et sinon toute première séance serait couverte de records (retour du 21/09/2026).
-import type { SessionSet } from './sessions.ts'
+import { groupBySession, type SessionSet } from './sessions.ts'
 
 export type Record_ = {
   set: SessionSet
@@ -53,9 +53,11 @@ export function sessionsWithRecords(
 ): Set<string> {
   const best = new Map<string, number>()
   const withRecords = new Set<string>()
+  // Les séries de chaque séance, rangées une fois pour toutes (et non refiltrées à chaque séance)
+  const bySession = groupBySession(allSets)
 
   for (const session of [...sessions].sort((a, b) => a.startedAt - b.startedAt)) {
-    const sets = allSets.filter((s) => s.sessionId === session.id && counts(s))
+    const sets = (bySession.get(session.id) ?? []).filter(counts)
     for (const s of sets) {
       const previous = best.get(key(s))
       if (previous !== undefined && value(s) > previous) withRecords.add(session.id)

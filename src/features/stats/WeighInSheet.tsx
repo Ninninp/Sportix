@@ -15,13 +15,13 @@ import { deleteBodyWeight, saveBodyWeight } from '../../db/bodyWeights.ts'
 import {
   BODY_WEIGHT_DEFAULT,
   BODY_WEIGHT_MIN,
-  dayStart,
   formatBodyWeight,
   parseBodyWeight,
   stepBodyWeight,
   type BodyWeight,
 } from '../../lib/bodyWeight.ts'
 import { formatShortDate } from '../../lib/stats.ts'
+import { dayStart } from '../../lib/week.ts'
 
 /** « 2026-09-14 » (valeur d'un champ date) ↔ horodatage local à 0 h. */
 const toInput = (time: number) => {
