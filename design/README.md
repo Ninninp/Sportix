@@ -68,6 +68,6 @@ Les fichiers de `wireframes-d2/`, `directions-d3/` et `design-system-d4/` sont u
 
 ## Exports
 
-Les PNG des planches validées vont dans [`exports/`](exports/).
+Les PNG de toutes les planches (D2 à J9, 151 planches en 2×) sont dans [`exports/`](exports/), un dossier par canvas, exportés le 29/09/2026 depuis les sources locales (`*.dc.html`, dimensions de `canvas.json`) avec Chromium et les vraies polices (Inter, Archivo, Barlow, IBM Plex). Retouches faites à la main dans un canvas en ligne et jamais reportées dans les sources : absentes des PNG. Pour refaire l'export après une modification : ouvrir chaque planche à sa taille (`w` × `h` de `canvas.json`) et la photographier.
 
 - **Revue design du J9 (28/09/2026)** : captures de l'app à côté des planches ; l'app suit les maquettes, sauf des écarts maintenant corrigés (durées de l'historique, onglet allumé, historique vide, « Première séance », liens « Supprimer » rouges, « Utilisé dans N séances », puce « Tous », jour fait sur la page d'un programme). Écarts gardés exprès : pas de barre d'état simulée dans l'app, formulaires de création fermés par ✕, carte du bloc de « Comparer » limitée aux données réelles.
