@@ -13,11 +13,13 @@ Pour l'installer sur iPhone : l'ouvrir dans Safari → Partager → « Sur l'éc
 - **Programmes** : jours d'entraînement en rotation (A → B → A…), accueil avec les chiffres de la semaine.
 - **Calendrier des blocs** : vue mensuelle, blocs colorés d'une durée en semaines avec objectif, programme et semaine de deload facultative ; les séances sont rattachées au bloc en cours.
 - **Stats** : progression par exercice (1RM estimé, charges, volume), records, séances par semaine, séries par muscle, comparaison de deux blocs, suivi du poids de corps et objectifs.
+- **Finitions** : thème Auto / Clair / Sombre, séries d'échauffement, supersets.
+- **Animations** : pages qui glissent, panneaux, validation d'une série, récap, graphiques qui se tracent ; « Réduire les animations » d'iOS respecté.
 - **Sauvegarde** : export des données dans un fichier JSON (partage iOS ou téléchargement) et import ; une pastille rappelle de sauvegarder.
 
 ## Avancement
 
-Jalons J1 à J8 codés et validés sur l'iPhone, sauf le son du minuteur (J4) qui reste à tester. Prochain jalon : **J9, finitions et revue design**. Le détail est dans [`docs/PLAN.md`](docs/PLAN.md), la source de vérité du projet.
+**Tous les jalons du plan (J0 à J10) sont codés et validés sur l'iPhone** (29/09/2026), J9 (finitions : thème manuel, échauffement, supersets) et J10 (animations) compris. La suite dépendra de l'usage à la salle. Le détail est dans [`docs/PLAN.md`](docs/PLAN.md), la source de vérité du projet.
 
 ## Démarrer
 
