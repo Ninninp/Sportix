@@ -142,12 +142,12 @@ src/
 - Export/import JSON (Web Share API), `navigator.storage.persist()`, rappel de sauvegarde, migrations Dexie.
 - **Objectif** : changer de téléphone sans rien perdre.
 
-### J9 — Finitions & revue design (continu)
+### J9 — Finitions & revue design — ✅ validé le 28/09/2026 (testé sur l'iPhone)
 > 28/09/2026 : revue design faite (tous les écrans, clair et sombre, face aux maquettes D5 à J8) et écarts corrigés (détail dans `CLAUDE.md`).
 - **Revue design** : captures de chaque écran (Browser pane) comparées aux maquettes ; corriger les écarts.
-- Mode clair/sombre, kg/lb, supersets, échauffement, bannière « nouvelle version ».
+- Mode clair/sombre (réglage « Apparence »), supersets, échauffement : faits et validés le 28/09/2026. **kg/lb et bannière « nouvelle version » abandonnés** (28/09/2026, choix de l'utilisateur).
 
-### J10 — Animations (à la fin, une fois les écrans stabilisés) — codé le 28/09/2026, à essayer sur l'iPhone
+### J10 — Animations (à la fin, une fois les écrans stabilisés) — codé le 28/09/2026, `/code-review` fait le 29/09/2026, validation finale sur l'iPhone en attente
 > 28/09/2026 : pas de maquettes pour le mouvement (choix de l'utilisateur) : codé avec les durées et courbes de `design/tokens.md`, vérifié dans Chrome, puis jugé sur l'iPhone. Fait : accueil (cascade, chiffres qui défilent, pastilles des jours sans animation), panneaux (montent / redescendent), validation d'une série (coche qui rebondit, repos qui arrive), entrée / sortie de séance, récapitulatif (tuiles, records mis en valeur). 29/09/2026 : navigation entre les pages (droite / gauche / fondu), graphiques qui se tracent, calendrier, listes en cascade. Détail dans `CLAUDE.md`.
 > Décidé le 21/09/2026 : les animations se règlent quand tous les écrans sont en place, pour ne pas les refaire à chaque changement. D'ici là, seules des animations simples en CSS existent (fin de repos, « +15 s », `src/index.css`).
 - Reprendre les animations du repos : fin du repos, « +15 s de repos » telle que décrite dans `design/README.md` (la charge rétrécit jusqu'à la carte « Ensuite », le chrono grandit à sa place).
@@ -159,6 +159,8 @@ src/
 ## Ordre & durée indicative
 J0 → **Phase D** → J1 → J2 → J3 (**MVP, ~3 semaines**) → J4 → J5 → J6 → J7 → J8 → J9 → J10.
 Total ≈ 6–8 semaines à temps partiel.
+
+> 29/09/2026 : **Capacitor écarté** (app iOS native pour les notifications écran verrouillé et les vibrations) : il faudrait un Mac avec Xcode et réinstaller l'app à chaque version ; Sportix reste une PWA.
 
 ## Vérification (à chaque jalon)
 - `npm run dev` ; `npm run build && npm run preview` pour tester le mode PWA.

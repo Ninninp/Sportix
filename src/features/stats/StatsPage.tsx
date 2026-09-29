@@ -95,7 +95,7 @@ function StatsPage() {
   if (!sessions || !sets || !exercises || !blocks || !weights || !settings) return null
 
   const from = periodStart(period, now)
-  const weighIn = weighPresence.item && <WeighInSheet open={weighPresence.open} weights={weights} onClose={() => setWeighing(false)} />
+  const weighIn = weighPresence.item && <WeighInSheet key={weighPresence.key} open={weighPresence.open} weights={weights} onClose={() => setWeighing(false)} />
 
   if (sessions.length === 0 && weights.length === 0) {
     return (

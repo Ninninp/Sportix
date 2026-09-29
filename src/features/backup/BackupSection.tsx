@@ -157,10 +157,11 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
         }}
       />
 
-      {exportPanel.item && <ExportSheet open={exportPanel.open} onClose={() => setExporting(false)} />}
+      {exportPanel.item && <ExportSheet key={exportPanel.key} open={exportPanel.open} onClose={() => setExporting(false)} />}
 
       {shownImport?.step === 'confirm' && (
         <ConfirmSheet
+          key={importPanel.key}
           open={importPanel.open && !exporting}
           backup={shownImport.backup}
           onCancel={() => setImporting(null)}

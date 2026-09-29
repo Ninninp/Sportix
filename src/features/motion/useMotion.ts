@@ -45,17 +45,25 @@ export const EXIT_MS = 200
  * `ouvert` devient faux : il n'a aucune chance de redescendre. Avec `usePresence`, `item` garde la
  * dernière valeur non vide jusqu'à la fin de la sortie, et `open` dit si le panneau doit être ouvert :
  *   const p = usePresence(exporting)
- *   {p.item && <ExportSheet open={p.open} … />}
+ *   {p.item && <ExportSheet key={p.key} open={p.open} … />}
+ * `key` change à chaque ouverture : un panneau rouvert pendant qu'il redescend repart de zéro
+ * (verrou anti double appui, identifiant tiré à l'ouverture), au lieu de reprendre l'ancien.
  * Avec « Réduire les animations » la sortie est immédiate.
  */
-export function usePresence<T>(value: T | null | undefined | false): { item: T | undefined; open: boolean } {
+export function usePresence<T>(value: T | null | undefined | false): { item: T | undefined; open: boolean; key: number } {
   const [kept, setKept] = useState<T | undefined>(value || undefined)
+  const [wasOpen, setWasOpen] = useState(Boolean(value))
+  const [key, setKey] = useState(0)
   // Pendant un rendu, comme la doc de React le prévoit pour « retenir une valeur d'un rendu à l'autre »
   if (value && kept !== value) setKept(value)
+  if (Boolean(value) !== wasOpen) {
+    setWasOpen(Boolean(value))
+    if (value) setKey((k) => k + 1)
+  }
   useEffect(() => {
     if (value) return
     const timer = window.setTimeout(() => setKept(undefined), prefersReducedMotion() ? 0 : EXIT_MS + 60)
     return () => window.clearTimeout(timer)
   }, [value])
-  return { item: value || kept, open: Boolean(value) }
+  return { item: value || kept, open: Boolean(value), key }
 }
