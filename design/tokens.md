@@ -138,6 +138,7 @@ Grille de 4 px.
 |---|---|---|
 | `ease-out` | `cubic-bezier(0.16, 1, 0.3, 1)` | Toutes les entrées |
 | `ease-in` | `cubic-bezier(0.7, 0, 0.84, 0)` | Les sorties (panneau qui redescend, séance réduite), en `duration-base` : ce qui part ne fait pas attendre (J10) |
+| `ease-glisse` | `cubic-bezier(0.25, 1, 0.5, 1)` | Glissement d'une page (400 ms) ou d'un mois du calendrier (arrivée 400 ms, sortie 140 ms) : plus long et plus doux que `duration-slow` (J10) |
 | `duration-fast` | 120 ms | Appui sur un bouton (léger enfoncement, `scale(0.97)`) |
 | `duration-base` | 200 ms | Changement d'état d'une série, remplissage de la barre de progression |
 | `duration-slow` | 320 ms | Passage à l'écran de fin de repos, animation « +15 s » (voir `README.md`) |
@@ -245,6 +246,7 @@ Avec le réglage iOS « Réduire les animations » (`prefers-reduced-motion`), t
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-glisse: cubic-bezier(0.25, 1, 0.5, 1);
 }
 ```
 

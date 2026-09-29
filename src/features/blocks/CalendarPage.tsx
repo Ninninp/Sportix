@@ -5,7 +5,7 @@
 // - chaque bloc a sa couleur ; un jour commun à deux blocs (chevauchement) est coupé en deux ;
 // - en bas, le bloc en cours (ou le prochain), dans une carte qui ouvre son détail.
 // Toucher un jour d'un bloc ouvre aussi ce bloc.
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
@@ -31,6 +31,7 @@ import {
 } from '../../lib/blocks.ts'
 import type { Session } from '../../lib/sessions.ts'
 import { useFinishedSessions } from '../sessions/useSession.ts'
+import { prefersReducedMotion } from '../motion/useMotion.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
 import { cellBackground, colorVar } from './blockColors.ts'
 import { useBlocks } from './useBlocks.ts'
@@ -46,11 +47,25 @@ function CalendarPage() {
   const now = useNowOnResume()
   // Mois affiché : celui d'aujourd'hui au départ (état de l'écran, pas en base).
   const [month, setMonth] = useState(() => monthStart(Date.now()))
-  // J10 : sens du dernier changement de mois (le mois suivant arrive par la droite)
-  const [slide, setSlide] = useState<'droite' | 'gauche' | null>(null)
+  // J10 : changement de mois en deux temps. L'ancien mois sort (140 ms) dans le sens du geste, puis
+  // le nouveau arrive de l'autre côté (400 ms). Des appuis rapprochés s'additionnent : le mois ne
+  // change qu'une fois, de plusieurs crans, à la fin de la sortie.
+  const [slide, setSlide] = useState<{ dir: 'droite' | 'gauche'; stage: 'sort' | 'entre' } | null>(null)
+  const pending = useRef(0)
+  const timer = useRef<number | undefined>(undefined)
+  useEffect(() => () => window.clearTimeout(timer.current), [])
   const changeMonth = (step: 1 | -1) => {
-    setMonth((m) => addMonths(m, step))
-    setSlide(step === 1 ? 'droite' : 'gauche')
+    const dir = step === 1 ? 'droite' : 'gauche'
+    pending.current += step
+    setSlide({ dir, stage: 'sort' })
+    if (timer.current !== undefined) return
+    timer.current = window.setTimeout(() => {
+      const total = pending.current
+      pending.current = 0
+      timer.current = undefined
+      setMonth((m) => addMonths(m, total))
+      setSlide({ dir: total >= 0 ? 'droite' : 'gauche', stage: 'entre' })
+    }, prefersReducedMotion() ? 0 : 140)
   }
 
   if (blocks === undefined || sessions === undefined) return null
@@ -122,9 +137,14 @@ function CalendarPage() {
         <div
           key={month}
           role="rowgroup"
-          className={`flex flex-col gap-1 ${
-            slide === 'droite' ? 'animate-[sx-page-droite_260ms_var(--ease-out)]' : slide === 'gauche' ? 'animate-[sx-page-gauche_260ms_var(--ease-out)]' : ''
-          }`}
+          className="flex flex-col gap-1"
+          style={
+            slide?.stage === 'sort'
+              ? { animation: `${slide.dir === 'droite' ? 'sx-sort-gauche' : 'sx-sort-droite'} 140ms cubic-bezier(0.4, 0, 1, 1) forwards` }
+              : slide?.stage === 'entre'
+                ? { animation: `${slide.dir === 'droite' ? 'sx-page-droite' : 'sx-page-gauche'} 400ms var(--ease-glisse)` }
+                : undefined
+          }
         >
         {grid.map((week) => (
           <div key={week.days[0].time} role="row" className={COLS}>

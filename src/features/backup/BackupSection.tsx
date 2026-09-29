@@ -15,6 +15,7 @@ import { compareWithDevice, importBackup, readBackupFile } from '../../db/backup
 import { describeImported, describeLastBackup, describeLost, summarize, type Backup, type BackupSummary } from '../../lib/backup.ts'
 import { formatDayMonth } from '../../lib/blocks.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
+import { usePresence } from '../motion/useMotion.ts'
 import ExportSheet from './ExportSheet.tsx'
 import { CompareRows } from './SummaryRows.tsx'
 
@@ -40,9 +41,9 @@ function Row({ icon, title, subtitle, onClick }: { icon: ReactNode; title: strin
   )
 }
 
-type ConfirmProps = { backup: Backup; onCancel: () => void; onExportFirst: () => void; onDone: (s: BackupSummary) => void; onFailed: () => void }
+type ConfirmProps = { open: boolean; backup: Backup; onCancel: () => void; onExportFirst: () => void; onDone: (s: BackupSummary) => void; onFailed: () => void }
 
-function ConfirmSheet({ backup, onCancel, onExportFirst, onDone, onFailed }: ConfirmProps) {
+function ConfirmSheet({ open, backup, onCancel, onExportFirst, onDone, onFailed }: ConfirmProps) {
   const comparison = useLiveQuery(() => compareWithDevice(backup), [backup])
   // Pendant l'import, le panneau ne se ferme plus (sinon on croirait avoir annulé un import
   // qui se termine quand même) ; le verrou empêche aussi un second appui.
@@ -64,7 +65,7 @@ function ConfirmSheet({ backup, onCancel, onExportFirst, onDone, onFailed }: Con
   }
 
   return (
-    <Sheet open onClose={running ? () => {} : onCancel} label="Remplacer tes données">
+    <Sheet open={open} onClose={running ? () => {} : onCancel} label="Remplacer tes données">
       <div>
         <h2 className="text-title font-bold">Remplacer tes données ?</h2>
         <p className="mt-1.5 text-body text-muted">Tout ce qui est sur ce téléphone sera remplacé par la sauvegarde.</p>
@@ -120,6 +121,10 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
   const input = useRef<HTMLInputElement>(null)
   const [exporting, setExporting] = useState(false)
   const [importing, setImporting] = useState<ImportState>(null)
+  // Les panneaux restent affichés le temps de leur sortie (J10, `usePresence`)
+  const exportPanel = usePresence(exporting)
+  const importPanel = usePresence(importing)
+  const shownImport = importPanel.item
 
   const chooseFile = () => {
     setImporting(null)
@@ -152,11 +157,12 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
         }}
       />
 
-      {exporting && <ExportSheet onClose={() => setExporting(false)} />}
+      {exportPanel.item && <ExportSheet open={exportPanel.open} onClose={() => setExporting(false)} />}
 
-      {importing?.step === 'confirm' && !exporting && (
+      {shownImport?.step === 'confirm' && (
         <ConfirmSheet
-          backup={importing.backup}
+          open={importPanel.open && !exporting}
+          backup={shownImport.backup}
           onCancel={() => setImporting(null)}
           onExportFirst={() => setExporting(true)}
           onDone={(summary) => setImporting({ step: 'done', summary })}
@@ -164,14 +170,14 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
         />
       )}
 
-      {importing?.step === 'refused' && (
-        <Sheet open onClose={() => setImporting(null)} label="Fichier refusé">
+      {shownImport?.step === 'refused' && (
+        <Sheet open={importPanel.open} onClose={() => setImporting(null)} label="Fichier refusé">
           <div className="flex flex-col gap-1.5">
             <span className="flex text-danger">
               <IconAlerte size={28} />
             </span>
-            <h2 className="text-title font-bold">{REFUSALS[importing.reason].title}</h2>
-            <p className="text-body text-muted">{REFUSALS[importing.reason].text}</p>
+            <h2 className="text-title font-bold">{REFUSALS[shownImport.reason].title}</h2>
+            <p className="text-body text-muted">{REFUSALS[shownImport.reason].text}</p>
           </div>
           <div className="flex flex-col gap-1">
             <Button variant="secondary" onClick={chooseFile}>
@@ -184,14 +190,14 @@ function BackupSection({ lastBackupAt }: { lastBackupAt?: number }) {
         </Sheet>
       )}
 
-      {importing?.step === 'done' && (
-        <Sheet open onClose={() => navigate('/')} label="Données importées">
+      {shownImport?.step === 'done' && (
+        <Sheet open={importPanel.open} onClose={() => navigate('/')} label="Données importées">
           <div className="flex flex-col gap-1.5">
             <span className="flex size-11 items-center justify-center rounded-full bg-inverse text-on-inverse">
               <IconCoche size={24} strokeWidth={2.5} />
             </span>
             <h2 className="text-title font-bold">Données importées</h2>
-            <p className="text-body text-muted">{describeImported(importing.summary)}</p>
+            <p className="text-body text-muted">{describeImported(shownImport.summary)}</p>
           </div>
           <Button onClick={() => navigate('/')}>OK</Button>
         </Sheet>

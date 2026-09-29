@@ -3,7 +3,7 @@
 // Le poids part de la dernière pesée : d'un jour à l'autre, il ne bouge que de quelques dixièmes.
 // Un jour qui a déjà sa pesée : le panneau reprend ce poids (l'enregistrer la remplace) et propose
 // de la supprimer (pesée faite par erreur, ou le mauvais jour).
-// À n'afficher que pendant qu'il est ouvert (`{open && <WeighInSheet … />}`) : l'identifiant de la
+// À n'afficher que pendant qu'il est ouvert, gardé le temps de sa sortie (`usePresence`) : l'identifiant de la
 // pesée est tiré à l'ouverture, deux appuis sur « Enregistrer » écrivent donc la même ligne.
 import { useRef, useState } from 'react'
 import Button from '../../components/Button.tsx'
@@ -33,9 +33,9 @@ const fromInput = (value: string) => {
   return new Date(y, m - 1, d).getTime()
 }
 
-type Props = { weights: BodyWeight[]; onClose: () => void }
+type Props = { open: boolean; weights: BodyWeight[]; onClose: () => void }
 
-function WeighInSheet({ weights, onClose }: Props) {
+function WeighInSheet({ open, weights, onClose }: Props) {
   const [id] = useState(() => crypto.randomUUID())
   // Aujourd'hui, figé à l'ouverture du panneau (jour proposé, et dernier jour qu'on peut choisir)
   const [today] = useState(() => dayStart(Date.now()))
@@ -65,7 +65,7 @@ function WeighInSheet({ weights, onClose }: Props) {
   }
 
   return (
-    <Sheet open onClose={onClose} label="Pesée">
+    <Sheet open={open} onClose={onClose} label="Pesée">
       <h2 className="text-title font-bold">Pesée</h2>
       <NumberStepper
         label="Poids"

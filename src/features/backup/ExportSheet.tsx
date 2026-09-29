@@ -2,7 +2,8 @@
 // fichier », qui ouvre la feuille de partage d'iOS (Fichiers, AirDrop, mail…).
 // Le fichier est préparé dès l'ouverture du panneau : iOS n'ouvre la feuille de partage que pendant
 // un appui, et lire toute la base après l'appui risquerait de laisser passer ce moment.
-// À n'afficher que pendant qu'il est ouvert (`{open && <ExportSheet … />}`).
+// À n'afficher que pendant qu'il est ouvert, en le gardant le temps de sa sortie
+// (`usePresence`, voir BackupSection).
 import { useEffect, useRef, useState } from 'react'
 import Button from '../../components/Button.tsx'
 import Card from '../../components/Card.tsx'
@@ -37,7 +38,7 @@ async function shareFile(file: File): Promise<'fait' | 'annule' | 'echec'> {
   return 'fait'
 }
 
-function ExportSheet({ onClose }: { onClose: () => void }) {
+function ExportSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [prepared, setPrepared] = useState<Prepared | null>(null)
   const [error, setError] = useState<string | null>(null)
   const busy = useRef(false)
@@ -75,7 +76,7 @@ function ExportSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <Sheet open onClose={onClose} label="Exporter mes données">
+    <Sheet open={open} onClose={onClose} label="Exporter mes données">
       <div>
         <h2 className="text-title font-bold">Exporter mes données</h2>
         <p className="mt-1.5 text-body text-muted">Un fichier avec tout ce que contient l’app. Range-le dans Fichiers ou envoie-le-toi : c’est ta copie de secours.</p>

@@ -5,10 +5,7 @@
 // avant de quitter la page. Il doit la quitter pour de bon : même invisible, un voile `fixed`
 // qui couvre le haut de l'écran colore la barre d'état d'iOS (leçon du J4).
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { prefersReducedMotion } from '../features/motion/useMotion.ts'
-
-/** Durée de la sortie, en ms (duration-base de tokens.md). */
-const EXIT_MS = 200
+import { EXIT_MS, prefersReducedMotion } from '../features/motion/useMotion.ts'
 
 type Props = { open: boolean; onClose: () => void; label: string; children: ReactNode }
 

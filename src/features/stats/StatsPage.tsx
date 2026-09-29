@@ -32,6 +32,7 @@ import {
 import { useBlocks } from '../blocks/useBlocks.ts'
 import { useAllSets, useExercisesById, useFinishedSessions } from '../sessions/useSession.ts'
 import { useSettings } from '../settings/useSettings.ts'
+import { usePresence } from '../motion/useMotion.ts'
 import { useNowOnResume } from '../timer/useNow.ts'
 import { HorizontalBars, Legend, TimeChart, WeekColumns } from './charts.tsx'
 import GoalsSheet from './GoalsSheet.tsx'
@@ -88,11 +89,13 @@ function StatsPage() {
   const now = useNowOnResume()
   const [weighing, setWeighing] = useState(false)
   const [goals, setGoals] = useState(false)
+  // Le panneau de pesée reste affiché le temps de sa sortie (J10)
+  const weighPresence = usePresence(weighing)
 
   if (!sessions || !sets || !exercises || !blocks || !weights || !settings) return null
 
   const from = periodStart(period, now)
-  const weighIn = weighing && <WeighInSheet weights={weights} onClose={() => setWeighing(false)} />
+  const weighIn = weighPresence.item && <WeighInSheet open={weighPresence.open} weights={weights} onClose={() => setWeighing(false)} />
 
   if (sessions.length === 0 && weights.length === 0) {
     return (

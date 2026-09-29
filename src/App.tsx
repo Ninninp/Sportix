@@ -12,9 +12,9 @@ import { pageAnimation, type PageAnimation } from './lib/motion.ts'
 /** Entrée de la page selon d'où l'on vient (J10) : durées de tokens.md. */
 const PAGE_ANIMATIONS: Record<PageAnimation, string> = {
   seance: 'animate-[sx-seance-monte_320ms_var(--ease-out)]',
-  droite: 'animate-[sx-page-droite_260ms_var(--ease-out)]',
-  gauche: 'animate-[sx-page-gauche_260ms_var(--ease-out)]',
-  fondu: 'animate-[sx-fondu_200ms_var(--ease-out)]',
+  droite: 'animate-[sx-page-droite_400ms_var(--ease-glisse)]',
+  gauche: 'animate-[sx-page-gauche_400ms_var(--ease-glisse)]',
+  fondu: 'animate-[sx-fondu_280ms_var(--ease-glisse)]',
 }
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,

@@ -11,7 +11,7 @@ function Chip({ selected, className = '', children, ...rest }: Props) {
       aria-pressed={selected}
       className={
         'inline-flex min-h-12 shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-4 text-body font-semibold ' +
-        'transition-transform duration-[120ms] ease-out active:scale-[0.97] ' +
+        'transition-[transform,background-color,border-color,color] duration-200 ease-out active:scale-[0.97] ' +
         (selected ? 'border-inverse bg-inverse text-on-inverse ' : 'border-border-strong bg-transparent text-text ') +
         className
       }

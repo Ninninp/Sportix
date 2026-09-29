@@ -109,6 +109,8 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  /* Glissements de pages et de mois : arrivée plus longue et très douce (ease-out-quart) */
+  --ease-glisse: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Styles de base de l'app */
@@ -236,13 +238,26 @@
 @keyframes sx-page-droite {
   from {
     opacity: 0;
-    transform: translateX(32px);
+    transform: translateX(48px);
   }
 }
 @keyframes sx-page-gauche {
   from {
     opacity: 0;
-    transform: translateX(-32px);
+    transform: translateX(-48px);
+  }
+}
+/* Sortie de l'ancien mois du calendrier, avant l'arrivée du nouveau */
+@keyframes sx-sort-gauche {
+  to {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+@keyframes sx-sort-droite {
+  to {
+    opacity: 0;
+    transform: translateX(28px);
   }
 }
 @keyframes sx-fondu {

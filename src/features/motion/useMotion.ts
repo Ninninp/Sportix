@@ -35,3 +35,27 @@ export function useCountUp(target: number, duration = COUNT_UP_MS): number {
 
   return done ? target : shown
 }
+
+/** Durée de sortie d'un panneau ou d'une page qui s'en va (duration-base de tokens.md), en ms. */
+export const EXIT_MS = 200
+
+/**
+ * Garde affiché ce qui vient de disparaître, le temps de son animation de sortie (J10).
+ * Un panneau construit avec `{ouvert && <Panneau />}` est retiré de la page à la seconde même où
+ * `ouvert` devient faux : il n'a aucune chance de redescendre. Avec `usePresence`, `item` garde la
+ * dernière valeur non vide jusqu'à la fin de la sortie, et `open` dit si le panneau doit être ouvert :
+ *   const p = usePresence(exporting)
+ *   {p.item && <ExportSheet open={p.open} … />}
+ * Avec « Réduire les animations » la sortie est immédiate.
+ */
+export function usePresence<T>(value: T | null | undefined | false): { item: T | undefined; open: boolean } {
+  const [kept, setKept] = useState<T | undefined>(value || undefined)
+  // Pendant un rendu, comme la doc de React le prévoit pour « retenir une valeur d'un rendu à l'autre »
+  if (value && kept !== value) setKept(value)
+  useEffect(() => {
+    if (value) return
+    const timer = window.setTimeout(() => setKept(undefined), prefersReducedMotion() ? 0 : EXIT_MS + 60)
+    return () => window.clearTimeout(timer)
+  }, [value])
+  return { item: value || kept, open: Boolean(value) }
+}
