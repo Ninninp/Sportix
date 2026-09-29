@@ -7,8 +7,9 @@
 // - J6 : la ligne du bloc en cours (« Bloc Force » + barre des semaines), SOUS les chiffres de la
 //   semaine et juste avant la grande carte (place choisie dans le canvas J6) ; elle ouvre le bloc.
 // - J10 : l'accueil ne s'affiche plus d'un bloc. Les parties arrivent en cascade (60 ms d'écart),
-//   les chiffres de la semaine défilent jusqu'à leur valeur, les pastilles des jours faits
-//   rebondissent l'une après l'autre, les lignes de la grande carte suivent.
+//   les chiffres de la semaine défilent jusqu'à leur valeur, les lignes de la grande carte suivent.
+//   Les pastilles des jours faits n'ont volontairement aucune animation (retiré à la demande de
+//   l'utilisateur le 29/09/2026 : le rebond gênait).
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import Card from '../../components/Card.tsx'
@@ -262,10 +263,8 @@ function HomePage() {
             >
               <span
                 className={`size-6 rounded-full ${
-                  d.done ? 'sx-pop border-2 border-inverse bg-inverse' : d.today ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'
+                  d.done ? 'border-2 border-inverse bg-inverse' : d.today ? 'border-[3px] border-text' : 'border-[1.5px] border-border-strong'
                 }`}
-                // Les jours faits se remplissent l'un après l'autre, pendant que les chiffres défilent
-                style={d.done ? { animationDelay: `${200 + staggerDelay(i, 50)}ms` } : undefined}
               />
               {d.letter}
             </div>
