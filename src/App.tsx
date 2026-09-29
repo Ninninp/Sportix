@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import BottomNav from './components/BottomNav.tsx'
-import PageStage from './features/motion/PageStage.tsx'
 import SessionBar from './features/sessions/SessionBar.tsx'
 import { useActiveSession } from './features/sessions/useSession.ts'
 import { useSettings } from './features/settings/useSettings.ts'
@@ -13,11 +12,9 @@ import { pageAnimation, type PageAnimation } from './lib/motion.ts'
 /** Entrée de la page selon d'où l'on vient (J10) : durées de tokens.md. */
 const PAGE_ANIMATIONS: Record<PageAnimation, string> = {
   seance: 'animate-[sx-seance-monte_320ms_var(--ease-out)]',
-  // Glissement (courbe douce) et fondu (ease-in-out, complémentaire de celui de l'ancienne page,
-  // voir PageStage) sont deux animations distinctes sur le même élément
-  droite: 'animate-[sx-glisse-droite_400ms_var(--ease-glisse),sx-fondu_280ms_ease-in-out]',
-  gauche: 'animate-[sx-glisse-gauche_400ms_var(--ease-glisse),sx-fondu_280ms_ease-in-out]',
-  fondu: 'animate-[sx-fondu_280ms_ease-in-out]',
+  droite: 'animate-[sx-page-droite_400ms_var(--ease-glisse)]',
+  gauche: 'animate-[sx-page-gauche_400ms_var(--ease-glisse)]',
+  fondu: 'animate-[sx-fondu_280ms_var(--ease-glisse)]',
 }
 
 // Mise en page commune : la page courante s'affiche à la place de <Outlet />,
@@ -55,18 +52,15 @@ function App() {
           (`pageAnimation`) : la séance monte, un niveau plus bas glisse depuis la droite, un niveau
           plus haut depuis la gauche, un autre onglet en fondu. `data-seance` sert à « Réduire »
           (SessionHeader), qui fait redescendre la séance avant de la quitter. */}
-      <PageStage path={pathname} animation={page.animation}>
-        <div
-          key={pathname}
-          data-page=""
-          data-seance={inSession ? '' : undefined}
-          className={`flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)] ${
-            page.animation ? PAGE_ANIMATIONS[page.animation] : ''
-          }`}
-        >
-          <Outlet />
-        </div>
-      </PageStage>
+      <div
+        key={pathname}
+        data-seance={inSession ? '' : undefined}
+        className={`flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)] ${
+          page.animation ? PAGE_ANIMATIONS[page.animation] : ''
+        }`}
+      >
+        <Outlet />
+      </div>
       {fullScreen ? (
         <div aria-hidden="true" className="h-[env(safe-area-inset-bottom)] shrink-0" />
       ) : (

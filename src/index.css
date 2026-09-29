@@ -248,34 +248,6 @@
     transform: translateX(-48px);
   }
 }
-/* Pages : le glissement et le fondu sont deux animations séparées (courbes différentes), pour que
-   le fondu enchaîné soit exact : la nouvelle page monte de 0 à 1, l'ancienne descend de 1 à 0 avec
-   la même durée et la même courbe (PageStage.tsx) */
-@keyframes sx-glisse-droite {
-  from {
-    transform: translateX(48px);
-  }
-}
-@keyframes sx-glisse-gauche {
-  from {
-    transform: translateX(-48px);
-  }
-}
-@keyframes sx-deplace-gauche {
-  to {
-    transform: translateX(-28px);
-  }
-}
-@keyframes sx-deplace-droite {
-  to {
-    transform: translateX(28px);
-  }
-}
-/* La copie de l'ancienne page est une image figée : rien ne bouge à l'intérieur */
-.sx-fantome * {
-  animation: none !important;
-  transition: none !important;
-}
 /* Sortie de l'ancien mois du calendrier, avant l'arrivée du nouveau */
 @keyframes sx-sort-gauche {
   to {
