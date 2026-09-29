@@ -63,6 +63,8 @@ Contraintes structurantes :
 
 L'auteur est **débutant en développement web** et travaille **en français**. Répondre en français, expliquer les choix et le rôle des fichiers créés plutôt que livrer du code sans commentaire.
 
+**Après chaque déploiement** (push sur `main`), la toute dernière ligne de la réponse est la version poussée, au format `version <commit court> - <JJ/MM/AAAA>`, par exemple `version 1d90e1f - 29/09/2026` (demandé par l'utilisateur le 29/09/2026). C'est ce qui permet de vérifier que l'app de l'iPhone est à jour : le même numéro s'affiche en bas des Réglages.
+
 ## Stack
 
 Installé : Vite 8 + React 19 + TypeScript 6 · Tailwind CSS v4 (plugin `@tailwindcss/vite`) · React Router v8 (paquet `react-router`, pas `react-router-dom`) · Vitest 5 · oxlint (config `.oxlintrc.json`, ignore `.claude/` et `design/`) · `vite-plugin-pwa` + `@vite-pwa/assets-generator` (J1) · Dexie + `dexie-react-hooks`, `fake-indexeddb` en dev (J2). Node ≥ 24 (`.nvmrc`).
