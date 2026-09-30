@@ -13,27 +13,11 @@
   <picture><source media="(prefers-color-scheme: dark)" srcset="docs/images/exercice-dark.png"><img src="docs/images/exercice-light.png" alt="Progression d'un exercice" width="190"></picture>
 </p>
 
-<<<<<<< Updated upstream
-- **Bibliothèque d'exercices** : 32 exercices fournis, ajout, modification et suppression.
-- **Séances** : séance libre ou tirée d'un programme, saisie série par série avec un pavé − / +, charges pré-remplies et double progression, records, récapitulatif et historique.
-- **Minuteur de repos** : lancé à chaque série validée, juste même écran verrouillé, son en fin de repos, écran gardé allumé.
-- **Programmes** : jours d'entraînement en rotation (A → B → A…), accueil avec les chiffres de la semaine.
-- **Calendrier des blocs** : vue mensuelle, blocs colorés d'une durée en semaines avec objectif, programme et semaine de deload facultative ; les séances sont rattachées au bloc en cours.
-- **Stats** : progression par exercice (1RM estimé, charges, volume), records, séances par semaine, séries par muscle, comparaison de deux blocs, suivi du poids de corps et objectifs.
-- **Finitions** : thème Auto / Clair / Sombre, séries d'échauffement, supersets.
-- **Animations** : pages qui glissent, panneaux, validation d'une série, récap, graphiques qui se tracent ; « Réduire les animations » d'iOS respecté.
-- **Sauvegarde** : export des données dans un fichier JSON (partage iOS ou téléchargement) et import ; une pastille rappelle de sauvegarder.
-=======
 Sportix est une application de suivi d'entraînement en salle, conçue pour le téléphone. Elle se saisit d'une main entre deux séries, marche sans connexion, et garde toutes vos données sur votre appareil : pas de compte, pas de serveur, pas de publicité.
->>>>>>> Stashed changes
 
 **Essayer l'app : https://ninninp.github.io/Sportix/**
 
-<<<<<<< Updated upstream
-**Tous les jalons du plan (J0 à J10) sont codés et validés sur l'iPhone** (29/09/2026), J9 (finitions : thème manuel, échauffement, supersets) et J10 (animations) compris. La suite dépendra de l'usage à la salle. Le détail est dans [`docs/PLAN.md`](docs/PLAN.md), la source de vérité du projet.
-=======
 Sur iPhone : ouvrir le lien dans Safari → Partager → « Sur l'écran d'accueil ». Elle s'utilise ensuite comme une app ordinaire, même en mode avion.
->>>>>>> Stashed changes
 
 ## Pourquoi Sportix
 
@@ -64,7 +48,7 @@ La plupart des carnets d'entraînement enregistrent des séances. Sportix ajoute
 ### Vos données vous appartiennent
 - **Export et import** en un fichier JSON : changer de téléphone ou garder une copie à l'abri se fait en deux appuis.
 - Un rappel discret vous invite à sauvegarder quand ça devient utile.
-- Thème clair, sombre ou automatique.
+- Thème clair, sombre ou automatique, et des animations discrètes (le réglage « Réduire les animations » d'iOS est respecté).
 
 ## Installer et lancer en local
 
